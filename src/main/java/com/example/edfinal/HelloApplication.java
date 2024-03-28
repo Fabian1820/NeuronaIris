@@ -18,7 +18,13 @@ public class HelloApplication extends Application {
     }
 
     public static void main(String[] args) {
-        launch();
+        //launch();
         System.out.println("edgfgdfvc");
+
+        int[][] data = {{3,2,1,4}, {4,5,6,7}, {8,6,4,3}, {9,7,5,6}};
+
+        System.out.println(data.length);
+
+
     }
 }
