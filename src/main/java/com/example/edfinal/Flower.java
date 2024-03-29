@@ -3,7 +3,6 @@ package com.example.edfinal;
 import java.util.Random;
 
 public class Flower {
-    private String type;
     private double petalWidth;
     private double petalLength;
     private double sepalWidth;
@@ -11,7 +10,7 @@ public class Flower {
 
     public Flower(String type, double petalWidth, double petalLength, double sepalWidth, double sepalLength)
     {
-        setType(type);
+
         setPetalWidth(petalWidth);
         setPetalLength(petalLength);
         setSepalWidth(sepalWidth);
@@ -20,7 +19,10 @@ public class Flower {
 
     public Flower()
     {
-        Random r = new Random();
+        this.petalWidth=RandomFeaturesPicker.randomPetalWidth();
+        this.petalLength=RandomFeaturesPicker.randomPetalLength();
+        this.sepalLength=RandomFeaturesPicker.randomSepalLength();
+        this.sepalWidth=RandomFeaturesPicker.randomSepalWidth();
     }
 
     private void setSepalLength(double sepalLength) {
@@ -43,8 +45,20 @@ public class Flower {
         this.petalWidth=petalWidth;
     }
 
-    private void setType(String type) {
-        //validaciones luego
-        this.type=type;
+    public double getPetalWidth() {
+        return this.petalWidth;
     }
+
+    public double getPetalLength() {
+        return this.petalLength;
+    }
+
+    public double getSepalWidth() {
+        return this.sepalWidth;
+    }
+
+    public double getSepalLength() {
+        return this.sepalLength;
+    }
+
 }
