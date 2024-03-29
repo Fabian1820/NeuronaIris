@@ -1,5 +1,7 @@
 package com.example.edfinal;
 
+import java.util.Random;
+
 public class RandomFeaturesPicker {
 //                  Min  Max
 //    sepal length: 4.3  7.9
@@ -17,23 +19,31 @@ public class RandomFeaturesPicker {
     private static double petalWidthMin = 0.1;
     private static double petalWidthMax = 2.5;
 
-//    public static double randomSepalLength()
-//    {
-//
-//    }
-//
-//    public static double randomSepalWidth()
-//    {
-//
-//    }
-//
-//    public static double randomPetalLength()
-//    {
-//
-//    }
-//
-//    public static double randomPetalWidth()
-//    {
-//
-//    }
+    public static double randomSepalLength()
+    {
+        Random rand = new Random();
+
+        return sepalLengthMin + (sepalLengthMax-sepalLengthMin) * rand.nextDouble();
+    }
+
+    public static double randomSepalWidth()
+    {
+        Random rand = new Random();
+
+        return sepalWidthMin + (sepalWidthMax-sepalWidthMin) * rand.nextDouble();
+    }
+
+    public static double randomPetalLength()
+    {
+         Random rand = new Random();
+
+         return petalLengthMin + (petalLengthMax-petalLengthMin) * rand.nextDouble();
+    }
+
+    public static double randomPetalWidth()
+    {
+        Random rand = new Random();
+
+        return petalWidthMin + (petalWidthMax-petalWidthMin) * rand.nextDouble();
+    }
 }

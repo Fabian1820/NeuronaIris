@@ -25,6 +25,21 @@ public class HelloApplication extends Application {
 
         System.out.println(data.length);
 
+        System.out.println("4.3       7.9");
+        int i = 20;
+        while(i!=0)
+        {
+            System.out.println(RandomFeaturesPicker.randomSepalLength());
+            i--;
+        }
+
+        System.out.println("2.0  4.4");
+        i = 20;
+        while(i!=0)
+        {
+            System.out.println(RandomFeaturesPicker.randomSepalWidth());
+            i--;
+        }
 
     }
 }
