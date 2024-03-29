@@ -12,12 +12,19 @@ public class HelloApplication extends Application {
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 320, 240);
-        stage.setTitle("Hello!");
+        stage.setTitle("Hello! soy clari la tank");
         stage.setScene(scene);
         stage.show();
     }
 
     public static void main(String[] args) {
-        launch();
+        //launch();
+        System.out.println("edgfgdfvc");
+
+        int[][] data = {{3,2,1,4}, {4,5,6,7}, {8,6,4,3}, {9,7,5,6}};
+
+        System.out.println(data.length);
+
+
     }
 }
