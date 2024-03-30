@@ -25,6 +25,8 @@ public class HelloApplication extends Application {
 
         System.out.println(data.length);
 
+
+
         System.out.println("4.3       7.9");
         int i = 20;
         while(i!=0)
