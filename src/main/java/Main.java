@@ -25,7 +25,7 @@ public class Main {
 
         ContadorGrupos contador = new ContadorGrupos();
         int cantidadGrupos = contador.contarGrupos(som.obtenerNeuronas());
-        System.out.println("Cantidad de grupos formados: " + cantidadGrupos);
+        System.out.println("Cantidad deE grupos formados: " + cantidadGrupos);
 
         FABIAN FDEZ, [24/03/2024 19:42]
 
