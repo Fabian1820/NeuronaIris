@@ -1,5 +1,6 @@
 package com.example.edfinal;
 
+import cu.edu.cujae.ceis.graph.Graph;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
