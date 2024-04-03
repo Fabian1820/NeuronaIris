@@ -12,7 +12,7 @@ public class Main {
             e.printStackTrace();
             return;
         }
-        FABIAN FDEZ, [24/03/2024 19:41]
+
 
         som.entrenar(flores);
 
@@ -27,7 +27,7 @@ public class Main {
         int cantidadGrupos = contador.contarGrupos(som.obtenerNeuronas());
         System.out.println("Cantidad deE grupos formados: " + cantidadGrupos);
 
-        FABIAN FDEZ, [24/03/2024 19:42]
+       
 
         try {
             Files.write(Paths.get("ruta/a/tu/configuracion.txt"), Collections.singleton(String.valueOf(cantidadGrupos)));

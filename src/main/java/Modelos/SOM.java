@@ -1,8 +1,11 @@
 package Modelos;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class SOM {
     private List<Neurona> neuronas;
-    private int M; // Máximo número de neuronas.
+    private int M; // Máximo número de neuronaas.
     private double L0; // Factor de aprendizaje inicial.
     private int J; // Número máximo de iteraciones.
 
@@ -26,7 +29,7 @@ public class SOM {
 
     private double funcionVecindad(int indiceBMU, int indiceNeurona, int iteracion) {
         double theta = (double) M / (2 * iteracion);
-        double distancia = distanciaEuclidiana(neuronas.get(indiceBMU).obtenerPesos(), neuronas.get(indiceNeurona).obtenerPesos());
+        double distancia = distanciaEuclidiana(neuronas.get(indiceBMU).getPesos(), neuronas.get(indiceNeurona).getPesos());
         return Math.exp(-Math.pow(distancia, 2) / (2 * Math.pow(theta, 2)));
     }
 

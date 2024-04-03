@@ -1,5 +1,8 @@
 package Modelos;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Neurona {
     private double[] pesos;
     private List<Flor> floresAsignadas;
