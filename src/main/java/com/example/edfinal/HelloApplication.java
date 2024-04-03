@@ -20,29 +20,61 @@ public class HelloApplication extends Application {
 
     public static void main(String[] args) {
         //launch();
-        System.out.println("edgfgdfvc");
+//        System.out.println("edgfgdfvc");
+//
+//        int[][] data = {{3,2,1,4}, {4,5,6,7}, {8,6,4,3}, {9,7,5,6}};
+//
+//        System.out.println(data.length);
+//
 
-        int[][] data = {{3,2,1,4}, {4,5,6,7}, {8,6,4,3}, {9,7,5,6}};
 
-        System.out.println(data.length);
+//        System.out.println("4.3       7.9");
+//        int i = 20;
+//        while(i!=0)
+//        {
+//            System.out.println(RandomFeaturesPicker.randomSepalLength());
+//            i--;
+//        }
+//
+//        System.out.println("2.0  4.4");
+//        i = 20;
+//        while(i!=0)
+//        {
+//            System.out.println(RandomFeaturesPicker.randomSepalWidth());
+//            i--;
+//        }
 
+//        Flower f = new Flower();
+//        SOMNeuron neurona = new SOMNeuron(1, f);
+//
+//        Flower f2 = new Flower();
+//
+//        System.out.println("Neurona pesos");
+//        System.out.println(((Flower)neurona.getInfo()).getPetalLength());
+//        System.out.println(((Flower)neurona.getInfo()).getPetalWidth());
+//        System.out.println(((Flower)neurona.getInfo()).getSepalLength());
+//        System.out.println(((Flower)neurona.getInfo()).getPetalWidth());
+//
+//        System.out.println("\nFlor pesos");
+//        System.out.println(f2.getPetalLength());
+//        System.out.println(f2.getPetalWidth());
+//        System.out.println(f2.getSepalLength());
+//        System.out.println(f2.getPetalWidth());
+//
+//        System.out.println();
+//        System.out.println(neurona.euclidianDistance(f2));
 
+        SOM mapa = new SOM();
+        mapa.initialize();
 
-        System.out.println("4.3       7.9");
-        int i = 20;
-        while(i!=0)
-        {
-            System.out.println(RandomFeaturesPicker.randomSepalLength());
-            i--;
-        }
+        Flower f = new Flower();
+        System.out.println(f.getSepalLength());
+        System.out.println(f.getSepalWidth());
+        System.out.println(f.getPetalLength());
+        System.out.println(f.getPetalWidth());
 
-        System.out.println("2.0  4.4");
-        i = 20;
-        while(i!=0)
-        {
-            System.out.println(RandomFeaturesPicker.randomSepalWidth());
-            i--;
-        }
+        SOMNeuron bmu = mapa.findBMU(f);
+        System.out.println(bmu.getId());
 
     }
 }

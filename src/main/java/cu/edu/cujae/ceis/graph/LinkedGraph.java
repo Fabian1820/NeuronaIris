@@ -24,7 +24,7 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 	/**
 	 * Lista de vértices.
 	 */
-	private LinkedList<Vertex> verticesList;
+	protected LinkedList<Vertex> verticesList;
 	
 	public LinkedGraph() {
 		verticesList = new LinkedList<Vertex>();

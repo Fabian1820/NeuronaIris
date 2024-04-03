@@ -1,22 +1,28 @@
 package com.example.edfinal;
 
-public class SOMNeuron {
+import cu.edu.cujae.ceis.graph.vertex.Vertex;
+import cu.edu.cujae.ceis.graph.vertex.WeightedVertex;
 
-    private Flower flower;
-
-    public SOMNeuron()
+public class SOMNeuron extends Vertex{
+    private int id;
+    public SOMNeuron( int id, Flower flower)
     {
-        this.flower= new Flower();
+        super(flower);
+        this.id=id;
     }
 
     public double euclidianDistance(Flower flower)
     {
-        double petalLengthDist = Math.pow((this.flower.getPetalLength()-flower.getPetalLength()),2);
-        double petalWidthDist = Math.pow((this.flower.getPetalWidth()-flower.getPetalWidth()),2);
-        double sepalLengthDist = Math.pow((this.flower.getSepalLength()-flower.getSepalLength()),2);
-        double sepalWidthDist = Math.pow((this.flower.getSepalWidth()-flower.getSepalWidth()),2);
+        double petalLengthDist = Math.pow((((Flower)this.getInfo()).getPetalLength()-flower.getPetalLength()),2);
+        double petalWidthDist = Math.pow((((Flower)this.getInfo()).getPetalWidth()-flower.getPetalWidth()),2);
+        double sepalLengthDist = Math.pow((((Flower)this.getInfo()).getSepalLength()-flower.getSepalLength()),2);
+        double sepalWidthDist = Math.pow((((Flower)this.getInfo()).getSepalWidth()-flower.getSepalWidth()),2);
 
         return Math.sqrt( petalLengthDist +  petalWidthDist + sepalLengthDist + sepalWidthDist);
     }
 
+    public int getId()
+    {
+        return this.id;
+    }
 }
