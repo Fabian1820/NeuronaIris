@@ -1,5 +1,9 @@
 package Utilidades;
 
+import Modelos.Neurona;
+
+import java.util.List;
+
 public class EscritorGrupos {
     public void escribirGrupos(List<Neurona> neuronas, String rutaArchivo) throws IOException {
         BufferedWriter escritor = new BufferedWriter(new FileWriter(rutaArchivo));
