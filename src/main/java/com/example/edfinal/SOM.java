@@ -12,6 +12,7 @@ public class SOM extends LinkedGraph {
     public SOM()
     {
       super();
+      this.currentEpoch = 1;
     }
 
     public void initialize()
