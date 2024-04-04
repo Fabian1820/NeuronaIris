@@ -2,10 +2,7 @@ package com.example.edfinal;
 import cu.edu.cujae.ceis.graph.LinkedGraph;
 import cu.edu.cujae.ceis.graph.vertex.Vertex;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Random;
+import java.util.*;
 
 public class SOM extends LinkedGraph {
     public SOM()
@@ -21,18 +18,25 @@ public class SOM extends LinkedGraph {
         makeConnections();
     }
 
+    //This method guaranties that the first two neurons in the edges list of each
+    //neuron to be the two previous ones and the other two be the two following neurons
     private void makeConnections()
     {   int i;
+
+        this.insertEdgeDG(0,this.verticesList.size()-2);
+        this.insertEdgeDG(0,this.verticesList.size()-1);
+        this.insertEdgeDG(1,this.verticesList.size()-1);
+
         for(i=0;i<this.verticesList.size()-2;i++)
         {
             this.insertEdgeNDG(i,i+1);
             this.insertEdgeNDG(i, i+2);
         }
-        this.insertEdgeNDG(i, ++i);        //Esta seria la conexion de la penultima neurona con la ultima y la primera
-        this.insertEdgeNDG(i, 0);
 
-        this.insertEdgeNDG(i, 0); //Esta seria la conexion de la ultima neurona con las dos primeras
-        this.insertEdgeNDG(i, 1);
+        this.insertEdgeNDG(i, i+1); //Esta seria la conexion de la penultima neurona con la ultima y la primera
+        this.insertEdgeDG(i, 0);
+        this.insertEdgeDG(++i, 0); //Esta seria la conexion de la ultima neurona con las dos primeras
+        this.insertEdgeDG(i, 1);
     }
     public SOMNeuron findBMU(Flower flower)
     {
