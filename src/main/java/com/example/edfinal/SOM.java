@@ -5,6 +5,10 @@ import cu.edu.cujae.ceis.graph.vertex.Vertex;
 import java.util.*;
 
 public class SOM extends LinkedGraph {
+
+    private static double initialLearningRate = 1.0;
+    private static int epochs = 150;
+    private int currentEpoch;
     public SOM()
     {
       super();
