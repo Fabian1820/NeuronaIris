@@ -8,7 +8,7 @@ public class Flower {
     private double sepalWidth;
     private double sepalLength;
 
-    public Flower(String type, double petalWidth, double petalLength, double sepalWidth, double sepalLength)
+    public Flower(double sepalLength, double sepalWidth, double petalLength, double petalWidth )
     {
 
         setPetalWidth(petalWidth);

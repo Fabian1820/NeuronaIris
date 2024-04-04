@@ -1,5 +1,6 @@
 package com.example.edfinal;
 
+import com.example.edfinal.utiles.GestorTxt;
 import cu.edu.cujae.ceis.graph.Graph;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -7,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class HelloApplication extends Application {
     @Override
@@ -76,5 +78,8 @@ public class HelloApplication extends Application {
         SOMNeuron bmu = mapa.findBMU(f);
         System.out.println(bmu.getId());
 
+        ArrayList<Flower> flowers = GestorTxt.getDataBase();
+
+        System.out.println(flowers.size());
     }
 }
