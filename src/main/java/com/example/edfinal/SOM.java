@@ -9,6 +9,8 @@ public class SOM extends LinkedGraph {
     private static double initialLearningRate = 1.0;
     private static int epochs = 150;
     private int currentEpoch;
+
+    private int maxNumberNeurons;
     public SOM()
     {
       super();
@@ -62,6 +64,53 @@ public class SOM extends LinkedGraph {
         }
 
         return BMU;
+    }
+
+    public void train(){
+        for(int i=0;i<=epochs;i++)
+            train(GestorTxt.getDataBase());
+    }
+
+    public void train(ArrayList<Flower> dataBase){
+        for(Flower f : dataBase){
+            SOMNeuron bmu = this.findBMU(f);
+            updateBMUandAdjacents(bmu, f);
+        }
+    }
+
+    public void updateBMUandAdjacents(SOMNeuron bmu, Flower f){
+        if (!bmu.isUpdated()) {
+            updateWeights(bmu, f);
+            bmu.setUpdated(true);
+
+            LinkedList<Vertex> neighbors = bmu.getAdjacents(); // Conflicto obt vecinos
+            for (Vertex neighbor : neighbors) {
+                if (!((SOMNeuron)neighbor).isUpdated()) {
+                    updateWeights((SOMNeuron)neighbor, f);
+                    ((SOMNeuron)neighbor).setUpdated(true);
+                }
+            }
+        }
+    }
+    private void updateWeights(SOMNeuron neuron, Flower flower) {
+        double learningRate = calculateLearningRate();
+        double[] weights = neuron.//aqui obtener los pesos
+        double[] inputVector = {flower.getPetalWidth(), flower.getPetalLength(), flower.getSepalWidth(), flower.getSepalLength()};
+
+        for (int i = 0; i < weights.length; i++) {
+            weights[i] += learningRate * (inputVector[i] - weights[i]);
+        }
+    }
+    private double calculateLearningRate() {
+
+        double maxEpochs = (double) epochs;
+        double currentEpochNormalized = (double) currentEpoch / maxEpochs;
+
+        double initialEta = initialLearningRate;
+        double theta = maxNumberNeurons / (2.0 * currentEpoch); // Ajustar mNN
+        double eta = initialEta * Math.exp(-Math.pow(currentEpochNormalized, 2) / (2.0 * Math.pow(theta, 2)));
+
+        return eta;
     }
 
 }

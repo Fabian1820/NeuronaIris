@@ -5,10 +5,12 @@ import cu.edu.cujae.ceis.graph.vertex.WeightedVertex;
 
 public class SOMNeuron extends Vertex{
     private int id;
+    private boolean updated;
     public SOMNeuron( int id, Flower flower)
     {
         super(flower);
         this.id=id;
+        this.updated = false;
     }
 
     public double euclidianDistance(Flower flower)
@@ -24,5 +26,12 @@ public class SOMNeuron extends Vertex{
     public int getId()
     {
         return this.id;
+    }
+    public boolean isUpdated() {
+        return updated;
+    }
+
+    public void setUpdated(boolean updated) {
+        this.updated = updated;
     }
 }

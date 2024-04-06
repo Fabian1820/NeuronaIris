@@ -10,7 +10,6 @@ public class Flower {
 
     public Flower(String type, double petalWidth, double petalLength, double sepalWidth, double sepalLength)
     {
-
         setPetalWidth(petalWidth);
         setPetalLength(petalLength);
         setSepalWidth(sepalWidth);
