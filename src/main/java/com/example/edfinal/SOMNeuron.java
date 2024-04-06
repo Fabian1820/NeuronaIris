@@ -25,4 +25,13 @@ public class SOMNeuron extends Vertex{
     {
         return this.id;
     }
+
+    public void updateWeight(double influenceRate, double learningRate, Flower flower)
+    {
+        ((Flower)this.getInfo()).getSepalWidth()=this.updateFeature(influenceRate, learningRate, flower.getSepalWidth());
+        ((Flower)this.getInfo()).getSepalLength()=this.updateFeature(influenceRate, learningRate, flower.getSepalLength());
+        ((Flower)this.getInfo()).getPetalWidth()=this.updateFeature(influenceRate, learningRate, flower.getPetalWidth());
+        ((Flower)this.getInfo()).getPetalLength()=this.updateFeature(influenceRate, learningRate, flower.getPetalLength());
+    }
+
 }

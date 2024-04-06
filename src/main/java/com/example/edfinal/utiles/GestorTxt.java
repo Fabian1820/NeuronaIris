@@ -30,7 +30,7 @@ public class GestorTxt {
     }
 
     private static void loadFlowers(){
-
+        int i=1;
         BufferedReader bufer;
         try {
             bufer = new BufferedReader(new FileReader(GestorTxt.getPath()));
@@ -41,7 +41,8 @@ public class GestorTxt {
                 {
                     String[] partes = linea.split(",");
 
-                    System.out.println(partes.length);
+                    System.out.print(partes.length);
+                    System.out.println("   "+i++);
                     double sepalLength = Double.parseDouble(partes[0]);
                     double sepalWidth = Double.parseDouble(partes[1]);
                     double petalLength = Double.parseDouble(partes[2]);

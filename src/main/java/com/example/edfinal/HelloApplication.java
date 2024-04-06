@@ -67,6 +67,7 @@ public class HelloApplication extends Application {
 //        System.out.println(neurona.euclidianDistance(f2));
 
         SOM mapa = new SOM();
+
         mapa.initialize();
 
         Flower f = new Flower();
@@ -81,5 +82,10 @@ public class HelloApplication extends Application {
         ArrayList<Flower> flowers = GestorTxt.getDataBase();
 
         System.out.println(flowers.size());
+
+        for(int i=0;i<flowers.size();i++)
+        {
+           System.out.println((i+1) +"     "+(flowers.get(i).getSepalLength()+flowers.get(i).getSepalWidth())/2+"    "+(flowers.get(i).getPetalLength()+flowers.get(i).getPetalWidth())/2);
+        }
     }
 }
