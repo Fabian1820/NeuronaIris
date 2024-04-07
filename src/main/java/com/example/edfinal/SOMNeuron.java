@@ -28,10 +28,15 @@ public class SOMNeuron extends Vertex{
 
     public void updateWeight(double influenceRate, double learningRate, Flower flower)
     {
-        ((Flower)this.getInfo()).getSepalWidth()=this.updateFeature(influenceRate, learningRate, flower.getSepalWidth());
-        ((Flower)this.getInfo()).getSepalLength()=this.updateFeature(influenceRate, learningRate, flower.getSepalLength());
-        ((Flower)this.getInfo()).getPetalWidth()=this.updateFeature(influenceRate, learningRate, flower.getPetalWidth());
-        ((Flower)this.getInfo()).getPetalLength()=this.updateFeature(influenceRate, learningRate, flower.getPetalLength());
+        ((Flower)this.getInfo()).setSepalWidth(this.updateFeature(influenceRate, learningRate, flower.getSepalWidth(), ((Flower)this.getInfo()).getSepalWidth()));
+        ((Flower)this.getInfo()).setSepalLength(this.updateFeature(influenceRate, learningRate, flower.getSepalLength(), ((Flower) this.getInfo()).getSepalLength()));
+        ((Flower)this.getInfo()).setPetalWidth(this.updateFeature(influenceRate, learningRate, flower.getPetalWidth(), ((Flower) this.getInfo()).getPetalWidth()));
+        ((Flower)this.getInfo()).setPetalLength(this.updateFeature(influenceRate, learningRate, flower.getPetalLength(), ((Flower) this.getInfo()).getPetalLength()));
+    }
+
+    public double updateFeature(double influenceRate, double learningRate, double newWeight, double currentWeight){
+
+        return currentWeight += influenceRate * learningRate * (newWeight - currentWeight);
     }
 
 }

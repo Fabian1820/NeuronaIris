@@ -102,12 +102,29 @@ public class SOM extends LinkedGraph {
 
     public void updateBmuAndAdjacents(SOMNeuron bmu, Flower flower, int currentEpoch)
     {
-        //crear arrayList de actualizadas
-        //bmu.actualizarPesos
-        //crear arreglo con las cuatro adyacentes
-        //actualizar sus cuatro adyacentes con un metodo para eso
-        //llamar a actualizar por la izquierda
-        //llamar a actualizar por la derecha
+        ArrayList<SOMNeuron> updateNeuron = new ArrayList<SOMNeuron>();
+        int distance=0;
+        updateBMU(bmu, flower, currentEpoch, distance);
+        updateNeuron.add(bmu);
+
+        ArrayList<SOMNeuron> toUpdate = new ArrayList<SOMNeuron>();
+        LinkedList<Vertex> adjacents = bmu.getAdjacents();
+        Iterator<Vertex> iter = adjacents.iterator();
+        while (iter.hasNext()) {
+            SOMNeuron n = (SOMNeuron) iter.next();
+            toUpdate.add(n);
+        }
+
+        updateGroup(toUpdate, ++distance, flower, currentEpoch);
+        updateNeuron.addAll(toUpdate);
+        updateRadious(updateNeuron, (SOMNeuron) adjacents.getFirst(), distance, flower, 'L', currentEpoch);
+        updateRadious(updateNeuron, (SOMNeuron) adjacents.getLast(), distance, flower, 'R', currentEpoch);
+
+    }
+
+    public void updateBMU(SOMNeuron bmu, Flower f, int currentEpch, int distance){
+        double influenceRate = influenceRate(distance, currentEpch);
+        bmu.updateWeight(influenceRate, this.currentLearningRate, f);
     }
 
     public void updateRadious(ArrayList<SOMNeuron> updated, SOMNeuron current, int distance, Flower flower,char direction, int currentEpoch)
@@ -144,10 +161,10 @@ public class SOM extends LinkedGraph {
         return Math.exp((-Math.pow(distance,2))/(2*((double)totalNeurons/(2*currentEpoch))));
     }
 
-//    public double learningRate(int currentEpoch)
-//    {
-//        return (initialLearningRate * Math.exp((double) -currentEpoch / epochs));
-//    }
+    public double learningRate(int currentEpoch)
+    {
+        return (initialLearningRate * Math.exp((double) -currentEpoch / epochs));
+    }
 
     public ArrayList<SOMNeuron> checkNotUpdated(ArrayList<SOMNeuron> updated, LinkedList<Vertex> adjacents)
     {
@@ -166,3 +183,6 @@ public class SOM extends LinkedGraph {
         return toUpdate;
     }
 }
+
+
+
