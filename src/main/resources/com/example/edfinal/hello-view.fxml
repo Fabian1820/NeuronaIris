@@ -1,16 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
-
 <?import javafx.scene.control.Button?>
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.example.edfinal.HelloController">
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
-    </padding>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
 
-    <Label fx:id="welcomeText"/>
-    <Button text="Hello!" onAction="#onHelloButtonClick"/>
-</VBox>
+<AnchorPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" prefHeight="1000" prefWidth="1000" >
+   <children>
+      <Label alignment="CENTER" layoutX="149.0" layoutY="25.0" opacity="0.41" prefHeight="54.0" prefWidth="472.0" text="Classification of Iris Flowers" textAlignment="CENTER" textFill="#8a206f" textOverrun="CLIP" AnchorPane.leftAnchor="149.0" AnchorPane.rightAnchor="149.20000000000005">
+         <font>
+            <Font name="System Bold" size="36.0" />
+         </font>
+      </Label>
+      <AnchorPane layoutX="292.0" layoutY="261.0" prefHeight="276.0" prefWidth="446.0">
+         <children>
+            <ImageView fitHeight="170.0" fitWidth="142.0" layoutX="14.0" layoutY="57.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../Imagen/SETOSA.jpg" />
+               </image>
+            </ImageView>
+            <Label layoutX="133.0" layoutY="34.0" prefHeight="223.0" prefWidth="308.0" text="La Iris setosa es una planta perenne rizomatosa que forma un grupo de hojas rígidas, estrechas y parecidas a espadas, de color verde medio. Estas hojas miden entre 30 y 60 cm de largo y tienen una nervadura prominente y una base teñida de púrpura.Sus flores son de un color azul violáceo, con sépalos y pétalos de 6 a 9 cm de ancho. Los sépalos son pequeños y las caídas (pétalos inferiores) son grandes y redondeadas" textAlignment="CENTER" wrapText="true" />
+            <Label layoutX="164.0" layoutY="14.0" text="RESULTADO" />
+         </children>
+      </AnchorPane>
+      <HBox layoutX="68.0" layoutY="103.0" prefHeight="100.0" prefWidth="679.0">
+         <children>
+            <TextField prefHeight="42.0" prefWidth="130.0" promptText="SEPAL WIDTH" />
+            <TextField alignment="CENTER" prefHeight="42.0" prefWidth="122.0" promptText="SEPAL LENGTH" />
+            <Label text="Data Entry">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Label>
+            <TextField prefHeight="42.0" prefWidth="110.0" promptText="PETAL WIDTH" />
+            <TextField prefHeight="42.0" prefWidth="122.0" promptText="PETAL LENGTH" />
+         </children>
+      </HBox>
+      <Button layoutX="500.0" layoutY="203.0" mnemonicParsing="false" text="TRAIN" />
+      <Button layoutX="186.0" layoutY="203.0" mnemonicParsing="false" text="START" />
+   </children>
+</AnchorPane>
