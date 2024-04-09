@@ -39,4 +39,12 @@ public class SOMNeuron extends Vertex{
         return currentWeight += influenceRate * learningRate * (newWeight - currentWeight);
     }
 
+    public double averageSepalMeasurement(){
+        return (((Flower)this.getInfo()).getSepalWidth() * (((Flower)this.getInfo()).getSepalLength()))/2;
+    }
+
+    public double averagePetalMeasurement(){
+        return (((Flower)this.getInfo()).getPetalWidth() * (((Flower)this.getInfo()).getPetalLength()))/2;
+    }
+
 }
