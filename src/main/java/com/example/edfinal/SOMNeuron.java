@@ -36,7 +36,7 @@ public class SOMNeuron extends Vertex{
 
     public double updateFeature(double influenceRate, double learningRate, double newWeight, double currentWeight){
 
-        return currentWeight += influenceRate * learningRate * (newWeight - currentWeight);
+        return currentWeight + influenceRate * learningRate * (newWeight - currentWeight);
     }
 
 }

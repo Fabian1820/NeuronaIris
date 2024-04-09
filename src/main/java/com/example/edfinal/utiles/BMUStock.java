@@ -5,22 +5,34 @@ import com.example.edfinal.SOMNeuron;
 import java.util.ArrayList;
 
 public class BMUStock {
-    private ArrayList<SOMNeuron> setosa;
-    private ArrayList<SOMNeuron> versicolor;
-    private ArrayList<SOMNeuron> virginica;
+    private static ArrayList<SOMNeuron> setosa;
+    private static ArrayList<SOMNeuron> versicolor;
+    private static ArrayList<SOMNeuron> virginica;
 
-    public ArrayList<SOMNeuron> getSetosa()
+    public static ArrayList<SOMNeuron> getSetosa()
     {
-        return this.setosa;
+        if(setosa==null)
+        {
+            setosa = new ArrayList<>();
+        }
+        return setosa;
     }
 
-    public ArrayList<SOMNeuron> getVersicolor()
+    public static ArrayList<SOMNeuron> getVersicolor()
     {
-        return this.versicolor;
+        if(versicolor==null)
+        {
+            versicolor = new ArrayList<>();
+        }
+        return versicolor;
     }
 
-    public ArrayList<SOMNeuron> getVirginica()
+    public static ArrayList<SOMNeuron> getVirginica()
     {
-        return this.virginica;
+        if(virginica==null)
+        {
+            virginica = new ArrayList<>();
+        }
+        return virginica;
     }
 }

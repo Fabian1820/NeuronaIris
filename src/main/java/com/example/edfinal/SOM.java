@@ -1,4 +1,5 @@
 package com.example.edfinal;
+import com.example.edfinal.utiles.BMUStock;
 import com.example.edfinal.utiles.GestorTxt;
 import cu.edu.cujae.ceis.graph.LinkedGraph;
 import cu.edu.cujae.ceis.graph.vertex.Vertex;
@@ -26,7 +27,7 @@ public class SOM extends LinkedGraph {
 
     public void initialize()
     {
-        for(int i=1;i<7;i++) {
+        for(int i=1;i<151;i++) {
             this.getVerticesList().add(new SOMNeuron(i, new Flower()));
         }
         makeConnections();
@@ -75,10 +76,43 @@ public class SOM extends LinkedGraph {
 
     public void groupBmus(ArrayList<Flower> dataBase)
     {
-        for(int i=0;i<49;i++)
+        int i=0;
+        while(i<50)
         {
-            
+            BMUStock.getSetosa().add(this.findBMU(dataBase.get(i)));
+            i++;
         }
+        while(i<100)
+        {
+            BMUStock.getVersicolor().add(this.findBMU(dataBase.get(i)));
+            i++;
+        }
+        while(i<150)
+        {
+            BMUStock.getVirginica().add(this.findBMU(dataBase.get(i)));
+            i++;
+        }
+    }
+
+    public String classify(SOMNeuron bmu)
+    {
+        String resp = "";
+        if(BMUStock.getSetosa().contains(bmu))
+        {
+            resp="setosa";
+        }
+        else
+            if (BMUStock.getVersicolor().contains(bmu))
+            {
+                resp="versicolor";
+            }
+            else
+                if (BMUStock.getVirginica().contains(bmu))
+                 {
+                    resp="virginica";
+                 }
+
+      return resp;
     }
 
     public void train()
@@ -102,10 +136,10 @@ public class SOM extends LinkedGraph {
 
     public void updateBmuAndAdjacents(SOMNeuron bmu, Flower flower, int currentEpoch)
     {
-        ArrayList<SOMNeuron> updateNeuron = new ArrayList<SOMNeuron>();
+        ArrayList<SOMNeuron> updated = new ArrayList<SOMNeuron>();
         int distance=0;
         updateBMU(bmu, flower, currentEpoch, distance);
-        updateNeuron.add(bmu);
+        updated.add(bmu);
 
         ArrayList<SOMNeuron> toUpdate = new ArrayList<SOMNeuron>();
         LinkedList<Vertex> adjacents = bmu.getAdjacents();
@@ -116,9 +150,9 @@ public class SOM extends LinkedGraph {
         }
 
         updateGroup(toUpdate, ++distance, flower, currentEpoch);
-        updateNeuron.addAll(toUpdate);
-        updateRadious(updateNeuron, (SOMNeuron) adjacents.getFirst(), distance, flower, 'L', currentEpoch);
-        updateRadious(updateNeuron, (SOMNeuron) adjacents.getLast(), distance, flower, 'R', currentEpoch);
+        updated.addAll(toUpdate);
+        updateRadious(updated, (SOMNeuron) adjacents.getFirst(), ++distance, flower, 'L', currentEpoch);
+        updateRadious(updated, (SOMNeuron) adjacents.getLast(), ++distance, flower, 'R', currentEpoch);
 
     }
 

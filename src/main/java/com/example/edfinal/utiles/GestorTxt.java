@@ -41,8 +41,6 @@ public class GestorTxt {
                 {
                     String[] partes = linea.split(",");
 
-                    System.out.print(partes.length);
-                    System.out.println("   "+i++);
                     double sepalLength = Double.parseDouble(partes[0]);
                     double sepalWidth = Double.parseDouble(partes[1]);
                     double petalLength = Double.parseDouble(partes[2]);
