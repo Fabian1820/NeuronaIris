@@ -45,8 +45,9 @@ public class GestorTxt {
                     double sepalWidth = Double.parseDouble(partes[1]);
                     double petalLength = Double.parseDouble(partes[2]);
                     double petalWidth = Double.parseDouble(partes[3]);
+                    String type = partes[4];
 
-                    Flower f = new Flower(sepalLength, sepalWidth, petalLength, petalWidth);
+                    Flower f = new Flower(sepalLength, sepalWidth, petalLength, petalWidth, type);
                     flowers.add(f);
                 }
 

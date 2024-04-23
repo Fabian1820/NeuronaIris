@@ -74,6 +74,32 @@ public class SOM extends LinkedGraph {
         return BMU;
     }
 
+    public ArrayList<SOMNeuron> findBMUConLista(Flower flower)
+    {
+        ArrayList<SOMNeuron> BMU = new ArrayList<SOMNeuron>();
+        double shortestED = Double.MAX_VALUE;
+        Iterator<Vertex> iter = this.verticesList.iterator();
+        double currentDist = 0.0;
+        while(iter.hasNext())
+        {
+            SOMNeuron current = (SOMNeuron) iter.next();
+            currentDist = current.euclidianDistance(flower);
+            if(currentDist<shortestED)
+            {
+                shortestED=currentDist;
+                BMU.clear();
+                BMU.add(current);
+            }
+            else
+                if(currentDist==shortestED)
+                {
+                    BMU.add(current);
+                }
+
+        }
+
+        return BMU;
+    }
     public void groupBmus(ArrayList<Flower> dataBase)
     {
         int i=0;
@@ -96,23 +122,61 @@ public class SOM extends LinkedGraph {
 
     public String classify(SOMNeuron bmu)
     {
+        int i=0;
+        String resp = this.classify2(bmu);
+
+        while(resp.equals(""))
+        {
+            System.out.print("  "+ i++);
+            bmu = findNearest(bmu);
+            resp= this.classify2(bmu);
+        }
+        return resp;
+    }
+
+    public String classify2(SOMNeuron bmu)
+    {
         String resp = "";
         if(BMUStock.getSetosa().contains(bmu))
         {
             resp="setosa";
         }
         else
-            if (BMUStock.getVersicolor().contains(bmu))
-            {
-                resp="versicolor";
-            }
-            else
-                if (BMUStock.getVirginica().contains(bmu))
-                 {
-                    resp="virginica";
-                 }
+        if (BMUStock.getVersicolor().contains(bmu))
+        {
+            resp="versicolor";
+        }
+        else
+        if (BMUStock.getVirginica().contains(bmu))
+        {
+            resp="virginica";
+        }
 
-      return resp;
+        return resp;
+    }
+
+    public SOMNeuron findNearest(SOMNeuron bmu)
+    {
+        Iterator<Vertex> iter = this.verticesList.iterator();
+        SOMNeuron newBMU = null;
+        double shortest = Double.MAX_VALUE;
+        double distance = 0.0;
+        Flower f = (Flower) bmu.getInfo();
+        while (iter.hasNext())
+        {
+            SOMNeuron n = (SOMNeuron) iter.next();
+            if(!n.equals(bmu))
+            {
+                distance=n.euclidianDistance(f);
+                if (distance<=shortest)
+                {
+                    shortest=distance;
+                    newBMU=n;
+                }
+            }
+        }
+
+        return newBMU;
     }
 
     public void train()

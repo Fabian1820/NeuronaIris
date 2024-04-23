@@ -8,13 +8,24 @@ public class Flower {
     private double sepalWidth;
     private double sepalLength;
 
-    public Flower(double sepalLength, double sepalWidth, double petalLength, double petalWidth )
-    {
+    private String type;
 
+    public Flower(double sepalLength, double sepalWidth, double petalLength, double petalWidth)
+    {
         setPetalWidth(petalWidth);
         setPetalLength(petalLength);
         setSepalWidth(sepalWidth);
         setSepalLength(sepalLength);
+        this.type=null;
+    }
+
+    public Flower(double sepalLength, double sepalWidth, double petalLength, double petalWidth, String type)
+    {
+        setPetalWidth(petalWidth);
+        setPetalLength(petalLength);
+        setSepalWidth(sepalWidth);
+        setSepalLength(sepalLength);
+        this.type=type;
     }
 
     public Flower()
@@ -67,6 +78,11 @@ public class Flower {
 
     public double getSepalLength() {
         return this.sepalLength;
+    }
+
+    public String getType()
+    {
+        return type;
     }
 
 }

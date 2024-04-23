@@ -1,5 +1,6 @@
 package com.example.edfinal;
 
+import com.example.edfinal.utiles.BMUStock;
 import com.example.edfinal.utiles.GestorTxt;
 import cu.edu.cujae.ceis.graph.Graph;
 import cu.edu.cujae.ceis.graph.vertex.Vertex;
@@ -10,6 +11,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 
 public class HelloApplication extends Application {
@@ -87,22 +89,40 @@ public class HelloApplication extends Application {
         }
 
         mapa.train();
-        i=1;
-        System.out.println("DESPUES\n");
-        Iterator<Vertex> iter2 = mapa.getVerticesList().iterator();
-        while(iter2.hasNext())
-        {
-            SOMNeuron n = (SOMNeuron) iter2.next();
-            System.out.println("Nodo "+ i++);
-            System.out.println("Sepal Width: "+((Flower)n.getInfo()).getSepalWidth());
-            System.out.println("Sepal Length: "+((Flower)n.getInfo()).getSepalLength());
-            System.out.println("Petal Width: "+((Flower)n.getInfo()).getPetalWidth());
-            System.out.println("Petal Length: "+((Flower)n.getInfo()).getPetalLength()+"\n");
-        }
+//
+//
+//        int k=1;
+//
+//        ArrayList<Flower> arr = GestorTxt.getDataBase();
+//
+//        System.out.println("\n\n//////////Ordenado//////////////////////////Clasificacion////////////////\n\n");
+//
+//        for(int j=0;j<arr.size();j++)
+//        {
+//            Flower flor = arr.get(j);
+//            System.out.print(k + "-" + flor.getType() + "      ");
+//
+//            SOMNeuron bmu = mapa.findBMU(flor);
+//            System.out.print("   " + "//"+bmu.getId()+"//");
+//            System.out.println("   " + k++ + "-" + mapa.classify(bmu));
+//        }
+//
+//        k=1;
+//        Collections.shuffle(arr);
+//
+//        System.out.println("\n\n//////////Desordenado//////////////////////////Clasificacion////////////////\n\n");
+//
+//        for(int j=0;j<arr.size();j++)
+//        {
+//            Flower flor = arr.get(j);
+//            System.out.print(k + "-" + flor.getType() + "      ");
+//
+//            SOMNeuron bmu = mapa.findBMU(flor);
+//            System.out.print("   " + "//"+bmu.getId()+"//");
+//            System.out.println("   " + k++ + "-" + mapa.classify(bmu));
+//        }
 
-        Flower flor = new Flower(6.4,3.1,4.5,1.4);
-        SOMNeuron bmu = mapa.findBMU(flor);
-        System.out.println(bmu.getId());
-        System.out.println(mapa.classify(bmu));
+
+
     }
 }
