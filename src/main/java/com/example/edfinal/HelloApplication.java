@@ -121,7 +121,7 @@ public class HelloApplication extends Application {
 //            System.out.print("   " + "//"+bmu.getId()+"//");
 //            System.out.println("   " + k++ + "-" + mapa.classify(bmu));
 //        }
-
+//sdfg
 
 
     }
