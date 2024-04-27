@@ -89,23 +89,23 @@ public class HelloApplication extends Application {
         }
 
         mapa.train();
-//
-//
-//        int k=1;
-//
-//        ArrayList<Flower> arr = GestorTxt.getDataBase();
-//
-//        System.out.println("\n\n//////////Ordenado//////////////////////////Clasificacion////////////////\n\n");
-//
-//        for(int j=0;j<arr.size();j++)
-//        {
-//            Flower flor = arr.get(j);
-//            System.out.print(k + "-" + flor.getType() + "      ");
-//
-//            SOMNeuron bmu = mapa.findBMU(flor);
-//            System.out.print("   " + "//"+bmu.getId()+"//");
-//            System.out.println("   " + k++ + "-" + mapa.classify(bmu));
-//        }
+
+
+        int k=1;
+
+        ArrayList<Flower> arr = GestorTxt.getDataBase();
+
+        System.out.println("\n\n//////////Ordenado//////////////////////////Clasificacion////////////////\n\n");
+
+        for(int j=0;j<arr.size();j++)
+        {
+            Flower flor = arr.get(j);
+            System.out.print(k + "-" + flor.getType() + "      ");
+
+            SOMNeuron bmu = mapa.findBMU(flor);
+            System.out.print("   " + "//"+bmu.getId()+"//");
+            System.out.println("   " + k++ + "-" + mapa.classify(bmu));
+        }
 //
 //        k=1;
 //        Collections.shuffle(arr);
