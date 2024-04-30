@@ -9,7 +9,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -17,15 +19,37 @@ import java.util.Iterator;
 public class HelloApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
+
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 320, 240);
-        stage.setTitle("Hello! soy clari la tank");
+        Scene scene = new Scene(fxmlLoader.load(), 1000, 680);
+        stage.setTitle("Iris Classifier");
         stage.setScene(scene);
         stage.show();
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
-        //launch();
+//        Flower f = new Flower(5.0, 3.0, 2.0, 1.0);
+//        System.out.println(f.getPetalWidth());
+        launch();
+
+
+//        try {
+//
+//            SOM map = new SOM();
+//            map.initialize();
+//            map.train();
+//
+//
+//            PrintWriter pw = new PrintWriter(f);
+//
+//
+//            pw.print("sdfyuikmnbfdrtyhbvc");
+//            pw.close();
+//        }
+//        catch (IOException e)
+//        {
+//            e.printStackTrace();
+//        }
 //        System.out.println("edgfgdfvc");
 //
 //        int[][] data = {{3,2,1,4}, {4,5,6,7}, {8,6,4,3}, {9,7,5,6}};
@@ -69,14 +93,14 @@ public class HelloApplication extends Application {
 //
 //        System.out.println();
 //        System.out.println(neurona.euclidianDistance(f2));
-
-        SOM m = new SOM();
-        m.initialize();
-
-
-
-        m.train();
-        
+//
+//        SOM m = new SOM();
+//        m.initialize();
+//
+//
+//
+//        m.train();
+//
 //        int k=1;
 //
 //        ArrayList<Flower> arr = GestorTxt.getDataBase();
@@ -109,19 +133,19 @@ public class HelloApplication extends Application {
 //        }
 //sdfg
 
-        Iterator<Vertex> iter = m.getVerticesList().iterator();
-        int i=1;
-
-        System.out.println("ANTES\n");
-        while(iter.hasNext())
-        {
-            SOMNeuron n = (SOMNeuron) iter.next();
-            System.out.println("Nodo "+ i++);
-            System.out.println("Sepal Width: "+((Flower)n.getInfo()).getSepalWidth());
-            System.out.println("Sepal Length: "+((Flower)n.getInfo()).getSepalLength());
-            System.out.println("Petal Width: "+((Flower)n.getInfo()).getPetalWidth());
-            System.out.println("Petal Length: "+((Flower)n.getInfo()).getPetalLength()+"\n");
-        }
+//        Iterator<Vertex> iter = m.getVerticesList().iterator();
+//        int i=1;
+//
+//        System.out.println("ANTES\n");
+//        while(iter.hasNext())
+//        {
+//            SOMNeuron n = (SOMNeuron) iter.next();
+//            System.out.println("Nodo "+ i++);
+//            System.out.println("Sepal Width: "+((Flower)n.getInfo()).getSepalWidth());
+//            System.out.println("Sepal Length: "+((Flower)n.getInfo()).getSepalLength());
+//            System.out.println("Petal Width: "+((Flower)n.getInfo()).getPetalWidth());
+//            System.out.println("Petal Length: "+((Flower)n.getInfo()).getPetalLength()+"\n");
+//        }
 
         //  GestorTxt.writeNeurons(m);
         //    m= GestorTxt.loadMap();

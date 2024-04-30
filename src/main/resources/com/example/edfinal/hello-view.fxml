@@ -1,72 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.chart.BubbleChart?>
+<?import java.net.URL?>
 <?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.ScatterChart?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
-<?import java.net.URL?>
 
-
-<AnchorPane prefHeight="1002.0" prefWidth="670.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.edfinal.HelloController">
+<AnchorPane prefHeight="769.0" prefWidth="1082.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.edfinal.HelloController">
    <stylesheets>
 
       <URL value="@../../../Styles/cupertino-dark.css" />
    </stylesheets>
 
    <children>
-      <Label alignment="CENTER" layoutX="258.0" layoutY="34.0" opacity="0.41" prefHeight="54.0" prefWidth="472.0" text="Classification of Iris Flowers" textAlignment="CENTER" textFill="#8a206f" textOverrun="CLIP">
+      <Label alignment="CENTER" layoutX="305.0" layoutY="14.0" opacity="0.41" prefHeight="54.0" prefWidth="472.0" text="Classification of Iris Flowers" textAlignment="CENTER" textFill="#8a206f" textOverrun="CLIP">
          <font>
             <Font name="System Bold" size="36.0" />
          </font>
       </Label>
-      <AnchorPane fx:id="result" layoutX="444.0" layoutY="338.0" prefHeight="278.0" prefWidth="530.0">
+      <AnchorPane fx:id="result" layoutX="725.0" layoutY="332.0" prefHeight="396.0" prefWidth="342.0">
          <children>
-            <ImageView fx:id="picture" fitHeight="170.0" fitWidth="142.0" layoutX="35.0" layoutY="53.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../../Imagen/SETOSA.jpg" />
-               </image>
-            </ImageView>
-            <Label fx:id="description" layoutX="186.0" layoutY="27.0" prefHeight="223.0" prefWidth="308.0" textAlignment="CENTER" wrapText="true" />
-            <Label layoutX="227.0" layoutY="17.0" opacity="0.55" text="RESULTADO">
+            <Label fx:id="LabelResult" layoutX="26.0" layoutY="41.0" prefHeight="205.0" prefWidth="290.0" textAlignment="CENTER" wrapText="true" />
+            <Label layoutX="119.0" layoutY="14.0" opacity="0.55" text="RESULTADO">
                <font>
                   <Font name="System Bold" size="18.0" />
                </font></Label>
          </children>
       </AnchorPane>
-      <AnchorPane layoutX="241.0" layoutY="88.0" prefHeight="200.0" prefWidth="592.0">
+      <AnchorPane layoutX="704.0" layoutY="41.0" prefHeight="242.0" prefWidth="359.0">
          <children>
-            <TextField alignment="CENTER" layoutX="175.0" layoutY="74.0" prefHeight="42.0" prefWidth="130.0" promptText="SEPAL WIDTH" />
-            <TextField alignment="CENTER" layoutX="26.0" layoutY="74.0" prefHeight="42.0" prefWidth="122.0" promptText="SEPAL LENGTH" />
-            <TextField alignment="CENTER" layoutX="327.0" layoutY="74.0" prefHeight="42.0" prefWidth="110.0" promptText="PETAL WIDTH" />
-            <TextField alignment="CENTER" layoutX="455.0" layoutY="74.0" prefHeight="42.0" prefWidth="122.0" promptText="PETAL LENGTH" />
-            <Label alignment="CENTER" layoutX="217.0" layoutY="14.0" opacity="0.55" text="Data Entry">
+            <TextField fx:id="SepalWidthText"  alignment="CENTER" layoutX="29.0" layoutY="64.0" prefHeight="42.0" prefWidth="130.0" promptText="SEPAL WIDTH" />
+            <TextField fx:id="SepalLengthText"  alignment="CENTER" layoutX="29.0" layoutY="117.0" prefHeight="42.0" prefWidth="130.0" promptText="SEPAL LENGTH" />
+            <TextField fx:id="PetalWidthText" alignment="CENTER" layoutX="209.0" layoutY="64.0" prefHeight="42.0" prefWidth="122.0" promptText="PETAL WIDTH" />
+            <TextField fx:id="PetalLengthText"  alignment="CENTER" layoutX="209.0" layoutY="117.0" prefHeight="42.0" prefWidth="122.0" promptText="PETAL LENGTH" />
+            <Label alignment="CENTER" layoutX="125.0" layoutY="25.0" opacity="0.55" text="Data Entry">
                <font>
                   <Font name="System Bold" size="24.0" />
                </font>
             </Label>
-            <Button fx:id="startButton" layoutX="143.0" layoutY="138.0" mnemonicParsing="false" text="START">
-               <font>
-                  <Font name="System Bold" size="12.0" />
-               </font></Button>
-            <Button fx:id="trainButton" layoutX="394.0" layoutY="138.0" mnemonicParsing="false" text="TRAIN">
-               <font>
-                  <Font name="System Bold" size="12.0" />
-               </font></Button>
+            <Button id="ClassButton" layoutX="146.0" layoutY="171.0" mnemonicParsing="false" onAction="#classify" text="Classify" />
          </children>
       </AnchorPane>
-
-      <BubbleChart fx:id="bubbleChart" layoutX="16.0" layoutY="266.0" prefHeight="400.0" prefWidth="449.0">
+      <Button fx:id="startButton" layoutX="319.0" layoutY="78.0" mnemonicParsing="false" onAction="#start" text="START">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Button>
+      <Button fx:id="trainButton" layoutX="395.0" layoutY="78.0" mnemonicParsing="false" onAction="#train" text="TRAIN">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Button>
+      <Button fx:id="LoadFileButton" layoutX="725.0" layoutY="277.0" mnemonicParsing="false" onAction="#loadFile" text="Load File" />
+      <Button fx:id="LoadMapButton" layoutX="884.0" layoutY="277.0" mnemonicParsing="false" onAction="#loadMap" text="Load Map" />
+      <ScatterChart fx:id="PetalChart" layoutX="22.0" layoutY="109.0" prefHeight="320.0" prefWidth="694.0">
         <xAxis>
-          <NumberAxis label="Eje x" lowerBound="0" side="BOTTOM" tickUnit="1" upperBound="10" />
+          <NumberAxis label="Petal Width" side="BOTTOM" />
         </xAxis>
         <yAxis>
-          <NumberAxis label="Eje x" lowerBound="0" side="LEFT" tickUnit="1" upperBound="10" />
+          <NumberAxis label="Petal Length" side="LEFT" />
         </yAxis>
-      </BubbleChart>
+      </ScatterChart>
+      <ScatterChart fx:id="SepalChart" layoutX="22.0" layoutY="429.0" prefHeight="320.0" prefWidth="694.0">
+        <xAxis>
+          <NumberAxis label="Sepal Width" side="BOTTOM" />
+        </xAxis>
+        <yAxis>
+          <NumberAxis label="Sepal Length" side="LEFT" />
+        </yAxis>
+      </ScatterChart>
+      <Button fx:id="SaveMapButton" onAction="#save" layoutX="978.0" layoutY="277.0" mnemonicParsing="false" text="Save Map" />
    </children>
 </AnchorPane>

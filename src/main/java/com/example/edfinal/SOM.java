@@ -13,13 +13,15 @@ public class SOM extends LinkedGraph {
 
     private double currentLearningRate;
     private static int epochs = 150;
-    private int totalNeurons=150;
+    public int totalNeurons=150;
     private int radious=30;
     private boolean trained;
+    private boolean init;
 
     public SOM()
     {
       super();
+        this.init=false;
       this.trained=false;
     }
 
@@ -34,12 +36,18 @@ public class SOM extends LinkedGraph {
         return this.trained;
     }
 
+    public boolean isInit()
+    {
+        return this.init;
+    }
+
     public void initialize()
     {
         for(int i=1;i<totalNeurons+1;i++) {
             this.getVerticesList().add(new SOMNeuron(i, new Flower()));
         }
         makeConnections();
+        this.init=true;
     }
 
     //This method guaranties that the first two neurons in the edges list of each
@@ -108,6 +116,11 @@ public class SOM extends LinkedGraph {
         }
 
         return BMU;
+    }
+
+    public void setInit(boolean b)
+    {
+        this.init=b;
     }
     public void groupBmus(ArrayList<Flower> dataBase)
     {

@@ -23,27 +23,27 @@ public class RandomFeaturesPicker {
     {
         Random rand = new Random();
 
-        return sepalLengthMin + (sepalLengthMax-sepalLengthMin) * rand.nextDouble();
+        return 0 + (100) * rand.nextDouble();
     }
 
     public static double randomSepalWidth()
     {
         Random rand = new Random();
 
-        return sepalWidthMin + (sepalWidthMax-sepalWidthMin) * rand.nextDouble();
+        return 0 + (100) * rand.nextDouble();
     }
 
     public static double randomPetalLength()
     {
         Random rand = new Random();
 
-        return petalLengthMin + (petalLengthMax-petalLengthMin) * rand.nextDouble();
+        return 0 + (100) * rand.nextDouble();
     }
 
     public static double randomPetalWidth()
     {
         Random rand = new Random();
 
-        return petalWidthMin + (petalWidthMax-petalWidthMin) * rand.nextDouble();
+        return 0 + (100) * rand.nextDouble();
     }
 }

@@ -13,17 +13,23 @@ import java.util.LinkedList;
 public class GestorTxt {
     private static final String path = "src/main/java/com/example/edfinal/Ficheros/iris.data";
 
-    private static ArrayList<Flower> flowers;
+    private static ArrayList<Flower> flowersDataBase;
+    private static ArrayList<Flower> lista;
 
     public static ArrayList<Flower> getDataBase()
     {
-        if(flowers==null)
+        if(flowersDataBase==null)
         {
-            flowers = new ArrayList<>();
-            loadFlowers();
+            flowersDataBase = load(path);
         }
+        return flowersDataBase;
+    }
 
-        return flowers;
+    public static ArrayList<Flower> getFile(String path)
+    {
+        lista = load(path);
+
+        return lista;
     }
 
     private static String getPath()
@@ -31,11 +37,11 @@ public class GestorTxt {
         return path;
     }
 
-    private static void loadFlowers(){
-        int i=1;
+    private static ArrayList<Flower> load(String path){
+        ArrayList<Flower> flowers = new ArrayList<>();
         BufferedReader bufer;
         try {
-            bufer = new BufferedReader(new FileReader(GestorTxt.getPath()));
+            bufer = new BufferedReader(new FileReader(path));
 
             String linea;
             try {
@@ -65,6 +71,8 @@ public class GestorTxt {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+
+        return flowers;
     }
 
     public static void writeNeurons(SOM map) throws IOException {
@@ -91,6 +99,7 @@ public class GestorTxt {
         RandomAccessFile raf = new RandomAccessFile("Grafo.dat", "rw");
         SOM m = new SOM();
         m.setTrained(true);
+        m.setInit(true);
         int neurons = raf.readInt();
         while(neurons>0)
         {
@@ -105,5 +114,36 @@ public class GestorTxt {
         m.makeConnections();
         raf.close();
         return  m;
+    }
+
+    public static void writeItemB() {
+        try {
+            PrintWriter pw = new PrintWriter("incisoB.txt");
+            for(BMUandFlowers baf : BMUandFManager.getLista())
+            {
+                pw.write("BMU: " + baf.bmu.getId()+" ");
+                double sepalLength = ((Flower)baf.bmu.getInfo()).getSepalLength();
+                double sepalWidth = ((Flower)baf.bmu.getInfo()).getSepalWidth();
+                double petalLength = ((Flower)baf.bmu.getInfo()).getPetalLength();
+                double petalWidth = ((Flower)baf.bmu.getInfo()).getPetalWidth();
+                pw.print(sepalLength +","+ sepalWidth +","+ petalLength +","+ petalWidth +"  ");
+                pw.println(baf.type);
+                for(Flower f : baf.flores)
+                {
+                    double sepalLengthF = f.getSepalLength();
+                    double sepalWidthF = f.getSepalWidth();
+                    double petalLengthF = f.getPetalLength();
+                    double petalWidthF = f.getPetalWidth();
+                    pw.println(sepalLengthF +","+ sepalWidthF +","+ petalLengthF +","+ petalWidthF);
+                }
+                pw.println();
+            }
+            pw.close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
     }
 }
