@@ -2,6 +2,7 @@ package cu.edu.cujae.ceis.graph.interfaces;
 
 import java.util.LinkedList;
 
+import com.example.edfinal.Flower;
 import cu.edu.cujae.ceis.graph.vertex.Vertex;
 
 /**
@@ -10,7 +11,7 @@ import cu.edu.cujae.ceis.graph.vertex.Vertex;
 public interface ILinkedDirectedGraph {
 		
 	public boolean areAdjacents(int posTail, int posHead);		
-	public boolean insertVertex(Object info);	
+	public boolean insertVertex(Flower info);
 	public boolean isEmpty();	
 	public boolean pathWithLength (int posTail, int posHead, int length);	
 	public LinkedList<Vertex> getVerticesList();

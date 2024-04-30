@@ -1,20 +1,22 @@
 package cu.edu.cujae.ceis.graph.vertex;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import com.example.edfinal.Flower;
 import cu.edu.cujae.ceis.graph.edge.Edge;
 
 
 /**
  * <h1>Vértice elemental</h1>
  */
-public class Vertex {
+public class Vertex implements Serializable {
 	
 	/**
 	 * Objeto que representa la información del vértice.
 	 */
-	private Object info;
+	private Flower info;
 	
 	/**
 	 * Lista de aristas.
@@ -27,7 +29,7 @@ public class Vertex {
 	 * 
 	 * @param info Información.
 	 */
-	public Vertex(Object info) {
+	public Vertex(Flower info) {
 		this.info = info;
 		edgeList  = new LinkedList<Edge>();
 	}
@@ -73,7 +75,7 @@ public class Vertex {
 	 * Define la información para este nodo.
 	 * @param info Información.
 	 */
-	public void setInfo(Object info) {
+	public void setInfo(Flower info) {
 		this.info = info;
 	}
 	

@@ -1,6 +1,7 @@
 package com.example.edfinal;
 
 import com.example.edfinal.utiles.BMUStock;
+import com.example.edfinal.utiles.Control;
 import com.example.edfinal.utiles.GestorTxt;
 import cu.edu.cujae.ceis.graph.Graph;
 import cu.edu.cujae.ceis.graph.vertex.Vertex;
@@ -24,7 +25,7 @@ public class HelloApplication extends Application {
         stage.show();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
         //launch();
 //        System.out.println("edgfgdfvc");
 //
@@ -70,11 +71,11 @@ public class HelloApplication extends Application {
 //        System.out.println();
 //        System.out.println(neurona.euclidianDistance(f2));
 
-        SOM mapa = new SOM();
+        Control c = new Control();
 
-        mapa.initialize();
+        c.getMap().initialize();
 
-        Iterator<Vertex> iter = mapa.getVerticesList().iterator();
+        Iterator<Vertex> iter = c.getMap().getVerticesList().iterator();
         int i=1;
 
         System.out.println("ANTES\n");
@@ -88,9 +89,8 @@ public class HelloApplication extends Application {
             System.out.println("Petal Length: "+((Flower)n.getInfo()).getPetalLength()+"\n");
         }
 
-        mapa.train();
-
-
+        c.getMap().train();
+        
         int k=1;
 
         ArrayList<Flower> arr = GestorTxt.getDataBase();
@@ -102,9 +102,9 @@ public class HelloApplication extends Application {
             Flower flor = arr.get(j);
             System.out.print(k + "-" + flor.getType() + "      ");
 
-            SOMNeuron bmu = mapa.findBMU(flor);
+            SOMNeuron bmu = c.getMap().findBMU(flor);
             System.out.print("   " + "//"+bmu.getId()+"//");
-            System.out.println("   " + k++ + "-" + mapa.classify(bmu));
+            System.out.println("   " + k++ + "-" + c.getMap().classify(bmu));
         }
 //
 //        k=1;
@@ -122,7 +122,23 @@ public class HelloApplication extends Application {
 //            System.out.println("   " + k++ + "-" + mapa.classify(bmu));
 //        }
 //sdfg
-
-
+      //  c.writeMapInDat();
+//        c.readMapFromDat();
+//        SOM m = c.readMapFromDat();
+//        c.setMap(m);
+//
+//        Iterator<Vertex> iter4 = c.getMap().getVerticesList().iterator();
+//        i=1;
+//
+//        System.out.println("ANTES\n");
+//        while(iter4.hasNext())
+//        {
+//            SOMNeuron n = (SOMNeuron) iter4.next();
+//            System.out.println("Nodo "+ i++);
+//            System.out.println("Sepal Width: "+((Flower)n.getInfo()).getSepalWidth());
+//            System.out.println("Sepal Length: "+((Flower)n.getInfo()).getSepalLength());
+//            System.out.println("Petal Width: "+((Flower)n.getInfo()).getPetalWidth());
+//            System.out.println("Petal Length: "+((Flower)n.getInfo()).getPetalLength()+"\n");
+//        }
     }
 }

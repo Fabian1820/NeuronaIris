@@ -3,7 +3,10 @@ package com.example.edfinal;
 import cu.edu.cujae.ceis.graph.vertex.Vertex;
 import cu.edu.cujae.ceis.graph.vertex.WeightedVertex;
 
-public class SOMNeuron extends Vertex{
+import java.io.Serializable;
+
+public class SOMNeuron extends Vertex implements Serializable {
+    private static final long serialVersionUID = 1L;
     private int id;
     public SOMNeuron( int id, Flower flower)
     {
@@ -46,5 +49,10 @@ public class SOMNeuron extends Vertex{
     public double averagePetalMeasurement(){
         return (((Flower)this.getInfo()).getPetalWidth() * (((Flower)this.getInfo()).getPetalLength()))/2;
     }
-
+    @Override
+    public String toString() {
+        if (getInfo() != null)
+        return getInfo().toString();
+        else return "pinga";
+    }
 }

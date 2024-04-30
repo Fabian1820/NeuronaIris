@@ -1,8 +1,9 @@
 package com.example.edfinal;
 
+import java.io.Serializable;
 import java.util.Random;
 
-public class Flower {
+public class Flower implements Serializable {
     private double petalWidth;
     private double petalLength;
     private double sepalWidth;
@@ -85,4 +86,13 @@ public class Flower {
         return type;
     }
 
+    @Override
+    public String toString() {
+        return "Flower{" +
+                "petalWidth=" + petalWidth +
+                ", petalLength=" + petalLength +
+                ", sepalWidth=" + sepalWidth +
+                ", sepalLength=" + sepalLength +
+                '}';
+    }
 }

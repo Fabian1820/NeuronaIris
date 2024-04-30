@@ -8,11 +8,13 @@ import java.util.*;
 
 public class SOM extends LinkedGraph {
 
+
     private static double initialLearningRate = 1.0;
 
     private double currentLearningRate;
     private static int epochs = 150;
     private int totalNeurons=150;
+    private int radious=30;
     private boolean trained;
     public SOM()
     {
@@ -27,7 +29,7 @@ public class SOM extends LinkedGraph {
 
     public void initialize()
     {
-        for(int i=1;i<151;i++) {
+        for(int i=1;i<totalNeurons+1;i++) {
             this.getVerticesList().add(new SOMNeuron(i, new Flower()));
         }
         makeConnections();
@@ -227,7 +229,7 @@ public class SOM extends LinkedGraph {
 
     public void updateRadious(ArrayList<SOMNeuron> updated, SOMNeuron current, int distance, Flower flower,char direction, int currentEpoch)
     {
-        if (distance <= 30) {
+        if (distance <= radious) {
 
             LinkedList<Vertex> adjacents = current.getAdjacents();
 

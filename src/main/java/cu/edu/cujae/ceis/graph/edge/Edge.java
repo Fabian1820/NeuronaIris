@@ -2,10 +2,12 @@ package cu.edu.cujae.ceis.graph.edge;
 
 import cu.edu.cujae.ceis.graph.vertex.Vertex;
 
+import java.io.Serializable;
+
 /**
  * <h1>Arista elemental</h1>
  */
-public class Edge {
+public class Edge implements Serializable {
 	
 	/**
 	 * Vértice asociado a la arista.
