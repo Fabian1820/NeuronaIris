@@ -14,13 +14,12 @@ public class BMUStock {
         return this.setosa;
     }
 
-    public ArrayList<SOMNeuron> getVersicolor()
-    {
-        return this.versicolor;
-    }
+    public ArrayList<SOMNeuron> getVersicolor() {return this.versicolor;}
 
     public ArrayList<SOMNeuron> getVirginica()
     {
         return this.virginica;
     }
 }
+
+

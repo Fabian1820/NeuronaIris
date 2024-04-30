@@ -14,14 +14,19 @@ public class HelloApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 320, 240);
-        stage.setTitle("Hello! soy fab :) el tank");
+        Scene scene = new Scene(fxmlLoader.load(), 1050, 770);
+        stage.setTitle("Proyectico de Flores y Eso ");
+        stage.setMinWidth(1050);
+        stage.setMinHeight(800);
+        stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
+
+
     }
 
     public static void main(String[] args) {
-        //launch();
+        launch(args);
 //        System.out.println("edgfgdfvc");
 //
 //        int[][] data = {{3,2,1,4}, {4,5,6,7}, {8,6,4,3}, {9,7,5,6}};
