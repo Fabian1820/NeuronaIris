@@ -1,16 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
-
+<?import javafx.scene.chart.BubbleChart?>
+<?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Button?>
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.example.edfinal.HelloController">
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
-    </padding>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import java.net.URL?>
 
-    <Label fx:id="welcomeText"/>
-    <Button text="Hello!" onAction="#onHelloButtonClick"/>
-</VBox>
+
+<AnchorPane prefHeight="1002.0" prefWidth="670.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.edfinal.HelloController">
+   <stylesheets>
+
+      <URL value="@../../../Styles/cupertino-dark.css" />
+   </stylesheets>
+
+   <children>
+      <Label alignment="CENTER" layoutX="258.0" layoutY="34.0" opacity="0.41" prefHeight="54.0" prefWidth="472.0" text="Classification of Iris Flowers" textAlignment="CENTER" textFill="#8a206f" textOverrun="CLIP">
+         <font>
+            <Font name="System Bold" size="36.0" />
+         </font>
+      </Label>
+      <AnchorPane fx:id="result" layoutX="444.0" layoutY="338.0" prefHeight="278.0" prefWidth="530.0">
+         <children>
+            <ImageView fx:id="picture" fitHeight="170.0" fitWidth="142.0" layoutX="35.0" layoutY="53.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../Imagen/SETOSA.jpg" />
+               </image>
+            </ImageView>
+            <Label fx:id="description" layoutX="186.0" layoutY="27.0" prefHeight="223.0" prefWidth="308.0" textAlignment="CENTER" wrapText="true" />
+            <Label layoutX="227.0" layoutY="17.0" opacity="0.55" text="RESULTADO">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font></Label>
+         </children>
+      </AnchorPane>
+      <AnchorPane layoutX="241.0" layoutY="88.0" prefHeight="200.0" prefWidth="592.0">
+         <children>
+            <TextField alignment="CENTER" layoutX="175.0" layoutY="74.0" prefHeight="42.0" prefWidth="130.0" promptText="SEPAL WIDTH" />
+            <TextField alignment="CENTER" layoutX="26.0" layoutY="74.0" prefHeight="42.0" prefWidth="122.0" promptText="SEPAL LENGTH" />
+            <TextField alignment="CENTER" layoutX="327.0" layoutY="74.0" prefHeight="42.0" prefWidth="110.0" promptText="PETAL WIDTH" />
+            <TextField alignment="CENTER" layoutX="455.0" layoutY="74.0" prefHeight="42.0" prefWidth="122.0" promptText="PETAL LENGTH" />
+            <Label alignment="CENTER" layoutX="217.0" layoutY="14.0" opacity="0.55" text="Data Entry">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Button fx:id="startButton" layoutX="143.0" layoutY="138.0" mnemonicParsing="false" text="START">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font></Button>
+            <Button fx:id="trainButton" layoutX="394.0" layoutY="138.0" mnemonicParsing="false" text="TRAIN">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font></Button>
+         </children>
+      </AnchorPane>
+
+      <BubbleChart fx:id="bubbleChart" layoutX="16.0" layoutY="266.0" prefHeight="400.0" prefWidth="449.0">
+        <xAxis>
+          <NumberAxis label="Eje x" lowerBound="0" side="BOTTOM" tickUnit="1" upperBound="10" />
+        </xAxis>
+        <yAxis>
+          <NumberAxis label="Eje x" lowerBound="0" side="LEFT" tickUnit="1" upperBound="10" />
+        </yAxis>
+      </BubbleChart>
+   </children>
+</AnchorPane>
