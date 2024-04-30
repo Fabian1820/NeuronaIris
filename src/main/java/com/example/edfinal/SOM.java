@@ -16,10 +16,17 @@ public class SOM extends LinkedGraph {
     private int totalNeurons=150;
     private int radious=30;
     private boolean trained;
+
     public SOM()
     {
       super();
       this.trained=false;
+    }
+
+
+    public void setTrained(boolean b)
+    {
+        this.trained=b;
     }
 
     public boolean isTrained()
@@ -37,7 +44,7 @@ public class SOM extends LinkedGraph {
 
     //This method guaranties that the first two neurons in the edges list of each
     //neuron to be the two previous ones and the other two be the two following neurons
-    private void makeConnections()
+    public void makeConnections()
     {   int i;
 
         this.insertEdgeDG(0,this.verticesList.size()-2);

@@ -1,12 +1,14 @@
 package com.example.edfinal.utiles;
 
 import com.example.edfinal.Flower;
+import com.example.edfinal.SOM;
+import com.example.edfinal.SOMNeuron;
+import cu.edu.cujae.ceis.graph.vertex.Vertex;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 public class GestorTxt {
     private static final String path = "src/main/java/com/example/edfinal/Ficheros/iris.data";
@@ -63,5 +65,45 @@ public class GestorTxt {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    public static void writeNeurons(SOM map) throws IOException {
+        RandomAccessFile raf = new RandomAccessFile("Grafo.dat", "rw");
+
+        raf.writeInt(map.getVerticesList().size());
+
+        Iterator<Vertex> iter = map.getVerticesList().iterator();
+
+        while (iter.hasNext())
+        {
+            SOMNeuron n = (SOMNeuron) iter.next();
+            raf.writeInt(n.getId());
+            raf.writeDouble(((Flower)n.getInfo()).getSepalLength());
+            raf.writeDouble(((Flower)n.getInfo()).getSepalWidth());
+            raf.writeDouble(((Flower)n.getInfo()).getPetalLength());
+            raf.writeDouble(((Flower)n.getInfo()).getPetalWidth());
+        }
+
+        raf.close();
+    }
+
+    public static SOM loadMap() throws IOException {
+        RandomAccessFile raf = new RandomAccessFile("Grafo.dat", "rw");
+        SOM m = new SOM();
+        m.setTrained(true);
+        int neurons = raf.readInt();
+        while(neurons>0)
+        {
+            int id = raf.readInt();
+            double sepalLength = raf.readDouble();
+            double sepalWidth = raf.readDouble();
+            double petalLength = raf.readDouble();
+            double petalWidth = raf.readDouble();
+            m.getVerticesList().add(new SOMNeuron(id, new Flower(sepalLength, sepalWidth, petalLength, petalWidth)));
+            neurons--;
+        }
+        m.makeConnections();
+        raf.close();
+        return  m;
     }
 }

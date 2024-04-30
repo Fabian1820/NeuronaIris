@@ -1,7 +1,6 @@
 package com.example.edfinal;
 
 import com.example.edfinal.utiles.BMUStock;
-import com.example.edfinal.utiles.Control;
 import com.example.edfinal.utiles.GestorTxt;
 import cu.edu.cujae.ceis.graph.Graph;
 import cu.edu.cujae.ceis.graph.vertex.Vertex;
@@ -71,41 +70,28 @@ public class HelloApplication extends Application {
 //        System.out.println();
 //        System.out.println(neurona.euclidianDistance(f2));
 
-        Control c = new Control();
+        SOM m = new SOM();
+        m.initialize();
 
-        c.getMap().initialize();
 
-        Iterator<Vertex> iter = c.getMap().getVerticesList().iterator();
-        int i=1;
 
-        System.out.println("ANTES\n");
-        while(iter.hasNext())
-        {
-            SOMNeuron n = (SOMNeuron) iter.next();
-            System.out.println("Nodo "+ i++);
-            System.out.println("Sepal Width: "+((Flower)n.getInfo()).getSepalWidth());
-            System.out.println("Sepal Length: "+((Flower)n.getInfo()).getSepalLength());
-            System.out.println("Petal Width: "+((Flower)n.getInfo()).getPetalWidth());
-            System.out.println("Petal Length: "+((Flower)n.getInfo()).getPetalLength()+"\n");
-        }
-
-        c.getMap().train();
+        m.train();
         
-        int k=1;
-
-        ArrayList<Flower> arr = GestorTxt.getDataBase();
-
-        System.out.println("\n\n//////////Ordenado//////////////////////////Clasificacion////////////////\n\n");
-
-        for(int j=0;j<arr.size();j++)
-        {
-            Flower flor = arr.get(j);
-            System.out.print(k + "-" + flor.getType() + "      ");
-
-            SOMNeuron bmu = c.getMap().findBMU(flor);
-            System.out.print("   " + "//"+bmu.getId()+"//");
-            System.out.println("   " + k++ + "-" + c.getMap().classify(bmu));
-        }
+//        int k=1;
+//
+//        ArrayList<Flower> arr = GestorTxt.getDataBase();
+//
+//        System.out.println("\n\n//////////Ordenado//////////////////////////Clasificacion////////////////\n\n");
+//
+//        for(int j=0;j<arr.size();j++)
+//        {
+//            Flower flor = arr.get(j);
+//            System.out.print(k + "-" + flor.getType() + "      ");
+//
+//            SOMNeuron bmu = m.findBMU(flor);
+//            System.out.print("   " + "//"+bmu.getId()+"//");
+//            System.out.println("   " + k++ + "-" + m.classify(bmu));
+//        }
 //
 //        k=1;
 //        Collections.shuffle(arr);
@@ -122,11 +108,38 @@ public class HelloApplication extends Application {
 //            System.out.println("   " + k++ + "-" + mapa.classify(bmu));
 //        }
 //sdfg
-      //  c.writeMapInDat();
-//        c.readMapFromDat();
-//        SOM m = c.readMapFromDat();
-//        c.setMap(m);
+
+        Iterator<Vertex> iter = m.getVerticesList().iterator();
+        int i=1;
+
+        System.out.println("ANTES\n");
+        while(iter.hasNext())
+        {
+            SOMNeuron n = (SOMNeuron) iter.next();
+            System.out.println("Nodo "+ i++);
+            System.out.println("Sepal Width: "+((Flower)n.getInfo()).getSepalWidth());
+            System.out.println("Sepal Length: "+((Flower)n.getInfo()).getSepalLength());
+            System.out.println("Petal Width: "+((Flower)n.getInfo()).getPetalWidth());
+            System.out.println("Petal Length: "+((Flower)n.getInfo()).getPetalLength()+"\n");
+        }
+
+        //  GestorTxt.writeNeurons(m);
+        //    m= GestorTxt.loadMap();
+
+//        Iterator<Vertex> iter2 = m.getVerticesList().iterator();
+//        i=1;
 //
+//        System.out.println("ANTES\n");
+//        while(iter2.hasNext())
+//        {
+//            SOMNeuron n = (SOMNeuron) iter2.next();
+//            System.out.println("Nodo "+ i++);
+//            System.out.println("Sepal Width: "+((Flower)n.getInfo()).getSepalWidth());
+//            System.out.println("Sepal Length: "+((Flower)n.getInfo()).getSepalLength());
+//            System.out.println("Petal Width: "+((Flower)n.getInfo()).getPetalWidth());
+//            System.out.println("Petal Length: "+((Flower)n.getInfo()).getPetalLength()+"\n");
+//        }
+
 //        Iterator<Vertex> iter4 = c.getMap().getVerticesList().iterator();
 //        i=1;
 //

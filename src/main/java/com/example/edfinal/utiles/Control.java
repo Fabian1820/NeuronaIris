@@ -1,98 +1,84 @@
-package com.example.edfinal.utiles;
-
-import com.example.edfinal.Flower;
-import com.example.edfinal.GraphWriter;
-import com.example.edfinal.SOM;
-import com.example.edfinal.SOMNeuron;
-import cu.edu.cujae.ceis.graph.vertex.Vertex;
-
-import java.io.*;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-
-public class Control {
-    private SOM map;
-
-    public Control()
-    {
-        map = new SOM();
-    }
-
-    public SOM getMap()
-    {
-        return map;
-    }
-
-    public void setMap(SOM m)
-    {
-        this.map=m;
-    }
-
-    public String writeMapInDat() throws IOException {
-        String resp = "";
-        if(this.map.isTrained())
-        {
-            resp="Mapa guardado con éxito";
-            GraphWriter.writeNeurons(this.map.getVerticesList());
-        }
-        else
-            resp="El mapa no ha sido entrenado";
-
-        return resp;
-    }
-
-    public SOM readMapFromDat(){
-//        FileInputStream raf = new FileInputStream("Grafo.dat");
-//        ObjectInputStream oos = new ObjectInputStream(raf);
-//        SOM m = new SOM();
+//package com.example.edfinal.utiles;
 //
-//        int size = oos.readInt();
-//        int i=0;
-//        while (i<size)
+//import com.example.edfinal.Flower;
+//import com.example.edfinal.GraphWriter;
+//import com.example.edfinal.SOM;
+//import com.example.edfinal.SOMNeuron;
+//import cu.edu.cujae.ceis.graph.vertex.Vertex;
+//
+//import java.io.*;
+//import java.util.Iterator;
+//import java.util.LinkedList;
+//import java.util.List;
+//import java.util.concurrent.atomic.AtomicInteger;
+//
+//public class Control {
+//    private SOM map;
+//
+//    public Control()
+//    {
+//        map = new SOM();
+//    }
+//
+//    public SOM getMap()
+//    {
+//        return map;
+//    }
+//
+//    public void setMap(SOM m)
+//    {
+//        this.map=m;
+//    }
+//
+//    public String writeMapInDat() throws IOException {
+//        String resp = "";
+//        if(this.map.isTrained())
 //        {
-//            SOMNeuron n = (SOMNeuron) oos.readObject();
-//            m.insertVertex(n);
-//            i++;
+//            resp="Mapa guardado con ï¿½xito";
+//            GraphWriter.writeNeurons(this.map.getVerticesList());
 //        }
-//        raf.close();
+//        else
+//            resp="El mapa no ha sido entrenado";
 //
-//        return m;
-        SOM m = new SOM();
-        List<SOMNeuron> neuronas = new LinkedList<>();
-
-        try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream("Grafo.dat"))) {
-            // Leer el tamaño de la lista
-            int size = inputStream.readInt();
-
-            // Leer las neuronas
-            for (int i = 0; i < size; i++) {
-                SOMNeuron neurona = (SOMNeuron) inputStream.readObject();
-                m.getVerticesList().add(neurona);
-            }
-            System.out.println("Se han leído " + m.getVerticesList().size() + " neuronas desde el archivo binario.");
-        } catch (Exception e) {
-            System.err.println("Error al leer las neuronas desde el archivo binario: " + e.getMessage());
-        }
-
-        Iterator<Vertex> iter = m.getVerticesList().iterator();
-
-        int i=1;
-
-        System.out.println("ANTES\n");
-        while(iter.hasNext())
-        {
-            SOMNeuron n = (SOMNeuron) iter.next();
-            System.out.println("Nodo "+ i++);
-            System.out.println("Sepal Width: "+((Flower)n.getInfo()).getSepalWidth());
-            System.out.println("Sepal Length: "+((Flower)n.getInfo()).getSepalLength());
-            System.out.println("Petal Width: "+((Flower)n.getInfo()).getPetalWidth());
-            System.out.println("Petal Length: "+((Flower)n.getInfo()).getPetalLength()+"\n");
-        }
-
-
-       return m;
-    }
-
-}
+//        return resp;
+//    }
+//
+//    public SOM readMapFromDat(){
+//
+//        SOM m = new SOM();
+//        List<SOMNeuron> neuronas = new LinkedList<>();
+//
+//        try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream("Grafo.dat"))) {
+//            // Leer el tamaï¿½o de la lista
+//            int size = inputStream.readInt();
+//
+//            // Leer las neuronas
+//            for (int i = 0; i < size; i++) {
+//                SOMNeuron neurona = (SOMNeuron) inputStream.readObject();
+//                m.getVerticesList().add(neurona);
+//            }
+//            System.out.println("Se han leï¿½do " + m.getVerticesList().size() + " neuronas desde el archivo binario.");
+//        } catch (Exception e) {
+//            System.err.println("Error al leer las neuronas desde el archivo binario: " + e.getMessage());
+//        }
+//
+//        Iterator<Vertex> iter = m.getVerticesList().iterator();
+//
+//        int i=1;
+//
+//        System.out.println("ANTES\n");
+//        while(iter.hasNext())
+//        {
+//            SOMNeuron n = (SOMNeuron) iter.next();
+//            System.out.println("Nodo "+ i++);
+//            System.out.println("Sepal Width: "+((Flower)n.getInfo()).getSepalWidth());
+//            System.out.println("Sepal Length: "+((Flower)n.getInfo()).getSepalLength());
+//            System.out.println("Petal Width: "+((Flower)n.getInfo()).getPetalWidth());
+//            System.out.println("Petal Length: "+((Flower)n.getInfo()).getPetalLength()+"\n");
+//        }
+//
+//
+//       return m;
+//    }
+//
+//}
