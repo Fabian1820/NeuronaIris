@@ -9,20 +9,41 @@ import java.util.*;
 public class SOM extends LinkedGraph {
 
 
-    private static double initialLearningRate = 1.0;
+    private double initialLearningRate;
 
     private double currentLearningRate;
-    private static int epochs = 150;
-    public int totalNeurons=150;
-    private int radious=30;
+    private int epochs;
+    public int totalNeurons;
+    private int radious;
     private boolean trained;
+
+    public double getInitialLearningRate() {
+        return initialLearningRate;
+    }
+
+    public int getEpochs() {
+        return epochs;
+    }
+
+    public int getTotalNeurons() {
+        return totalNeurons;
+    }
+
+    public int getRadious() {
+        return radious;
+    }
+
     private boolean init;
 
-    public SOM()
+    public SOM(int epochs, int neurons, double learningRate, int radius)
     {
       super();
-        this.init=false;
+      this.init=false;
       this.trained=false;
+      this.epochs=epochs;
+      this.totalNeurons=neurons;
+      this.initialLearningRate=learningRate;
+      this.radious=radius;
     }
 
 

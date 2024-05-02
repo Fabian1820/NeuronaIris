@@ -9,33 +9,34 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="769.0" prefWidth="1082.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.edfinal.HelloController">
+<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="785.0" prefWidth="1545.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.edfinal.HelloController">
    <stylesheets>
 
       <URL value="@../../../Styles/cupertino-dark.css" />
    </stylesheets>
 
    <children>
-      <Label alignment="CENTER" layoutX="305.0" layoutY="14.0" opacity="0.41" prefHeight="54.0" prefWidth="472.0" text="Classification of Iris Flowers" textAlignment="CENTER" textFill="#8a206f" textOverrun="CLIP">
+      <Label alignment="CENTER" layoutX="537.0" layoutY="14.0" opacity="0.41" prefHeight="54.0" prefWidth="472.0" text="Classification of Iris Flowers" textAlignment="CENTER" textFill="#8a206f" textOverrun="CLIP">
          <font>
             <Font name="System Bold" size="36.0" />
          </font>
       </Label>
-      <AnchorPane fx:id="result" layoutX="725.0" layoutY="332.0" prefHeight="396.0" prefWidth="342.0">
+      <AnchorPane fx:id="result" layoutX="1181.0" layoutY="351.0" prefHeight="442.0" prefWidth="347.0">
          <children>
-            <Label fx:id="LabelResult" layoutX="26.0" layoutY="41.0" prefHeight="205.0" prefWidth="290.0" textAlignment="CENTER" wrapText="true" />
-            <Label layoutX="119.0" layoutY="14.0" opacity="0.55" text="RESULTADO">
+            <Label fx:id="LabelResult" layoutX="5.0" layoutY="41.0" prefHeight="206.0" prefWidth="336.0" textAlignment="CENTER" wrapText="true" />
+            <Label layoutX="122.0" layoutY="7.0" opacity="0.55" text="RESULTADO">
                <font>
                   <Font name="System Bold" size="18.0" />
                </font></Label>
+            <AnchorPane layoutX="28.0" layoutY="249.0" prefHeight="186.0" prefWidth="287.0" />
          </children>
       </AnchorPane>
-      <AnchorPane layoutX="704.0" layoutY="41.0" prefHeight="242.0" prefWidth="359.0">
+      <AnchorPane layoutX="1174.0" layoutY="70.0" prefHeight="185.0" prefWidth="359.0">
          <children>
-            <TextField fx:id="SepalWidthText"  alignment="CENTER" layoutX="29.0" layoutY="64.0" prefHeight="42.0" prefWidth="130.0" promptText="SEPAL WIDTH" />
-            <TextField fx:id="SepalLengthText"  alignment="CENTER" layoutX="29.0" layoutY="117.0" prefHeight="42.0" prefWidth="130.0" promptText="SEPAL LENGTH" />
+            <TextField fx:id="SepalWidthText" alignment="CENTER" layoutX="29.0" layoutY="64.0" prefHeight="42.0" prefWidth="130.0" promptText="SEPAL WIDTH" />
+            <TextField fx:id="SepalLengthText" alignment="CENTER" layoutX="29.0" layoutY="117.0" prefHeight="42.0" prefWidth="130.0" promptText="SEPAL LENGTH" />
             <TextField fx:id="PetalWidthText" alignment="CENTER" layoutX="209.0" layoutY="64.0" prefHeight="42.0" prefWidth="122.0" promptText="PETAL WIDTH" />
-            <TextField fx:id="PetalLengthText"  alignment="CENTER" layoutX="209.0" layoutY="117.0" prefHeight="42.0" prefWidth="122.0" promptText="PETAL LENGTH" />
+            <TextField fx:id="PetalLengthText" alignment="CENTER" layoutX="209.0" layoutY="117.0" prefHeight="42.0" prefWidth="122.0" promptText="PETAL LENGTH" />
             <Label alignment="CENTER" layoutX="125.0" layoutY="25.0" opacity="0.55" text="Data Entry">
                <font>
                   <Font name="System Bold" size="24.0" />
@@ -44,19 +45,17 @@
             <Button id="ClassButton" layoutX="146.0" layoutY="171.0" mnemonicParsing="false" onAction="#classify" text="Classify" />
          </children>
       </AnchorPane>
-      <Button fx:id="startButton" layoutX="319.0" layoutY="78.0" mnemonicParsing="false" onAction="#start" text="START">
+      <Button fx:id="startButton" layoutX="739.0" layoutY="82.0" mnemonicParsing="false" onAction="#start" text="START">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
       </Button>
-      <Button fx:id="trainButton" layoutX="395.0" layoutY="78.0" mnemonicParsing="false" onAction="#train" text="TRAIN">
+      <Button fx:id="trainButton" layoutX="817.0" layoutY="82.0" mnemonicParsing="false" onAction="#train" text="TRAIN">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
       </Button>
-      <Button fx:id="LoadFileButton" layoutX="725.0" layoutY="277.0" mnemonicParsing="false" onAction="#loadFile" text="Load File" />
-      <Button fx:id="LoadMapButton" layoutX="884.0" layoutY="277.0" mnemonicParsing="false" onAction="#loadMap" text="Load Map" />
-      <ScatterChart fx:id="PetalChart" layoutX="22.0" layoutY="109.0" prefHeight="320.0" prefWidth="694.0">
+      <ScatterChart fx:id="PetalChart" layoutX="580.0" layoutY="129.0" prefHeight="338.0" prefWidth="595.0">
         <xAxis>
           <NumberAxis label="Petal Width" side="BOTTOM" />
         </xAxis>
@@ -64,7 +63,7 @@
           <NumberAxis label="Petal Length" side="LEFT" />
         </yAxis>
       </ScatterChart>
-      <ScatterChart fx:id="SepalChart" layoutX="22.0" layoutY="429.0" prefHeight="320.0" prefWidth="694.0">
+      <ScatterChart fx:id="SepalChart" layoutX="580.0" layoutY="460.0" prefHeight="338.0" prefWidth="595.0">
         <xAxis>
           <NumberAxis label="Sepal Width" side="BOTTOM" />
         </xAxis>
@@ -72,6 +71,32 @@
           <NumberAxis label="Sepal Length" side="LEFT" />
         </yAxis>
       </ScatterChart>
-      <Button fx:id="SaveMapButton" onAction="#save" layoutX="978.0" layoutY="277.0" mnemonicParsing="false" text="Save Map" />
+      <AnchorPane layoutX="1198.0" layoutY="297.0" prefHeight="33.0" prefWidth="311.0">
+         <children>
+            <Button fx:id="LoadFileButton" layoutY="1.0" mnemonicParsing="false" onAction="#loadFile" text="Load File" />
+            <Button fx:id="LoadMapButton" layoutX="135.0" layoutY="1.0" mnemonicParsing="false" onAction="#loadMap" text="Load Map" />
+            <Button fx:id="SaveMapButton" layoutX="224.0" layoutY="1.0" mnemonicParsing="false" onAction="#save" prefHeight="27.0" prefWidth="86.0" text="Save Map" />
+         </children>
+      </AnchorPane>
+      <ScatterChart fx:id="WidthChart" layoutX="-7.0" layoutY="127.0" prefHeight="338.0" prefWidth="595.0">
+        <xAxis>
+          <NumberAxis label="Petal Width" side="BOTTOM" />
+        </xAxis>
+        <yAxis>
+          <NumberAxis label="Sepal Width" side="LEFT" />
+        </yAxis>
+      </ScatterChart>
+      <ScatterChart fx:id="LengthChart" layoutX="-7.0" layoutY="460.0" prefHeight="338.0" prefWidth="595.0">
+        <xAxis>
+          <NumberAxis label="Petal Length" side="BOTTOM" />
+        </xAxis>
+        <yAxis>
+          <NumberAxis label="Sepal Length" side="LEFT" />
+        </yAxis>
+      </ScatterChart>
+      <TextField fx:id="NeuronsTF" alignment="CENTER" layoutX="137.0" layoutY="80.0" prefHeight="34.0" prefWidth="130.0" promptText="NEURONS" />
+      <TextField fx:id="EpochsTF" alignment="CENTER" layoutX="286.0" layoutY="80.0" prefHeight="34.0" prefWidth="130.0" promptText="EPOCHS" />
+      <TextField fx:id="LearningRateTF" alignment="CENTER" layoutX="579.0" layoutY="80.0" prefHeight="34.0" prefWidth="130.0" promptText="LEARNING RATE" />
+      <TextField fx:id="RadiusTF" alignment="CENTER" layoutX="432.0" layoutY="80.0" prefHeight="34.0" prefWidth="130.0" promptText="RADIUS" />
    </children>
 </AnchorPane>

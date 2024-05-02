@@ -75,10 +75,13 @@ public class GestorTxt {
         return flowers;
     }
 
-    public static void writeNeurons(SOM map) throws IOException {
-        RandomAccessFile raf = new RandomAccessFile("Grafo.dat", "rw");
+    public static void writeMap(SOM map) throws IOException {
+        RandomAccessFile raf = new RandomAccessFile("Map.dat", "rw");
 
-        raf.writeInt(map.getVerticesList().size());
+        raf.writeInt(map.getEpochs());
+        raf.writeInt(map.getTotalNeurons());
+        raf.writeDouble(map.getInitialLearningRate());
+        raf.writeInt(map.getRadious());
 
         Iterator<Vertex> iter = map.getVerticesList().iterator();
 
@@ -96,11 +99,14 @@ public class GestorTxt {
     }
 
     public static SOM loadMap() throws IOException {
-        RandomAccessFile raf = new RandomAccessFile("Grafo.dat", "rw");
-        SOM m = new SOM();
+        RandomAccessFile raf = new RandomAccessFile("Map.dat", "rw");
+        int epochs= raf.readInt();
+        int neurons = raf.readInt();
+        double learningRate = raf.readDouble();
+        int radius = raf.readInt();
+        SOM m = new SOM(epochs, neurons, learningRate, radius);
         m.setTrained(true);
         m.setInit(true);
-        int neurons = raf.readInt();
         while(neurons>0)
         {
             int id = raf.readInt();
