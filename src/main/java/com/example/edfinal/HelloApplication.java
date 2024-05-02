@@ -22,6 +22,7 @@ public class HelloApplication extends Application {
 
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
+        stage.setFullScreen(true);
         stage.setTitle("Iris Classifier");
         stage.setScene(scene);
         stage.show();
@@ -30,10 +31,16 @@ public class HelloApplication extends Application {
     public static void main(String[] args) throws IOException, ClassNotFoundException {
 //        Flower f = new Flower(5.0, 3.0, 2.0, 1.0);
 //        System.out.println(f.getPetalWidth());
-        launch();
-//            SOM map = new SOM(100, 60, 1.0, 15);
+       launch();
+//            SOM map = new SOM(150, 150, 1.0, 30);
 //            map.initialize();
 //            map.train();
+
+//            ArrayList<SOMNeuron> n = map.findBMUConLista(new Flower(5.0,3.0,2.0,1.0));
+//            System.out.println(n.size());
+//            String resp = map.classify(n);
+//            System.out.println(((Flower)n.getInfo()).getPetalLength());
+//            System.out.println(resp);
 //// 2.93 7.10
 //        Iterator<Vertex> iter = map.getVerticesList().iterator();
 //        int i=1;

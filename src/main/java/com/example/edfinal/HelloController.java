@@ -10,15 +10,15 @@ import javafx.scene.Node;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -41,6 +41,7 @@ public class HelloController implements Initializable {
     public TextField EpochsTF;
     public TextField LearningRateTF;
     public TextField RadiusTF;
+    public Button CloseButton;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -95,6 +96,7 @@ public class HelloController implements Initializable {
         WidthChart.getData().clear();
         LengthChart.getData().clear();
         this.map = GestorTxt.loadMap();
+        //GestorTxt.writeHeaderConfig(map);
         BMUStock.getSetosa().clear();
         BMUStock.getVersicolor().clear();
         BMUStock.getVirginica().clear();
@@ -111,11 +113,15 @@ public class HelloController implements Initializable {
         WidthChart.getData().clear();
         LengthChart.getData().clear();
         try {
+            BMUStock.getSetosa().clear();
+            BMUStock.getVersicolor().clear();
+            BMUStock.getVirginica().clear();
             int epochs = Integer.parseInt(EpochsTF.getText());
             int neurons = Integer.parseInt(NeuronsTF.getText());
             double learningRate = Double.parseDouble(LearningRateTF.getText());
             int radius = Integer.parseInt(RadiusTF.getText());
             map = new SOM(epochs, neurons, learningRate, radius);
+          //  GestorTxt.writeHeaderConfig(map);
             map.initialize();
             mostrar();
             this.startPressed = true;
@@ -215,9 +221,11 @@ public class HelloController implements Initializable {
         if(startPressed) {
             if (map.isTrained()) {
                 try {
-                    if (SepalChart.getData().size() > 3 && PetalChart.getData().size() > 3) {
+                    if (SepalChart.getData().size() > 3 && PetalChart.getData().size() > 3 && WidthChart.getData().size() > 3 && LengthChart.getData().size() > 3) {
                         SepalChart.getData().remove(SepalChart.getData().size() - 1);
                         PetalChart.getData().remove(PetalChart.getData().size() - 1);
+                        WidthChart.getData().remove(WidthChart.getData().size() - 1);
+                        LengthChart.getData().remove(LengthChart.getData().size() - 1);
                     }
                     double sepalLength = Double.parseDouble(SepalLengthText.getText());
                     double sepalWidth = Double.parseDouble(SepalWidthText.getText());
@@ -226,13 +234,17 @@ public class HelloController implements Initializable {
 
                     Flower f = new Flower(sepalLength, sepalWidth, petalLength, petalWidth, 'E');
                     SOMNeuron bmu = map.findBMU(f);
-                    String resp = map.classify(bmu);
-                    LabelResult.setText(resp);
+                   // GestorTxt.writeInConfig(bmu);
 
-                    updateChartData(SepalChart, ((Flower) bmu.getInfo()).getSepalWidth(), ((Flower) bmu.getInfo()).getSepalLength(), Color.YELLOW);
-                    updateChartData(PetalChart, ((Flower) bmu.getInfo()).getPetalWidth(), ((Flower) bmu.getInfo()).getPetalLength(), Color.YELLOW);
-                    updateChartData(WidthChart, ((Flower) bmu.getInfo()).getPetalWidth(), ((Flower) bmu.getInfo()).getSepalWidth(), Color.YELLOW);
-                    updateChartData(LengthChart, ((Flower) bmu.getInfo()).getPetalLength(), ((Flower) bmu.getInfo()).getSepalLength(), Color.YELLOW);
+                    sepalLength=((Flower) bmu.getInfo()).getSepalLength();
+                    sepalWidth=((Flower) bmu.getInfo()).getSepalWidth();
+                    petalLength=((Flower) bmu.getInfo()).getPetalLength();
+                    petalWidth=((Flower) bmu.getInfo()).getPetalWidth();
+
+                    updateChartData(SepalChart, sepalWidth, sepalLength, Color.YELLOW);
+                    updateChartData(PetalChart, petalWidth, petalLength, Color.YELLOW);
+                    updateChartData(WidthChart, petalWidth, sepalWidth, Color.YELLOW);
+                    updateChartData(LengthChart, petalLength, sepalLength, Color.YELLOW);
                 } catch (Exception e) {
                     e.printStackTrace();
                     showAlert("Check the data entry. Data must be entered this way:\nPetal Length: 1.0cm-6.9cm\nPetal Width: 0.1cm-2.5cm\nSepal Length: 4.3cm-7.9cm\nSepal Width: 2.0cm-4.4cm", Alert.AlertType.ERROR);
@@ -252,6 +264,7 @@ public class HelloController implements Initializable {
 
         Circle circle = new Circle(7);
         circle.setFill(color);
+        circle.setOpacity(40);
 
         data.setNode(circle);
 
@@ -296,5 +309,9 @@ public class HelloController implements Initializable {
         {
             showAlert("No map has been created to save. Press Start and then Train.", Alert.AlertType.WARNING);
         }
+    }
+
+    public void closeScreen(ActionEvent actionEvent) throws IOException {
+        ((Stage)CloseButton.getScene().getWindow()).close();
     }
 }

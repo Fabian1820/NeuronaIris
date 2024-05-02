@@ -177,7 +177,7 @@ public class SOM extends LinkedGraph {
         return resp;
     }
 
-    public String classify2(SOMNeuron bmu)
+    private String classify2(SOMNeuron bmu)
     {
         String resp = "";
         if(BMUStock.getSetosa().contains(bmu))
@@ -258,8 +258,10 @@ public class SOM extends LinkedGraph {
 
         updateGroup(toUpdate, ++distance, flower, currentEpoch);
         updated.addAll(toUpdate);
-        updateRadious(updated, (SOMNeuron) adjacents.getFirst(), ++distance, flower, 'L', currentEpoch);
-        updateRadious(updated, (SOMNeuron) adjacents.getLast(), ++distance, flower, 'R', currentEpoch);
+
+        int r = ++distance;
+        updateRadious(updated, (SOMNeuron) adjacents.getFirst(), r, flower, 'L', currentEpoch);
+        updateRadious(updated, (SOMNeuron) adjacents.getLast(), r, flower, 'R', currentEpoch);
 
     }
 
@@ -275,7 +277,7 @@ public class SOM extends LinkedGraph {
             LinkedList<Vertex> adjacents = current.getAdjacents();
 
             ArrayList<SOMNeuron> toUpdate = checkNotUpdated(updated, adjacents);
-            updateGroup(toUpdate, ++distance, flower, currentEpoch);
+            updateGroup(toUpdate, distance, flower, currentEpoch);
             updated.addAll(toUpdate);
             if(direction=='L')
             {

@@ -152,4 +152,32 @@ public class GestorTxt {
         }
 
     }
+
+    public static void writeInConfig(SOMNeuron n) throws IOException {
+        RandomAccessFile raf = new RandomAccessFile("Configuration.dat","rw");
+        raf.skipBytes(20);
+        long pos = raf.getFilePointer();
+        int cantIdent = raf.readInt();
+        raf.seek(raf.length());
+        raf.writeInt(n.getId());
+        raf.writeDouble(((Flower)n.getInfo()).getSepalLength());
+        raf.writeDouble(((Flower)n.getInfo()).getSepalWidth());
+        raf.writeDouble(((Flower)n.getInfo()).getPetalLength());
+        raf.writeDouble(((Flower)n.getInfo()).getPetalWidth());
+        raf.seek(pos);
+        raf.writeInt(++cantIdent);
+        raf.close();
+    }
+
+    public static void writeHeaderConfig(SOM map) throws IOException {
+        RandomAccessFile raf = new RandomAccessFile("Configuration.dat","rw");
+
+        raf.writeInt(map.getEpochs());
+        raf.writeInt(map.getTotalNeurons());
+        raf.writeDouble(map.getInitialLearningRate());
+        raf.writeInt(map.getRadious());
+        raf.writeInt(0);
+
+        raf.close();
+    }
 }
