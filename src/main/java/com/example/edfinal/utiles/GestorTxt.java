@@ -158,7 +158,8 @@ public class GestorTxt {
         raf.skipBytes(20);
         long pos = raf.getFilePointer();
         int cantIdent = raf.readInt();
-        raf.seek(raf.length());
+        if(cantIdent!=0)
+            raf.skipBytes(36*cantIdent);
         raf.writeInt(n.getId());
         raf.writeDouble(((Flower)n.getInfo()).getSepalLength());
         raf.writeDouble(((Flower)n.getInfo()).getSepalWidth());
@@ -171,7 +172,7 @@ public class GestorTxt {
 
     public static void writeHeaderConfig(SOM map) throws IOException {
         RandomAccessFile raf = new RandomAccessFile("Configuration.dat","rw");
-
+        raf.setLength(0);
         raf.writeInt(map.getEpochs());
         raf.writeInt(map.getTotalNeurons());
         raf.writeDouble(map.getInitialLearningRate());
@@ -179,5 +180,25 @@ public class GestorTxt {
         raf.writeInt(0);
 
         raf.close();
+    }
+
+    public static ArrayList<SOMNeuron> readConfig() throws IOException {
+        RandomAccessFile raf = new RandomAccessFile("Configuration.dat","rw");
+        ArrayList<SOMNeuron> list = new ArrayList<>();
+        raf.skipBytes(20);
+        int cant = raf.readInt();
+        while (cant>0)
+        {
+            int id = raf.readInt();
+            double sepalLength = raf.readDouble();
+            double sepalWidth = raf.readDouble();
+            double petalLength = raf.readDouble();
+            double petalWidth = raf.readDouble();
+            list.add(new SOMNeuron(id, new Flower(sepalLength,sepalWidth,petalLength,petalWidth)));
+            cant--;
+        }
+        raf.close();
+        return list;
+
     }
 }

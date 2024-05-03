@@ -15,6 +15,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.SortedMap;
 
 public class HelloApplication extends Application {
     @Override
@@ -35,6 +36,26 @@ public class HelloApplication extends Application {
 //            SOM map = new SOM(150, 150, 1.0, 30);
 //            map.initialize();
 //            map.train();
+//
+//            GestorTxt.writeHeaderConfig(map);
+//
+//        ArrayList<Flower> arr = GestorTxt.getDataBase();
+//        for(int j=0;j<5;j++)
+//        {
+//            Flower flor = arr.get(j);
+//            SOMNeuron bmu = map.findBMU(flor);
+//            GestorTxt.writeInConfig(bmu);
+//            System.out.print("   " + "//"+bmu.getId()+"//");
+//        }
+//
+//        System.out.println();
+//
+//        ArrayList<SOMNeuron> list = GestorTxt.readConfig();
+//
+//        for(SOMNeuron n : list)
+//        {
+//            System.out.print("   " + "//"+n.getId()+"//");
+//        }
 
 //            ArrayList<SOMNeuron> n = map.findBMUConLista(new Flower(5.0,3.0,2.0,1.0));
 //            System.out.println(n.size());

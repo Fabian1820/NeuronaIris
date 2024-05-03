@@ -4,31 +4,34 @@ import com.example.edfinal.utiles.BMUStock;
 import com.example.edfinal.utiles.BMUandFManager;
 import com.example.edfinal.utiles.GestorTxt;
 import cu.edu.cujae.ceis.graph.vertex.Vertex;
+import javafx.animation.KeyFrame;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.animation.Timeline;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.*;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.ResourceBundle;
 
 public class HelloController implements Initializable {
     public SOM map;
-
     public boolean startPressed;
-    public Label LabelResult;
     public ScatterChart<Number, Number> SepalChart;
     public ScatterChart<Number, Number> PetalChart;
     public TextField SepalWidthText;
@@ -42,6 +45,20 @@ public class HelloController implements Initializable {
     public TextField LearningRateTF;
     public TextField RadiusTF;
     public Button CloseButton;
+    public TextArea TextA;
+    public ImageView ImgView;
+
+    @FXML
+    private AnchorPane ImgAnchor;
+    private int currentImageIndex = 0;
+    private String[] imagePaths = {
+            "C:/Users/ruben/IdeaProjects/NeuronaIris/src/main/resources/Imagen/FLORP.jpg",
+            "C:/Users/ruben/IdeaProjects/NeuronaIris/src/main/resources/Imagen/MORP.jpg",
+            "C:/Users/ruben/IdeaProjects/NeuronaIris/src/main/resources/Imagen/OIPP.jpg",
+            "C:/Users/ruben/IdeaProjects/NeuronaIris/src/main/resources/Imagen/RP.jpg",
+            "C:/Users/ruben/IdeaProjects/NeuronaIris/src/main/resources/Imagen/SPIP.jpg"
+    };
+
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -50,8 +67,18 @@ public class HelloController implements Initializable {
         PetalChart.setLegendVisible(false);
         WidthChart.setLegendVisible(false);
         LengthChart.setLegendVisible(false);
+        Timeline imageChangeTimeline = new Timeline(
+                new KeyFrame(Duration.seconds(5), event -> changeImage()));
+        imageChangeTimeline.setCycleCount(Timeline.INDEFINITE);
+        imageChangeTimeline.play();
         mostrarBase();
     }
+
+private void changeImage() {
+    Image newImage = new Image(imagePaths[currentImageIndex]);
+    ImgView.setImage(newImage);
+    currentImageIndex = (currentImageIndex + 1) % imagePaths.length;
+}
 
 
     public void loadFile(ActionEvent actionEvent) throws FileNotFoundException {
@@ -96,7 +123,7 @@ public class HelloController implements Initializable {
         WidthChart.getData().clear();
         LengthChart.getData().clear();
         this.map = GestorTxt.loadMap();
-        //GestorTxt.writeHeaderConfig(map);
+        GestorTxt.writeHeaderConfig(map);
         BMUStock.getSetosa().clear();
         BMUStock.getVersicolor().clear();
         BMUStock.getVirginica().clear();
@@ -112,6 +139,7 @@ public class HelloController implements Initializable {
         SepalChart.getData().clear();
         WidthChart.getData().clear();
         LengthChart.getData().clear();
+        TextA.setText("");
         try {
             BMUStock.getSetosa().clear();
             BMUStock.getVersicolor().clear();
@@ -121,7 +149,7 @@ public class HelloController implements Initializable {
             double learningRate = Double.parseDouble(LearningRateTF.getText());
             int radius = Integer.parseInt(RadiusTF.getText());
             map = new SOM(epochs, neurons, learningRate, radius);
-          //  GestorTxt.writeHeaderConfig(map);
+            GestorTxt.writeHeaderConfig(map);
             map.initialize();
             mostrar();
             this.startPressed = true;
@@ -234,12 +262,14 @@ public class HelloController implements Initializable {
 
                     Flower f = new Flower(sepalLength, sepalWidth, petalLength, petalWidth, 'E');
                     SOMNeuron bmu = map.findBMU(f);
-                   // GestorTxt.writeInConfig(bmu);
 
-                    sepalLength=((Flower) bmu.getInfo()).getSepalLength();
-                    sepalWidth=((Flower) bmu.getInfo()).getSepalWidth();
-                    petalLength=((Flower) bmu.getInfo()).getPetalLength();
-                    petalWidth=((Flower) bmu.getInfo()).getPetalWidth();
+                    DecimalFormat df = new DecimalFormat("#.00");
+                    sepalLength = ((Flower)bmu.getInfo()).getSepalLength();
+                    sepalWidth = ((Flower)bmu.getInfo()).getSepalWidth();
+                    petalLength = ((Flower)bmu.getInfo()).getPetalLength();
+                    petalWidth = ((Flower)bmu.getInfo()).getPetalWidth();
+                    TextA.appendText("Id: "+bmu.getId()+" SL: "+df.format(sepalLength)+" SW: "+df.format(sepalWidth)+" PL: "+df.format(petalLength)+" PW: "+df.format(petalWidth)+"\n");
+                    GestorTxt.writeInConfig(bmu);
 
                     updateChartData(SepalChart, sepalWidth, sepalLength, Color.YELLOW);
                     updateChartData(PetalChart, petalWidth, petalLength, Color.YELLOW);
@@ -292,6 +322,7 @@ public class HelloController implements Initializable {
         alert.setTitle("Error");
         alert.setHeaderText(null);
         alert.setContentText(message);
+        alert.initOwner(ImgAnchor.getScene().getWindow());
         alert.showAndWait();
     }
 
