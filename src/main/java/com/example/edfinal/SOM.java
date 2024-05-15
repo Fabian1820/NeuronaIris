@@ -8,9 +8,7 @@ import java.util.*;
 
 public class SOM extends LinkedGraph {
 
-
     private double initialLearningRate;
-
     private double currentLearningRate;
     private int epochs;
     public int totalNeurons;

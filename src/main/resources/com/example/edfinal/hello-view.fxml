@@ -117,17 +117,19 @@
       <TextField fx:id="LearningRateTF" alignment="CENTER" layoutX="642.0" layoutY="80.0" prefHeight="34.0" prefWidth="130.0" promptText="LEARNING RATE" />
       <TextField fx:id="RadiusTF" alignment="CENTER" layoutX="495.0" layoutY="80.0" prefHeight="34.0" prefWidth="130.0" promptText="RADIUS" />
       <Button fx:id="CloseButton" layoutX="1476.0" layoutY="14.0" mnemonicParsing="false" onAction="#closeScreen" prefHeight="30.0" prefWidth="30.0" text="X" />
-      <AnchorPane layoutX="377.0" layoutY="793.0" prefHeight="54.0" prefWidth="619.0">
+      <AnchorPane layoutX="248.0" layoutY="790.0" prefHeight="54.0" prefWidth="792.0">
          <children>
-            <Circle id="OrangeC" fill="ORANGE" layoutX="-15.0" layoutY="21.0" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
-            <Circle id="CyanC" fill="CYAN" layoutX="-15.0" layoutY="38.0" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
-            <Label layoutX="-4.0" layoutY="20.0" text="Data Base and Random Weights" />
+            <Circle id="OrangeC" fill="ORANGE" layoutX="-8.0" layoutY="21.0" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle id="CyanC" fill="CYAN" layoutX="-8.0" layoutY="38.0" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
+            <Label layoutX="3.0" layoutY="20.0" text="Data Base Random Weights" />
             <Circle fill="RED" layoutX="233.0" layoutY="30.0" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
             <Label layoutX="244.0" layoutY="20.0" text="Iris Setosa" />
             <Circle id="GreenC" fill="GREEN" layoutX="364.0" layoutY="30.0" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
             <Label layoutX="373.0" layoutY="21.0" text="Iris Versicolor" />
             <Circle id="BlueC" fill="BLUE" layoutX="507.0" layoutY="30.0" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
             <Label layoutX="517.0" layoutY="21.0" text="Iris Virginica" />
+            <Circle id="YellowC" fill="YELLOW" layoutX="634.0" layoutY="31.0" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
+            <Label layoutX="645.0" layoutY="21.0" text="BMU of Data Entry" />
          </children>
       </AnchorPane>
    </children>

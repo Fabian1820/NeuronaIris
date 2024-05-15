@@ -131,6 +131,7 @@ private void changeImage() {
         mostrarNeuronasGrupo(BMUStock.getSetosa(), Color.RED);
         mostrarNeuronasGrupo(BMUStock.getVersicolor(), Color.GREEN);
         mostrarNeuronasGrupo(BMUStock.getVirginica(), Color.BLUE);
+        TextA.setText("");
         this.startPressed=true;
     }
 
@@ -156,7 +157,6 @@ private void changeImage() {
         }
         catch (Exception e)
         {
-            e.printStackTrace();
             showAlert("Fill all the map configuration parameters.", Alert.AlertType.WARNING);
         }
     }
@@ -276,7 +276,6 @@ private void changeImage() {
                     updateChartData(WidthChart, petalWidth, sepalWidth, Color.YELLOW);
                     updateChartData(LengthChart, petalLength, sepalLength, Color.YELLOW);
                 } catch (Exception e) {
-                    e.printStackTrace();
                     showAlert("Check the data entry. Data must be entered this way:\nPetal Length: 1.0cm-6.9cm\nPetal Width: 0.1cm-2.5cm\nSepal Length: 4.3cm-7.9cm\nSepal Width: 2.0cm-4.4cm", Alert.AlertType.ERROR);
                 }
             } else {
