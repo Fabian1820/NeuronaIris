@@ -1,0 +1,12 @@
+
+.dialog-pane {
+    -fx-background-color: #2f2e2e;
+}
+
+
+.dialog-pane .button {
+    -fx-background-color: #007bff;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
