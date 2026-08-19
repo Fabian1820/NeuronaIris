@@ -1,0 +1,5 @@
+# El tema de JavaFX es CSS de terceros: que no cuente como lenguaje del proyecto
+src/main/resources/Styles/cupertino-dark.css linguist-vendored
+
+# Dependencias empaquetadas
+*.jar binary linguist-vendored
