@@ -84,7 +84,7 @@ class ExperimentoTest {
 
         // Foto de los pesos, una época más, y cuánto se movieron.
         double[] antes = pesos(som);
-        som.train2(GestorTxt.getDataBase(), epochs);
+        som.train2(som.getDataset().getSamples(), epochs);
         double[] despues = pesos(som);
 
         double desplazamiento = 0;

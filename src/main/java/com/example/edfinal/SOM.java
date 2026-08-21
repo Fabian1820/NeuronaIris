@@ -1,6 +1,8 @@
 package com.example.edfinal;
 import com.example.edfinal.utiles.BMUStock;
 import com.example.edfinal.utiles.GestorTxt;
+import com.example.edfinal.data.Dataset;
+import com.example.edfinal.data.Sample;
 import cu.edu.cujae.ceis.graph.LinkedGraph;
 import cu.edu.cujae.ceis.graph.vertex.Vertex;
 
@@ -33,8 +35,16 @@ public class SOM extends LinkedGraph {
 
     private boolean init;
     private final Map<Integer, String> labels = new HashMap<>();
+    private Dataset dataset;
 
+    /** Mapa sobre el dataset Iris (comportamiento histórico). */
     public SOM(int epochs, int neurons, double learningRate, int radius)
+    {
+      this(epochs, neurons, learningRate, radius, null);
+    }
+
+    /** Mapa sobre cualquier dataset. Si es null se usa el Iris de GestorTxt. */
+    public SOM(int epochs, int neurons, double learningRate, int radius, Dataset dataset)
     {
       super();
       this.init=false;
@@ -43,6 +53,14 @@ public class SOM extends LinkedGraph {
       this.totalNeurons=neurons;
       this.initialLearningRate=learningRate;
       this.radious=radius;
+      this.dataset=dataset;
+    }
+
+    /** El dataset del mapa; se resuelve perezosamente al Iris si no se dio otro. */
+    public Dataset getDataset()
+    {
+        if (dataset == null) dataset = GestorTxt.getIrisDataset();
+        return dataset;
     }
 
 
@@ -69,8 +87,15 @@ public class SOM extends LinkedGraph {
 
     public void initialize()
     {
+        Dataset d = getDataset();
+        double[] min = d.getMin(), max = d.getMax();
+        boolean esIris = d.dimension() == 4;
+
         for(int i=1;i<totalNeurons+1;i++) {
-            this.getVerticesList().add(new SOMNeuron(i, new Flower()));
+            Sample pesos = Sample.random(min, max, RandomFeaturesPicker.getRandom());
+            // Para el caso Iris se envuelve en Flower: la interfaz lee las
+            // medidas por nombre y hace casts a Flower en varios sitios.
+            this.getVerticesList().add(new SOMNeuron(i, esIris ? Flower.from(pesos) : pesos));
         }
         makeConnections();
         this.init=true;
@@ -96,7 +121,7 @@ public class SOM extends LinkedGraph {
         this.insertEdgeDG(++i, 0); //Esta seria la conexion de la ultima neurona con las dos primeras
         this.insertEdgeDG(i, 1);
     }
-    public SOMNeuron findBMU(Flower flower)
+    public SOMNeuron findBMU(Sample flower)
     {
         SOMNeuron BMU = null;
         double shortestED = Double.MAX_VALUE;
@@ -117,7 +142,7 @@ public class SOM extends LinkedGraph {
         return BMU;
     }
 
-    public ArrayList<SOMNeuron> findBMUConLista(Flower flower)
+    public ArrayList<SOMNeuron> findBMUConLista(Sample flower)
     {
         ArrayList<SOMNeuron> BMU = new ArrayList<SOMNeuron>();
         double shortestED = Double.MAX_VALUE;
@@ -148,26 +173,22 @@ public class SOM extends LinkedGraph {
     {
         this.init=b;
     }
-    public void groupBmus(ArrayList<Flower> dataBase)
+    /**
+     * Agrupa la BMU de cada muestra por su etiqueta real.
+     *
+     * Antes esto recorría los índices 0-49, 50-99 y 100-149 dando por hecho que
+     * el fichero eran 150 flores ordenadas por especie: cargar cualquier otro
+     * dataset lo rompía en silencio.
+     */
+    public void groupBmus(List<Sample> dataBase)
     {
         // Un agrupamiento nuevo sustituye al anterior: sin esto, reentrenar
         // duplicaba las BMUs (150 -> 300) y la clasificación quedaba sucia.
         BMUStock.clear();
-        int i=0;
-        while(i<50)
+        for (Sample s : dataBase)
         {
-            BMUStock.getSetosa().add(this.findBMU(dataBase.get(i)));
-            i++;
-        }
-        while(i<100)
-        {
-            BMUStock.getVersicolor().add(this.findBMU(dataBase.get(i)));
-            i++;
-        }
-        while(i<150)
-        {
-            BMUStock.getVirginica().add(this.findBMU(dataBase.get(i)));
-            i++;
+            if (s.getLabel() == null) continue;
+            BMUStock.forLabel(especie(s.getLabel())).add(this.findBMU(s));
         }
     }
 
@@ -177,14 +198,14 @@ public class SOM extends LinkedGraph {
      * flores de dos especies se queda con la que más veces la eligió, en vez de con
      * la primera que aparezca en la lista.
      */
-    public void labelNeurons(ArrayList<Flower> dataBase)
+    public void labelNeurons(List<Sample> dataBase)
     {
         Map<Integer, Map<String, Integer>> votos = new HashMap<>();
-        for (Flower f : dataBase)
+        for (Sample f : dataBase)
         {
-            if (f.getType() == null) continue;
+            if (f.getLabel() == null) continue;
             int id = findBMU(f).getId();
-            votos.computeIfAbsent(id, k -> new HashMap<>()).merge(especie(f.getType()), 1, Integer::sum);
+            votos.computeIfAbsent(id, k -> new HashMap<>()).merge(especie(f.getLabel()), 1, Integer::sum);
         }
 
         labels.clear();
@@ -213,7 +234,7 @@ public class SOM extends LinkedGraph {
 
         // Neurona muerta (no ganó ninguna muestra): se usa la neurona etiquetada
         // más parecida. Recorre la lista una vez, sin riesgo de ciclo infinito.
-        Flower pesos = (Flower) bmu.getInfo();
+        Sample pesos = bmu.getWeights();
         String mejor = "";
         double menorDistancia = Double.MAX_VALUE;
         for (Vertex v : this.verticesList)
@@ -238,7 +259,7 @@ public class SOM extends LinkedGraph {
         SOMNeuron newBMU = null;
         double shortest = Double.MAX_VALUE;
         double distance = 0.0;
-        Flower f = (Flower) bmu.getInfo();
+        Sample f = bmu.getWeights();
         while (iter.hasNext())
         {
             SOMNeuron n = (SOMNeuron) iter.next();
@@ -261,22 +282,22 @@ public class SOM extends LinkedGraph {
         for(int i=1;i<=epochs;i++)
         {
             this.currentLearningRate= learningRate(i);
-            train2(GestorTxt.getDataBase(), i);
+            train2(getDataset().getSamples(), i);
         }
         this.trained=true;
-        groupBmus(GestorTxt.getDataBase());
-        labelNeurons(GestorTxt.getDataBase());
+        groupBmus(getDataset().getSamples());
+        labelNeurons(getDataset().getSamples());
     }
 
-    public void train2(ArrayList<Flower> dataBase, int currentEpoch)
+    public void train2(List<Sample> dataBase, int currentEpoch)
     {
-        for (Flower flower : dataBase) {
+        for (Sample flower : dataBase) {
             SOMNeuron bmu = this.findBMU(flower);
             updateBmuAndAdjacents(bmu, flower, currentEpoch);
         }
     }
 
-    public void updateBmuAndAdjacents(SOMNeuron bmu, Flower flower, int currentEpoch)
+    public void updateBmuAndAdjacents(SOMNeuron bmu, Sample flower, int currentEpoch)
     {
         ArrayList<SOMNeuron> updated = new ArrayList<SOMNeuron>();
         int distance=0;
@@ -300,12 +321,12 @@ public class SOM extends LinkedGraph {
 
     }
 
-    public void updateBMU(SOMNeuron bmu, Flower f, int currentEpch, int distance){
+    public void updateBMU(SOMNeuron bmu, Sample f, int currentEpch, int distance){
         double influenceRate = influenceRate(distance, currentEpch);
         bmu.updateWeight(influenceRate, this.currentLearningRate, f);
     }
 
-    public void updateRadious(ArrayList<SOMNeuron> updated, SOMNeuron current, int distance, Flower flower,char direction, int currentEpoch)
+    public void updateRadious(ArrayList<SOMNeuron> updated, SOMNeuron current, int distance, Sample flower,char direction, int currentEpoch)
     {
         if (distance <= radious) {
 
@@ -325,7 +346,7 @@ public class SOM extends LinkedGraph {
         }
     }
 
-    public void updateGroup(ArrayList<SOMNeuron> toUpdate, int distance, Flower flower, int currentEpoch)
+    public void updateGroup(ArrayList<SOMNeuron> toUpdate, int distance, Sample flower, int currentEpoch)
     {
         double influenceRate = influenceRate(distance, currentEpoch);
         for(SOMNeuron n : toUpdate)

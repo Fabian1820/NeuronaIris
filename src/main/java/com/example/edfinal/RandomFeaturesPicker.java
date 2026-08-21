@@ -32,6 +32,12 @@ public class RandomFeaturesPicker {
         rand = new Random(seed);
     }
 
+    /** Fuente aleatoria compartida, para que la semilla valga en todo el proyecto. */
+    public static Random getRandom()
+    {
+        return rand;
+    }
+
     private static double entre(double min, double max)
     {
         return min + (max - min) * rand.nextDouble();

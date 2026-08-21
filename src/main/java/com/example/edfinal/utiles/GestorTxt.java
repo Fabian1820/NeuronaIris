@@ -1,6 +1,8 @@
 package com.example.edfinal.utiles;
 
 import com.example.edfinal.Flower;
+import com.example.edfinal.data.Dataset;
+import com.example.edfinal.data.Sample;
 import com.example.edfinal.SOM;
 import com.example.edfinal.SOMNeuron;
 import cu.edu.cujae.ceis.graph.vertex.Vertex;
@@ -16,6 +18,8 @@ public class GestorTxt {
     private static ArrayList<Flower> flowersDataBase;
     private static ArrayList<Flower> lista;
 
+    private static Dataset irisDataset;
+
     public static ArrayList<Flower> getDataBase()
     {
         if(flowersDataBase==null)
@@ -23,6 +27,22 @@ public class GestorTxt {
             flowersDataBase = load(path);
         }
         return flowersDataBase;
+    }
+
+    /** El Iris como Dataset genérico (lo que consume el mapa). */
+    public static Dataset getIrisDataset()
+    {
+        if (irisDataset == null)
+        {
+            irisDataset = new Dataset(new ArrayList<Sample>(getDataBase()), Flower.FEATURE_NAMES);
+        }
+        return irisDataset;
+    }
+
+    /** Carga cualquier CSV numérico como dataset. */
+    public static Dataset loadDataset(String ruta) throws IOException
+    {
+        return Dataset.fromCsv(ruta);
     }
 
     public static ArrayList<Flower> getFile(String path)

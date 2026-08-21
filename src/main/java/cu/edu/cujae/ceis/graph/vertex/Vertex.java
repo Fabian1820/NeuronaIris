@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import com.example.edfinal.Flower;
+import com.example.edfinal.data.Sample;
 import cu.edu.cujae.ceis.graph.edge.Edge;
 
 
@@ -16,7 +16,7 @@ public class Vertex implements Serializable {
 	/**
 	 * Objeto que representa la información del vértice.
 	 */
-	private Flower info;
+	private Sample info;
 	
 	/**
 	 * Lista de aristas.
@@ -29,7 +29,7 @@ public class Vertex implements Serializable {
 	 * 
 	 * @param info Información.
 	 */
-	public Vertex(Flower info) {
+	public Vertex(Sample info) {
 		this.info = info;
 		edgeList  = new LinkedList<Edge>();
 	}
@@ -75,7 +75,7 @@ public class Vertex implements Serializable {
 	 * Define la información para este nodo.
 	 * @param info Información.
 	 */
-	public void setInfo(Flower info) {
+	public void setInfo(Sample info) {
 		this.info = info;
 	}
 	

@@ -136,7 +136,7 @@ private void changeImage() {
         BMUStock.getSetosa().clear();
         BMUStock.getVersicolor().clear();
         BMUStock.getVirginica().clear();
-        map.groupBmus(GestorTxt.getDataBase());
+        map.groupBmus(map.getDataset().getSamples());
         mostrarNeuronasGrupo(BMUStock.getSetosa(), Color.RED);
         mostrarNeuronasGrupo(BMUStock.getVersicolor(), Color.GREEN);
         mostrarNeuronasGrupo(BMUStock.getVirginica(), Color.BLUE);

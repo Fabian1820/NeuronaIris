@@ -3,44 +3,56 @@ package com.example.edfinal.utiles;
 import com.example.edfinal.SOMNeuron;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
+/**
+ * BMUs agrupadas por etiqueta.
+ *
+ * Antes eran tres listas fijas (setosa/versicolor/virginica). Ahora es un mapa
+ * por etiqueta, para que sirva con cualquier dataset; los tres accesores de
+ * siempre se mantienen porque la interfaz pinta cada especie de un color.
+ */
 public class BMUStock {
-    private static ArrayList<SOMNeuron> setosa;
-    private static ArrayList<SOMNeuron> versicolor;
-    private static ArrayList<SOMNeuron> virginica;
+
+    private static final Map<String, ArrayList<SOMNeuron>> grupos = new LinkedHashMap<>();
+
+    /** Lista de BMUs de una etiqueta; se crea vacía si aún no existe. */
+    public static ArrayList<SOMNeuron> forLabel(String label)
+    {
+        return grupos.computeIfAbsent(label, k -> new ArrayList<>());
+    }
+
+    /** Etiquetas presentes, en orden de aparición. */
+    public static Set<String> labels()
+    {
+        return grupos.keySet();
+    }
 
     public static ArrayList<SOMNeuron> getSetosa()
     {
-        if(setosa==null)
-        {
-            setosa = new ArrayList<>();
-        }
-        return setosa;
+        return forLabel("setosa");
     }
 
     public static ArrayList<SOMNeuron> getVersicolor()
     {
-        if(versicolor==null)
-        {
-            versicolor = new ArrayList<>();
-        }
-        return versicolor;
+        return forLabel("versicolor");
     }
 
     public static ArrayList<SOMNeuron> getVirginica()
     {
-        if(virginica==null)
-        {
-            virginica = new ArrayList<>();
-        }
-        return virginica;
+        return forLabel("virginica");
     }
 
-    /** Vacía los tres grupos. Un agrupamiento nuevo reemplaza al anterior, no se suma. */
+    /**
+     * Descarta el agrupamiento entero, etiquetas incluidas.
+     *
+     * No basta con vaciar las listas: si se quedaran las claves, labels()
+     * seguiría anunciando etiquetas de un dataset anterior.
+     */
     public static void clear()
     {
-        getSetosa().clear();
-        getVersicolor().clear();
-        getVirginica().clear();
+        grupos.clear();
     }
 }

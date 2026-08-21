@@ -1,6 +1,6 @@
 package cu.edu.cujae.ceis.graph.vertex;
 
-import com.example.edfinal.Flower;
+import com.example.edfinal.data.Sample;
 
 /**
  * <h1>Vértice con peso</h1>
@@ -19,7 +19,7 @@ public class WeightedVertex extends Vertex {
 	 * @param info Información del vértice.
 	 * @param weight Peso del vértice.
 	 */
-	public WeightedVertex(Flower info, Object weight) {
+	public WeightedVertex(Sample info, Object weight) {
 		super(info);
 		this.weight = weight;
 	}

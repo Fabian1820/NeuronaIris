@@ -3,7 +3,7 @@ package cu.edu.cujae.ceis.graph;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import com.example.edfinal.Flower;
+import com.example.edfinal.data.Sample;
 import cu.edu.cujae.ceis.graph.edge.Edge;
 import cu.edu.cujae.ceis.graph.edge.WeightedEdge;
 import cu.edu.cujae.ceis.graph.interfaces.ILinkedDirectedGraph;
@@ -219,7 +219,7 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 	 * 			satisfactoriamente, false si no.
 	 */
 	
-	public boolean insertVertex(Flower info) {
+	public boolean insertVertex(Sample info) {
 		return verticesList.add(new Vertex(info));
 	}
 
@@ -631,7 +631,7 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 	 * 			satisfactoriamente, false si no.
 	 */
 	
-	public boolean insertWVertex(Flower info, Object weight) {
+	public boolean insertWVertex(Sample info, Object weight) {
 		return verticesList.add(new WeightedVertex(info, weight));
 	}	
 }

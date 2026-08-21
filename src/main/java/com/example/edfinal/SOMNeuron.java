@@ -1,27 +1,33 @@
 package com.example.edfinal;
 
+import com.example.edfinal.data.Sample;
 import cu.edu.cujae.ceis.graph.vertex.Vertex;
-import cu.edu.cujae.ceis.graph.vertex.WeightedVertex;
 
 import java.io.Serializable;
 
+/**
+ * Una neurona del mapa. Sus pesos son una muestra del mismo espacio que los
+ * datos: N variables, no cuatro medidas fijas.
+ */
 public class SOMNeuron extends Vertex implements Serializable {
     private static final long serialVersionUID = 1L;
     private int id;
-    public SOMNeuron( int id, Flower flower)
+
+    public SOMNeuron(int id, Sample weights)
     {
-        super(flower);
+        super(weights);
         this.id=id;
     }
 
-    public double euclidianDistance(Flower flower)
+    /** Pesos de la neurona. */
+    public Sample getWeights()
     {
-        double petalLengthDist = Math.pow((((Flower)this.getInfo()).getPetalLength()-flower.getPetalLength()),2);
-        double petalWidthDist = Math.pow((((Flower)this.getInfo()).getPetalWidth()-flower.getPetalWidth()),2);
-        double sepalLengthDist = Math.pow((((Flower)this.getInfo()).getSepalLength()-flower.getSepalLength()),2);
-        double sepalWidthDist = Math.pow((((Flower)this.getInfo()).getSepalWidth()-flower.getSepalWidth()),2);
+        return (Sample) this.getInfo();
+    }
 
-        return Math.sqrt( petalLengthDist +  petalWidthDist + sepalLengthDist + sepalWidthDist);
+    public double euclidianDistance(Sample other)
+    {
+        return getWeights().distanceTo(other);
     }
 
     public int getId()
@@ -29,12 +35,9 @@ public class SOMNeuron extends Vertex implements Serializable {
         return this.id;
     }
 
-    public void updateWeight(double influenceRate, double learningRate, Flower flower)
+    public void updateWeight(double influenceRate, double learningRate, Sample target)
     {
-        ((Flower)this.getInfo()).setSepalWidth(this.updateFeature(influenceRate, learningRate, flower.getSepalWidth(), ((Flower)this.getInfo()).getSepalWidth()));
-        ((Flower)this.getInfo()).setSepalLength(this.updateFeature(influenceRate, learningRate, flower.getSepalLength(), ((Flower) this.getInfo()).getSepalLength()));
-        ((Flower)this.getInfo()).setPetalWidth(this.updateFeature(influenceRate, learningRate, flower.getPetalWidth(), ((Flower) this.getInfo()).getPetalWidth()));
-        ((Flower)this.getInfo()).setPetalLength(this.updateFeature(influenceRate, learningRate, flower.getPetalLength(), ((Flower) this.getInfo()).getPetalLength()));
+        getWeights().moveToward(target, influenceRate, learningRate);
     }
 
     public double updateFeature(double influenceRate, double learningRate, double newWeight, double currentWeight){
@@ -42,17 +45,8 @@ public class SOMNeuron extends Vertex implements Serializable {
         return currentWeight + influenceRate * learningRate * (newWeight - currentWeight);
     }
 
-    public double averageSepalMeasurement(){
-        return (((Flower)this.getInfo()).getSepalWidth() * (((Flower)this.getInfo()).getSepalLength()))/2;
-    }
-
-    public double averagePetalMeasurement(){
-        return (((Flower)this.getInfo()).getPetalWidth() * (((Flower)this.getInfo()).getPetalLength()))/2;
-    }
     @Override
     public String toString() {
-        if (getInfo() != null)
-        return getInfo().toString();
-        else return "SOMNeuron sin datos";
+        return getInfo() != null ? getInfo().toString() : "SOMNeuron sin datos";
     }
 }
