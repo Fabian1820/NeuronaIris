@@ -5,8 +5,15 @@ import com.example.edfinal.utiles.GestorTxt;
 import cu.edu.cujae.ceis.graph.Graph;
 import cu.edu.cujae.ceis.graph.vertex.Vertex;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.Group;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.StackPane;
+import javafx.scene.transform.Scale;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -18,14 +25,49 @@ import java.util.Iterator;
 import java.util.SortedMap;
 
 public class HelloApplication extends Application {
+
+    /** Tamaño para el que está dibujado el FXML (coordenadas absolutas). */
+    private static final double DISENO_ANCHO = 1545;
+    private static final double DISENO_ALTO = 881;
+
     @Override
     public void start(Stage stage) throws IOException {
 
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load());
-        stage.setFullScreen(true);
+        Parent contenido = fxmlLoader.load();
+
+        // El FXML usa posiciones absolutas sobre un lienzo de 1545x881, así que
+        // en cualquier monitor más estrecho se salía por el borde derecho. En vez
+        // de rehacer el layout entero, se escala el contenido para que quepa
+        // siempre, manteniendo la proporción y centrado.
+        Group lienzo = new Group(contenido);
+        StackPane raiz = new StackPane(lienzo);
+        raiz.setStyle("-fx-background-color: #1e1e1e;");
+
+        Rectangle2D pantalla = Screen.getPrimary().getVisualBounds();
+        double ancho = Math.min(DISENO_ANCHO, pantalla.getWidth());
+        double alto = Math.min(DISENO_ALTO, pantalla.getHeight());
+
+        Scene scene = new Scene(raiz, ancho, alto);
+
+        Scale escala = new Scale(1, 1, 0, 0);
+        contenido.getTransforms().add(escala);
+
+        ChangeListener<Number> ajustar = (obs, viejo, nuevo) -> {
+            double factor = Math.min(scene.getWidth() / DISENO_ANCHO,
+                                     scene.getHeight() / DISENO_ALTO);
+            escala.setX(factor);
+            escala.setY(factor);
+        };
+        scene.widthProperty().addListener(ajustar);
+        scene.heightProperty().addListener(ajustar);
+        ajustar.changed(null, 0, 0);
+
         stage.setTitle("Iris Classifier");
         stage.setScene(scene);
+        stage.setMinWidth(800);
+        stage.setMinHeight(600);
+        stage.setMaximized(true);
         stage.show();
     }
 
