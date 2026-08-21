@@ -37,10 +37,45 @@ public class SOM extends LinkedGraph {
     private final Map<Integer, String> labels = new HashMap<>();
     private Dataset dataset;
 
+    /** Cómo se conectan las neuronas entre sí. */
+    public enum Topology { RING, GRID }
+
+    private Topology topology = Topology.RING;
+    private int rows = 0;
+    private int cols = 0;
+
     /** Mapa sobre el dataset Iris (comportamiento histórico). */
     public SOM(int epochs, int neurons, double learningRate, int radius)
     {
       this(epochs, neurons, learningRate, radius, null);
+    }
+
+    /**
+     * Mapa con topología de rejilla 2-D: cada neurona se conecta con las de
+     * arriba, abajo, izquierda y derecha. Es la forma canónica del SOM y la que
+     * permite dibujar U-matrix y planos de componentes.
+     */
+    public SOM(int epochs, int rows, int cols, double learningRate, int radius, Dataset dataset)
+    {
+      this(epochs, rows * cols, learningRate, radius, dataset);
+      if (rows < 2 || cols < 2) {
+          throw new IllegalArgumentException("Una rejilla necesita al menos 2x2 y se pidió " + rows + "x" + cols);
+      }
+      this.topology = Topology.GRID;
+      this.rows = rows;
+      this.cols = cols;
+    }
+
+    public Topology getTopology() { return topology; }
+    public int getRows() { return rows; }
+    public int getCols() { return cols; }
+
+    /** Fila y columna de una neurona en la rejilla (null si el mapa es un anillo). */
+    public int[] positionOf(SOMNeuron n)
+    {
+        if (topology != Topology.GRID) return null;
+        int idx = this.verticesList.indexOf(n);
+        return idx < 0 ? null : new int[]{ idx / cols, idx % cols };
     }
 
     /** Mapa sobre cualquier dataset. Si es null se usa el Iris de GestorTxt. */
@@ -101,9 +136,29 @@ public class SOM extends LinkedGraph {
         this.init=true;
     }
 
+    public void makeConnections()
+    {
+        if (topology == Topology.GRID) { makeGridConnections(); return; }
+        makeRingConnections();
+    }
+
+    /** Rejilla 2-D: cada neurona con su vecina de arriba, abajo, izquierda y derecha. */
+    private void makeGridConnections()
+    {
+        for (int r = 0; r < rows; r++)
+        {
+            for (int c = 0; c < cols; c++)
+            {
+                int actual = r * cols + c;
+                if (c + 1 < cols) this.insertEdgeNDG(actual, r * cols + (c + 1));
+                if (r + 1 < rows) this.insertEdgeNDG(actual, (r + 1) * cols + c);
+            }
+        }
+    }
+
     //This method guaranties that the first two neurons in the edges list of each
     //neuron to be the two previous ones and the other two be the two following neurons
-    public void makeConnections()
+    private void makeRingConnections()
     {   int i;
 
         this.insertEdgeDG(0,this.verticesList.size()-2);
@@ -297,53 +352,57 @@ public class SOM extends LinkedGraph {
         }
     }
 
+    /**
+     * Actualiza la BMU y su vecindad.
+     *
+     * La vecindad se calcula recorriendo el grafo en anchura desde la BMU, así
+     * que la distancia es el número de saltos y sirve igual para el anillo que
+     * para la rejilla. Antes esto caminaba a izquierda y derecha con
+     * getFirst()/getLast(), que solo tiene sentido en un anillo.
+     */
     public void updateBmuAndAdjacents(SOMNeuron bmu, Sample flower, int currentEpoch)
     {
-        ArrayList<SOMNeuron> updated = new ArrayList<SOMNeuron>();
-        int distance=0;
-        updateBMU(bmu, flower, currentEpoch, distance);
-        updated.add(bmu);
-
-        ArrayList<SOMNeuron> toUpdate = new ArrayList<SOMNeuron>();
-        LinkedList<Vertex> adjacents = bmu.getAdjacents();
-        Iterator<Vertex> iter = adjacents.iterator();
-        while (iter.hasNext()) {
-            SOMNeuron n = (SOMNeuron) iter.next();
-            toUpdate.add(n);
+        for (Map.Entry<SOMNeuron, Integer> e : neighborhood(bmu, radious).entrySet())
+        {
+            double influencia = influenceRate(e.getValue(), currentEpoch);
+            e.getKey().updateWeight(influencia, this.currentLearningRate, flower);
         }
+    }
 
-        updateGroup(toUpdate, ++distance, flower, currentEpoch);
-        updated.addAll(toUpdate);
+    /**
+     * Neuronas a como mucho {@code radio} saltos de la de partida, con su
+     * distancia. Incluye la propia neurona a distancia 0.
+     */
+    public Map<SOMNeuron, Integer> neighborhood(SOMNeuron desde, int radio)
+    {
+        Map<SOMNeuron, Integer> distancias = new LinkedHashMap<>();
+        distancias.put(desde, 0);
 
-        int r = ++distance;
-        updateRadious(updated, (SOMNeuron) adjacents.getFirst(), r, flower, 'L', currentEpoch);
-        updateRadious(updated, (SOMNeuron) adjacents.getLast(), r, flower, 'R', currentEpoch);
+        Deque<SOMNeuron> cola = new ArrayDeque<>();
+        cola.add(desde);
 
+        while (!cola.isEmpty())
+        {
+            SOMNeuron actual = cola.poll();
+            int d = distancias.get(actual);
+            if (d >= radio) continue;
+
+            for (Vertex v : actual.getAdjacents())
+            {
+                SOMNeuron vecino = (SOMNeuron) v;
+                if (!distancias.containsKey(vecino))
+                {
+                    distancias.put(vecino, d + 1);
+                    cola.add(vecino);
+                }
+            }
+        }
+        return distancias;
     }
 
     public void updateBMU(SOMNeuron bmu, Sample f, int currentEpch, int distance){
         double influenceRate = influenceRate(distance, currentEpch);
         bmu.updateWeight(influenceRate, this.currentLearningRate, f);
-    }
-
-    public void updateRadious(ArrayList<SOMNeuron> updated, SOMNeuron current, int distance, Sample flower,char direction, int currentEpoch)
-    {
-        if (distance <= radious) {
-
-            LinkedList<Vertex> adjacents = current.getAdjacents();
-
-            ArrayList<SOMNeuron> toUpdate = checkNotUpdated(updated, adjacents);
-            updateGroup(toUpdate, distance, flower, currentEpoch);
-            updated.addAll(toUpdate);
-            if(direction=='L')
-            {
-                updateRadious(updated,(SOMNeuron)adjacents.getFirst(), ++distance, flower,'L', currentEpoch);
-            }
-            else
-            {
-                updateRadious(updated,(SOMNeuron)adjacents.getLast(), ++distance, flower,'R', currentEpoch);
-            }
-        }
     }
 
     public void updateGroup(ArrayList<SOMNeuron> toUpdate, int distance, Sample flower, int currentEpoch)
