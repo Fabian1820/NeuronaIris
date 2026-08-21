@@ -170,6 +170,57 @@ private void changeImage() {
         }
     }
 
+    /**
+     * Entrena una rejilla 2-D con los mismos parámetros del formulario y abre la
+     * vista del mapa (U-matrix, planos de componentes y etiquetas).
+     *
+     * El mapa del formulario principal es un anillo, y esas lecturas necesitan
+     * una rejilla; se entrena una aparte con el mismo número de neuronas,
+     * repartidas en la rejilla más cuadrada posible.
+     */
+    public void verMapa2D(ActionEvent actionEvent) {
+        int epochs, neurons, radius;
+        double learningRate;
+        try {
+            epochs = Integer.parseInt(EpochsTF.getText());
+            neurons = Integer.parseInt(NeuronsTF.getText());
+            learningRate = Double.parseDouble(LearningRateTF.getText());
+            radius = Integer.parseInt(RadiusTF.getText());
+        } catch (Exception e) {
+            showAlert("Fill all the map configuration parameters.", Alert.AlertType.WARNING);
+            return;
+        }
+
+        if (neurons < 4) {
+            showAlert("A 2-D map needs at least 4 neurons.", Alert.AlertType.WARNING);
+            return;
+        }
+
+        int[] rejilla = repartirEnRejilla(neurons);
+        SOM mapa2D = new SOM(epochs, rejilla[0], rejilla[1], learningRate, radius,
+                GestorTxt.getIrisDataset());
+        mapa2D.initialize();
+        mapa2D.train();
+
+        try {
+            new com.example.edfinal.ui.MapaView(mapa2D).mostrar();
+        } catch (Exception e) {
+            showAlert("No se pudo abrir el mapa: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    /** Reparte n neuronas en la rejilla más cuadrada posible. */
+    static int[] repartirEnRejilla(int n) {
+        int filas = (int) Math.floor(Math.sqrt(n));
+        while (filas > 1 && n % filas != 0) filas--;
+        int columnas = n / filas;
+        if (filas < 2) {              // número primo: se redondea hacia arriba
+            filas = 2;
+            columnas = (int) Math.ceil(n / 2.0);
+        }
+        return new int[]{filas, columnas};
+    }
+
     public void train(ActionEvent actionEvent) {
         if(startPressed) {
             if (map.isInit()) {
