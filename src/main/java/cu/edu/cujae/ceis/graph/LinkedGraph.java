@@ -23,7 +23,7 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 							ILinkedWeightedVertexDirectedGraph, ILinkedWeightedVertexNotDirectedGraph {
 	
 	/**
-	 * Lista de vÈrtices.
+	 * Lista de v√©rtices.
 	 */
 	protected LinkedList<Vertex> verticesList;
 	
@@ -32,24 +32,24 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 	}
 	
 	/**
-	 * Valida una posiciÛn en la lista 
-	 * de vÈrtices.
-	 * @param pos posiciÛn.
-	 * @return true si la posiciÛn es v·lida, false si no.
+	 * Valida una posici√≥n en la lista 
+	 * de v√©rtices.
+	 * @param pos posici√≥n.
+	 * @return true si la posici√≥n es v√°lida, false si no.
 	 */
 	private boolean posInRange(int pos) {
 		return pos > -1 && pos < verticesList.size();
 	}
 	
 	/**
-	 * Elimina un vÈrtice.
-	 * @param vertex vÈrtice.
+	 * Elimina un v√©rtice.
+	 * @param vertex v√©rtice.
 	 */
 	private void deleteVertex(Vertex vertex) {
 		//se elimina el de la lista
 		verticesList.remove(vertex);
 		
-		//y de la lista de adyacentes de todos los dem·s vÈrtices
+		//y de la lista de adyacentes de todos los dem√°s v√©rtices
 		Iterator<Vertex> iter = verticesList.iterator();
 		while(iter.hasNext()) {
 			iter.next().deleteEdge(vertex);
@@ -57,10 +57,10 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 	}
 	
 	/**
-	 * Devuelve recursivamente un vÈrtice junto con todos sus asociados
+	 * Devuelve recursivamente un v√©rtice junto con todos sus asociados
 	 * directa e indirectamente en un grafo.
-	 * @param vertex vÈrtice.
-	 * @param selected lista de vÈrtices seleccionados.
+	 * @param vertex v√©rtice.
+	 * @param selected lista de v√©rtices seleccionados.
 	 */
 	private void selectVerticesInCascadeRecurs(Vertex vertex, LinkedList<Vertex> selected) {
 		if(!selected.contains(vertex)) {
@@ -77,12 +77,12 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 	}
 	
 	/**
-	 * Indica si existe al menos un ciclo comenzando por el vÈrtice
+	 * Indica si existe al menos un ciclo comenzando por el v√©rtice
 	 * especificado en un grafo dirigido.
 	 * 
-	 * @param adjacents lista de adyacentes del vÈrtice a verificar.
-	 * @param vertex vÈrtice a verificar.
-	 * @param visited lista de vÈrtices visitados.
+	 * @param adjacents lista de adyacentes del v√©rtice a verificar.
+	 * @param vertex v√©rtice a verificar.
+	 * @param visited lista de v√©rtices visitados.
 	 * @return true si existe un ciclo con inicio en vertex.
 	 */
 	private boolean cycleInNodeDG(LinkedList<Edge> adjacents, Vertex vertex, LinkedList<Vertex> visited) {			
@@ -105,7 +105,7 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 	}
 	
 	/**
-	 * Indica si existe al menos un ciclo comenzando por el vÈrtice
+	 * Indica si existe al menos un ciclo comenzando por el v√©rtice
 	 * especificado en un grafo no dirigido.
 	 * 
 	 * @param vertex vertex.
@@ -134,10 +134,10 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 	
 	/**
 	 * Chequea recursivamente si existe un camino entre 
-	 * dos vÈrtices de longitud especificada.
+	 * dos v√©rtices de longitud especificada.
 	 * 
-	 * @param v1 vÈrtice 1.
-	 * @param v2 vÈrtice 2.
+	 * @param v1 v√©rtice 1.
+	 * @param v2 v√©rtice 2.
 	 * @param length longitud del camino.
 	 * @return true si el camino existe, false si no.
 	 */
@@ -166,9 +166,9 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 	\*-----------------------------------------*/
 	
 	/**
-	 * Devuelve el Ìndice de un vÈrtice.
-	 * @param vertex vÈrtice
-	 * @return Ìndice del vÈrtice en la lista de vÈrtices
+	 * Devuelve el √≠ndice de un v√©rtice.
+	 * @param vertex v√©rtice
+	 * @return √≠ndice del v√©rtice en la lista de v√©rtices
 	 * 			o -1 si no existe.
 	 */
 	public int getVertexIndex(Vertex vertex) {
@@ -186,8 +186,8 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 	}
 		
 	/**
-	 * Indica si el grafo est· vacÌo.
-	 * @return true si est· vacÌo, false si no.
+	 * Indica si el grafo est√° vac√≠o.
+	 * @return true si est√° vac√≠o, false si no.
 	 */
 	@Override
 	public boolean isEmpty() {
@@ -195,10 +195,10 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 	}
 	
 	/**
-	 * Indica si dos vÈrtice son adyacentes.
+	 * Indica si dos v√©rtice son adyacentes.
 	 * 
-	 * @param posTail posiciÛn del vÈrtice cola.
-	 * @param posHead posiciÛn del vÈrtice cabeza.
+	 * @param posTail posici√≥n del v√©rtice cola.
+	 * @param posHead posici√≥n del v√©rtice cabeza.
 	 * @return true si son adyacentes, false si no.
 	 */
 	
@@ -212,10 +212,10 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 	}			
 	
 	/**
-	 * Inserta un nuevo vÈrtice al grafo.
+	 * Inserta un nuevo v√©rtice al grafo.
 	 *
-	 * @param info informaciÛn del vÈrtice.
-	 * @return true si la operaciÛn se completÛ 
+	 * @param info informaci√≥n del v√©rtice.
+	 * @return true si la operaci√≥n se complet√≥ 
 	 * 			satisfactoriamente, false si no.
 	 */
 	
@@ -225,10 +225,10 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 
 	/**
 	 * Indica si existe un camino de 
-	 * longitud determinada entre dos vÈrtices.
+	 * longitud determinada entre dos v√©rtices.
 	 * 
-	 * @param posTail posiciÛn del vÈrtice en la cola del camino.
-	 * @param posHead posiciÛn del vÈrtice en la cabeza del camino.
+	 * @param posTail posici√≥n del v√©rtice en la cola del camino.
+	 * @param posHead posici√≥n del v√©rtice en la cabeza del camino.
 	 * @param length longitud del camino.
 	 * @return true si el camino existe, false si no.
 	 */
@@ -243,8 +243,8 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 	}		
 	
 	/**
-	 * Devuelve la lista de vÈrtices.
-	 * @return lista de vÈrtices.
+	 * Devuelve la lista de v√©rtices.
+	 * @return lista de v√©rtices.
 	 */
 	
 	public LinkedList<Vertex> getVerticesList() {
@@ -253,9 +253,9 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 
 	/**
 	 * Devuelve la lista de adyacentes a
-	 * un vÈrtice.
-	 * @param pos posiciÛn del vÈrtice del que se quiere conocer los adyacentes.
-	 * @return lista de vÈrtices adyacentes.
+	 * un v√©rtice.
+	 * @param pos posici√≥n del v√©rtice del que se quiere conocer los adyacentes.
+	 * @return lista de v√©rtices adyacentes.
 	 */
 	
 	public LinkedList<Vertex> adjacentsG(int pos) {		
@@ -272,9 +272,9 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 	}
 	
 	/**
-	 * Elimina un vÈrtice del grafo.
-	 * @param pos posiciÛn del vÈrtice.
-	 * @return retorna el vÈrtice eliminado si la operaciÛn es
+	 * Elimina un v√©rtice del grafo.
+	 * @param pos posici√≥n del v√©rtice.
+	 * @return retorna el v√©rtice eliminado si la operaci√≥n es
 	 * 		satisfactoria o null en caso contrario.
 	 */
 	
@@ -288,11 +288,11 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 	}
 	
 	/**
-	 * Elimina en cascada un vÈrtice junto con todos sus adyacentes. 
-	 * Si existe al menos un camino desde el vÈrtice hasta todos los 
-	 * dem·s el grafo quedar· vacÌo.
+	 * Elimina en cascada un v√©rtice junto con todos sus adyacentes. 
+	 * Si existe al menos un camino desde el v√©rtice hasta todos los 
+	 * dem√°s el grafo quedar√° vac√≠o.
 	 * 
-	 * @return lista de vÈrtices eliminados.
+	 * @return lista de v√©rtices eliminados.
 	 */
 	
 	public LinkedList<Vertex> deleteVertexCascade(int pos) {
@@ -334,12 +334,12 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 	}
 	
 	/**
-	 * Indica el grado de un vÈrtice
+	 * Indica el grado de un v√©rtice
 	 * en un grafo dirigido.
 	 * 
-	 * @param pos posiciÛn del vÈrtice del que se
+	 * @param pos posici√≥n del v√©rtice del que se
 	 * 			desea saber el grado.
-	 * @return el grado del vÈrtice o -1 si ocurre
+	 * @return el grado del v√©rtice o -1 si ocurre
 	 * 			un error.
 	 */
 	
@@ -352,12 +352,12 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 	}
 	
 	/**
-	 * Indica el grado de entrada de un vÈrtice
+	 * Indica el grado de entrada de un v√©rtice
 	 * en un grafo dirigido.
 	 * 
-	 * @param pos posiciÛn del vÈrtice del que se
+	 * @param pos posici√≥n del v√©rtice del que se
 	 * 			desea saber el grado de entrada.
-	 * @return el grado del vÈrtice o -1 si ocurre
+	 * @return el grado del v√©rtice o -1 si ocurre
 	 * 			un error.
 	 */
 	
@@ -378,12 +378,12 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 	}
 	
 	/**
-	 * Indica el grado de salida de un vÈrtice
+	 * Indica el grado de salida de un v√©rtice
 	 * en un grafo dirigido.
 	 * 
-	 * @param pos posiciÛn del vÈrtice del que se
+	 * @param pos posici√≥n del v√©rtice del que se
 	 * 			desea saber el grado de salida.
-	 * @return el grado del vÈrtice o -1 si ocurre	un error.
+	 * @return el grado del v√©rtice o -1 si ocurre	un error.
 	 */
 	
 	public int outDegree(int pos) {
@@ -396,12 +396,12 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 	}	
 	
 	/**
-	 * Elimina una arista entre dos vÈrtices en
+	 * Elimina una arista entre dos v√©rtices en
 	 * un grafo dirigido.
 	 * 
-	 * @param posTail posiciÛn del vÈrtice en la cola de la arista.
-	 * @param posHead posiciÛn del vÈrtice en la cabeza de la arista.
-	 * @return true si la operaciÛn se completÛ satisfactoriamente, false si no.
+	 * @param posTail posici√≥n del v√©rtice en la cola de la arista.
+	 * @param posHead posici√≥n del v√©rtice en la cabeza de la arista.
+	 * @return true si la operaci√≥n se complet√≥ satisfactoriamente, false si no.
 	 */
 	
 	public boolean deleteEdgeD(int posTail, int posHead) {
@@ -416,12 +416,12 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 	}
 	
 	/**
-	 * Inserta una arista entre dos vÈrtices en
+	 * Inserta una arista entre dos v√©rtices en
 	 * un grafo dirigido.
 	 * 
-	 * @param posTail posiciÛn del vÈrtice en la cola de la arista.
-	 * @param posHead posiciÛn del vÈrtice en la cabeza de la arista.
-	 * @return true si la operaciÛn se completÛ satisfactoriamente, false si no.
+	 * @param posTail posici√≥n del v√©rtice en la cola de la arista.
+	 * @param posHead posici√≥n del v√©rtice en la cabeza de la arista.
+	 * @return true si la operaci√≥n se complet√≥ satisfactoriamente, false si no.
 	 */
 	
 	public boolean insertEdgeDG(int posTail, int posHead) {
@@ -436,11 +436,11 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 	}		
 
 	/**
-	 * <p>Elimina los vÈrtices que no se encuentren asociados
+	 * <p>Elimina los v√©rtices que no se encuentren asociados
 	 * en un grafo dirigido.</p>
-	 * <bold>Nota:</bold> Un vÈrtice con un lazo a si mismo no
+	 * <bold>Nota:</bold> Un v√©rtice con un lazo a si mismo no
 	 * se considera desconectado.
-	 * @return lista de vÈrtices eliminados.
+	 * @return lista de v√©rtices eliminados.
 	 */
 	
 	public LinkedList<Vertex> removeDisconnectVerticesDG() {
@@ -479,8 +479,8 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 	}
 	
 	/**
-	 * Devuelve el grado de un vÈrtice en un grafo no dirigido.
-	 * @param pos Ìndice del vÈrtice del que se quiere 
+	 * Devuelve el grado de un v√©rtice en un grafo no dirigido.
+	 * @param pos √≠ndice del v√©rtice del que se quiere 
 	 * 				conocer el grado.
 	 */
 	
@@ -495,12 +495,12 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 	}
 
 	/**
-	 * Elimina una arista entre dos vÈrtices en
+	 * Elimina una arista entre dos v√©rtices en
 	 * un grafo no dirigido.
 	 * 
-	 * @param posTail posiciÛn del vÈrtice en el extremo 1.
-	 * @param posHead posiciÛn del vÈrtice en el extremo 2.
-	 * @return true si la operaciÛn se completÛ satisfactoriamente, false si no.
+	 * @param posTail posici√≥n del v√©rtice en el extremo 1.
+	 * @param posHead posici√≥n del v√©rtice en el extremo 2.
+	 * @return true si la operaci√≥n se complet√≥ satisfactoriamente, false si no.
 	 */
 	
 	public boolean deleteEdgeND(int posTail, int posHead) {
@@ -514,12 +514,12 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 	}
 
 	/**
-	 * Inserta una arista entre dos vÈrtices en
+	 * Inserta una arista entre dos v√©rtices en
 	 * un grafo no dirigido.
 	 * 
-	 * @param posTail posiciÛn del vÈrtice en el extremo 1.
-	 * @param posHead posiciÛn del vÈrtice en el extremo 2.
-	 * @return true si la operaciÛn se completÛ satisfactoriamente, false si no.
+	 * @param posTail posici√≥n del v√©rtice en el extremo 1.
+	 * @param posHead posici√≥n del v√©rtice en el extremo 2.
+	 * @return true si la operaci√≥n se complet√≥ satisfactoriamente, false si no.
 	 */
 	
 	public boolean insertEdgeNDG(int posTail, int posHead) {
@@ -528,7 +528,7 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 		if(posInRange(posTail) && posInRange(posHead)) {
 			success  = insertEdgeDG(posTail, posHead);
 			
-			//si es un lazo al mismo vÈrtice se hace un solo enlace
+			//si es un lazo al mismo v√©rtice se hace un solo enlace
 			if(posTail != posHead)
 				success &= insertEdgeDG(posHead, posTail);
 		}
@@ -537,7 +537,7 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 
 	/* 
 	   ------------------------
-	< I¥m not a bug, I¥m a cow  >
+	< I¬¥m not a bug, I¬¥m a cow  >
 	  ------------------------
 	       \ ,__,
 	        \(oo)____
@@ -546,11 +546,11 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 	 */
 	
 	/**
-	 * <p>Elimina los vÈrtices que no se encuentren asociados
+	 * <p>Elimina los v√©rtices que no se encuentren asociados
 	 * en un grafo no dirigido.</p>
-	 * <bold>Nota:</bold> Un vÈrtice con un lazo a si mismo no
+	 * <bold>Nota:</bold> Un v√©rtice con un lazo a si mismo no
 	 * se considera desconectado.
-	 * @return lista de vÈrtices eliminados.
+	 * @return lista de v√©rtices eliminados.
 	 */
 	
 	public LinkedList<Vertex> removeDisconnectVerticesND() {
@@ -571,13 +571,13 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 	\*-------------------------------------------------------------*/
 	
 	/**
-	 * Inserta una arista ponderada entre dos vÈrtices en
+	 * Inserta una arista ponderada entre dos v√©rtices en
 	 * un grafo dirigido.
 	 * 
-	 * @param posTail posiciÛn del vÈrtice en el extremo 1.
-	 * @param posHead posiciÛn del vÈrtice en el extremo 2.
+	 * @param posTail posici√≥n del v√©rtice en el extremo 1.
+	 * @param posHead posici√≥n del v√©rtice en el extremo 2.
 	 * @param weight peso.
-	 * @return true si la operaciÛn se completÛ satisfactoriamente, false si no.
+	 * @return true si la operaci√≥n se complet√≥ satisfactoriamente, false si no.
 	 */
 	
 	public boolean insertWEdgeDG(int posTail, int posHead, Object weight) {
@@ -596,13 +596,13 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 	\*----------------------------------------------------------------*/
 	
 	/**
-	 * Inserta una arista ponderada entre dos vÈrtices en
+	 * Inserta una arista ponderada entre dos v√©rtices en
 	 * un grafo no dirigido.
 	 * 
-	 * @param posTail posiciÛn del vÈrtice en el extremo 1.
-	 * @param posHead posiciÛn del vÈrtice en el extremo 2.
+	 * @param posTail posici√≥n del v√©rtice en el extremo 1.
+	 * @param posHead posici√≥n del v√©rtice en el extremo 2.
 	 * @param weight peso.
-	 * @return true si la operaciÛn se completÛ satisfactoriamente, false si no.
+	 * @return true si la operaci√≥n se complet√≥ satisfactoriamente, false si no.
 	 */
 	
 	public boolean insertWEdgeNDG(int posTail, int posHead, Object weight) {
@@ -611,7 +611,7 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 		if(posInRange(posTail) && posInRange(posHead)) {
 			success  = insertWEdgeDG(posTail, posHead, weight);
 			
-			//si es un lazo al mismo vÈrtice se hace un solo enlace
+			//si es un lazo al mismo v√©rtice se hace un solo enlace
 			if(posTail != posHead)
 				success &= insertWEdgeDG(posHead, posTail, weight);
 		}
@@ -619,15 +619,15 @@ public class LinkedGraph extends Graph implements ILinkedDirectedGraph, ILinkedN
 	}
 		
 	/*---------------------------------------------------*\
-	|   Funciones para grafos con vÈrtices ponderados     |
+	|   Funciones para grafos con v√©rtices ponderados     |
 	\*---------------------------------------------------*/
 	
 	/**
-	 * Inserta un vÈrtice ponderado al grafo.
+	 * Inserta un v√©rtice ponderado al grafo.
 	 *
-	 * @param info informaciÛn del vÈrtice.
+	 * @param info informaci√≥n del v√©rtice.
 	 * @param weight peso.
-	 * @return true si la operaciÛn se completÛ 
+	 * @return true si la operaci√≥n se complet√≥ 
 	 * 			satisfactoriamente, false si no.
 	 */
 	

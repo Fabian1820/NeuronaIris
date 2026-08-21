@@ -9,12 +9,12 @@ import cu.edu.cujae.ceis.graph.edge.Edge;
 
 
 /**
- * <h1>Vértice elemental</h1>
+ * <h1>VÃ©rtice elemental</h1>
  */
 public class Vertex implements Serializable {
 	
 	/**
-	 * Objeto que representa la información del vértice.
+	 * Objeto que representa la informaciÃ³n del vÃ©rtice.
 	 */
 	private Flower info;
 	
@@ -25,9 +25,9 @@ public class Vertex implements Serializable {
 
 	/**
 	 * Inicia la instancia con la
-	 * información del vértice.
+	 * informaciÃ³n del vÃ©rtice.
 	 * 
-	 * @param info Información.
+	 * @param info InformaciÃ³n.
 	 */
 	public Vertex(Flower info) {
 		this.info = info;
@@ -35,11 +35,11 @@ public class Vertex implements Serializable {
 	}
 	
 	/**
-	 * Elimina la arista hacia un vértice dado.
+	 * Elimina la arista hacia un vÃ©rtice dado.
 	 * 
-	 * @param vertex Vértice.
-	 * @return True si se realiza la operación. False si no 
-	 * 			se encuentra una arista hacia el vértice
+	 * @param vertex VÃ©rtice.
+	 * @return True si se realiza la operaciÃ³n. False si no 
+	 * 			se encuentra una arista hacia el vÃ©rtice
 	 * 			dado.
 	 */
 	public boolean deleteEdge(Vertex vertex) {
@@ -64,16 +64,16 @@ public class Vertex implements Serializable {
 	}
 	
 	/**
-	 * Obtiene la información del vértice.
-	 * @return Información.
+	 * Obtiene la informaciÃ³n del vÃ©rtice.
+	 * @return InformaciÃ³n.
 	 */
 	public Object getInfo() {
 		return info;
 	}
 	
 	/**
-	 * Define la información para este nodo.
-	 * @param info Información.
+	 * Define la informaciÃ³n para este nodo.
+	 * @param info InformaciÃ³n.
 	 */
 	public void setInfo(Flower info) {
 		this.info = info;
@@ -95,10 +95,10 @@ public class Vertex implements Serializable {
 	}	
 	
 	/**
-	 * Permite saber si este vértice es adyacente
-	 * con un vértice dado.
+	 * Permite saber si este vÃ©rtice es adyacente
+	 * con un vÃ©rtice dado.
 	 * 
-	 * @param vertex Vértice.
+	 * @param vertex VÃ©rtice.
 	 * @return True si son adyacente, false si no.
 	 */
 	public boolean isAdjacent(Vertex vertex) {
@@ -114,8 +114,8 @@ public class Vertex implements Serializable {
 	}
 	
 	/**
-	 * Esta función será útil para la depuración.
-	 * @return Información.
+	 * Esta funciÃ³n serÃ¡ Ãºtil para la depuraciÃ³n.
+	 * @return InformaciÃ³n.
 	 */
 	@Override
 	public String toString() {

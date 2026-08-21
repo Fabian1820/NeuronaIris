@@ -38,3 +38,8 @@ build/
 .DS_Store
 # IntelliJ IDEA (configuración local)
 .idea/
+
+### Estado generado por la app en tiempo de ejecución
+Map.dat
+Configuration.dat
+incisoB.txt

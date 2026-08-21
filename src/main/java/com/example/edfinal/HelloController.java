@@ -51,12 +51,13 @@ public class HelloController implements Initializable {
     @FXML
     private AnchorPane ImgAnchor;
     private int currentImageIndex = 0;
+    // Rutas dentro del classpath: funcionan en cualquier máquina y dentro del jar.
     private String[] imagePaths = {
-            "C:/Users/ruben/IdeaProjects/NeuronaIris/src/main/resources/Imagen/FLORP.jpg",
-            "C:/Users/ruben/IdeaProjects/NeuronaIris/src/main/resources/Imagen/MORP.jpg",
-            "C:/Users/ruben/IdeaProjects/NeuronaIris/src/main/resources/Imagen/OIPP.jpg",
-            "C:/Users/ruben/IdeaProjects/NeuronaIris/src/main/resources/Imagen/RP.jpg",
-            "C:/Users/ruben/IdeaProjects/NeuronaIris/src/main/resources/Imagen/SPIP.jpg"
+            "/Imagen/FLORP.jpg",
+            "/Imagen/MORP.jpg",
+            "/Imagen/OIPP.jpg",
+            "/Imagen/RP.jpg",
+            "/Imagen/SPIP.jpg"
     };
 
 
@@ -75,8 +76,10 @@ public class HelloController implements Initializable {
     }
 
 private void changeImage() {
-    Image newImage = new Image(imagePaths[currentImageIndex]);
-    ImgView.setImage(newImage);
+    var stream = getClass().getResourceAsStream(imagePaths[currentImageIndex]);
+    if (stream != null) {
+        ImgView.setImage(new Image(stream));
+    }
     currentImageIndex = (currentImageIndex + 1) % imagePaths.length;
 }
 
@@ -118,6 +121,12 @@ private void changeImage() {
     }
 
     public void loadMap(ActionEvent actionEvent) throws IOException {
+        // Map.dat lo genera "Guardar": en una copia recién clonada no existe todavía.
+        java.io.File saved = new java.io.File("Map.dat");
+        if (!saved.isFile() || saved.length() == 0) {
+            showAlert("There is no saved map yet. Train a map and press Save first.", Alert.AlertType.WARNING);
+            return;
+        }
         PetalChart.getData().clear();
         SepalChart.getData().clear();
         WidthChart.getData().clear();

@@ -3,21 +3,21 @@ package cu.edu.cujae.ceis.graph.vertex;
 import com.example.edfinal.Flower;
 
 /**
- * <h1>Vértice con peso</h1>
+ * <h1>VÃ©rtice con peso</h1>
  */
 public class WeightedVertex extends Vertex {
 	
 	/**
-	 * Objeto que representa el peso del vértice.
+	 * Objeto que representa el peso del vÃ©rtice.
 	 */
 	private Object weight;
 	
 	/**
-	 * Inicia la instancia con la información del 
-	 * vértice y su peso.
+	 * Inicia la instancia con la informaciÃ³n del 
+	 * vÃ©rtice y su peso.
 	 * 
-	 * @param info Información del vértice.
-	 * @param weight Peso del vértice.
+	 * @param info InformaciÃ³n del vÃ©rtice.
+	 * @param weight Peso del vÃ©rtice.
 	 */
 	public WeightedVertex(Flower info, Object weight) {
 		super(info);
@@ -25,7 +25,7 @@ public class WeightedVertex extends Vertex {
 	}
 	
 	/**
-	 * Obtiene el peso del vértice.
+	 * Obtiene el peso del vÃ©rtice.
 	 * @return Peso.
 	 */
 	public Object getWeight() {
