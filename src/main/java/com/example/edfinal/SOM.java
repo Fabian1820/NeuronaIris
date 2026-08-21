@@ -32,6 +32,7 @@ public class SOM extends LinkedGraph {
     }
 
     private boolean init;
+    private final Map<Integer, String> labels = new HashMap<>();
 
     public SOM(int epochs, int neurons, double learningRate, int radius)
     {
@@ -48,6 +49,12 @@ public class SOM extends LinkedGraph {
     public void setTrained(boolean b)
     {
         this.trained=b;
+    }
+
+    /** Permite entrenar sobre un conjunto distinto al de GestorTxt (experimentos, validación). */
+    public void setCurrentLearningRate(double lr)
+    {
+        this.currentLearningRate = lr;
     }
 
     public boolean isTrained()
@@ -164,40 +171,66 @@ public class SOM extends LinkedGraph {
         }
     }
 
+    /**
+     * Etiqueta cada neurona con la especie mayoritaria entre las muestras que gana.
+     * Es más fiable que mirar en qué grupo del BMUStock cayó: una neurona que gana
+     * flores de dos especies se queda con la que más veces la eligió, en vez de con
+     * la primera que aparezca en la lista.
+     */
+    public void labelNeurons(ArrayList<Flower> dataBase)
+    {
+        Map<Integer, Map<String, Integer>> votos = new HashMap<>();
+        for (Flower f : dataBase)
+        {
+            if (f.getType() == null) continue;
+            int id = findBMU(f).getId();
+            votos.computeIfAbsent(id, k -> new HashMap<>()).merge(especie(f.getType()), 1, Integer::sum);
+        }
+
+        labels.clear();
+        for (Map.Entry<Integer, Map<String, Integer>> e : votos.entrySet())
+        {
+            String ganadora = e.getValue().entrySet().stream()
+                    .max(Map.Entry.comparingByValue())
+                    .map(Map.Entry::getKey)
+                    .orElse("");
+            if (!ganadora.isEmpty()) labels.put(e.getKey(), ganadora);
+        }
+    }
+
+    /** "Iris-setosa" -> "setosa" */
+    private String especie(String tipo)
+    {
+        String t = tipo.trim().toLowerCase();
+        int guion = t.lastIndexOf('-');
+        return guion >= 0 ? t.substring(guion + 1) : t;
+    }
+
     public String classify(SOMNeuron bmu)
     {
-        int i=0;
-        String resp = this.classify2(bmu);
+        String etiqueta = labels.get(bmu.getId());
+        if (etiqueta != null) return etiqueta;
 
-        while(resp.equals(""))
+        // Neurona muerta (no ganó ninguna muestra): se usa la neurona etiquetada
+        // más parecida. Recorre la lista una vez, sin riesgo de ciclo infinito.
+        Flower pesos = (Flower) bmu.getInfo();
+        String mejor = "";
+        double menorDistancia = Double.MAX_VALUE;
+        for (Vertex v : this.verticesList)
         {
-            System.out.print("  "+ i++);
-            bmu = findNearest(bmu);
-            resp= this.classify2(bmu);
+            SOMNeuron n = (SOMNeuron) v;
+            String suEtiqueta = labels.get(n.getId());
+            if (suEtiqueta == null) continue;
+            double d = n.euclidianDistance(pesos);
+            if (d < menorDistancia)
+            {
+                menorDistancia = d;
+                mejor = suEtiqueta;
+            }
         }
-        return resp;
+        return mejor;
     }
 
-    private String classify2(SOMNeuron bmu)
-    {
-        String resp = "";
-        if(BMUStock.getSetosa().contains(bmu))
-        {
-            resp="setosa";
-        }
-        else
-        if (BMUStock.getVersicolor().contains(bmu))
-        {
-            resp="versicolor";
-        }
-        else
-        if (BMUStock.getVirginica().contains(bmu))
-        {
-            resp="virginica";
-        }
-
-        return resp;
-    }
 
     public SOMNeuron findNearest(SOMNeuron bmu)
     {
@@ -232,6 +265,7 @@ public class SOM extends LinkedGraph {
         }
         this.trained=true;
         groupBmus(GestorTxt.getDataBase());
+        labelNeurons(GestorTxt.getDataBase());
     }
 
     public void train2(ArrayList<Flower> dataBase, int currentEpoch)

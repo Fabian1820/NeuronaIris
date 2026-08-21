@@ -53,6 +53,6 @@ public class SOMNeuron extends Vertex implements Serializable {
     public String toString() {
         if (getInfo() != null)
         return getInfo().toString();
-        else return "pinga";
+        else return "SOMNeuron sin datos";
     }
 }
