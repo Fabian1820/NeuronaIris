@@ -143,6 +143,9 @@ public class SOM extends LinkedGraph {
     }
     public void groupBmus(ArrayList<Flower> dataBase)
     {
+        // Un agrupamiento nuevo sustituye al anterior: sin esto, reentrenar
+        // duplicaba las BMUs (150 -> 300) y la clasificación quedaba sucia.
+        BMUStock.clear();
         int i=0;
         while(i<50)
         {

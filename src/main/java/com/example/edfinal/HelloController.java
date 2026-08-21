@@ -172,21 +172,19 @@ private void changeImage() {
 
     public void train(ActionEvent actionEvent) {
         if(startPressed) {
-            if (!map.isTrained()) {
-                if (map.isInit()) {
-                    SepalChart.getData().clear();
-                    PetalChart.getData().clear();
-                    WidthChart.getData().clear();
-                    LengthChart.getData().clear();
-                    map.train();
-                    mostrarNeuronasGrupo(BMUStock.getSetosa(), Color.RED);
-                    mostrarNeuronasGrupo(BMUStock.getVersicolor(), Color.GREEN);
-                    mostrarNeuronasGrupo(BMUStock.getVirginica(), Color.BLUE);
-                } else {
-                    showAlert("The map has not been created. To do so press Start", Alert.AlertType.WARNING);
-                }
+            if (map.isInit()) {
+                SepalChart.getData().clear();
+                PetalChart.getData().clear();
+                WidthChart.getData().clear();
+                LengthChart.getData().clear();
+                // Reentrenar es válido: sigue ajustando el mapa desde los pesos
+                // actuales y rehace el agrupamiento desde cero.
+                map.train();
+                mostrarNeuronasGrupo(BMUStock.getSetosa(), Color.RED);
+                mostrarNeuronasGrupo(BMUStock.getVersicolor(), Color.GREEN);
+                mostrarNeuronasGrupo(BMUStock.getVirginica(), Color.BLUE);
             } else {
-                showAlert("Do not train the map again you fool!!!. You'll break this sh*t. Restart it!!!", Alert.AlertType.WARNING);
+                showAlert("The map has not been created. To do so press Start", Alert.AlertType.WARNING);
             }
         }else
         {

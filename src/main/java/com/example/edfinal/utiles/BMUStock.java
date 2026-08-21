@@ -35,4 +35,12 @@ public class BMUStock {
         }
         return virginica;
     }
+
+    /** Vacía los tres grupos. Un agrupamiento nuevo reemplaza al anterior, no se suma. */
+    public static void clear()
+    {
+        getSetosa().clear();
+        getVersicolor().clear();
+        getVirginica().clear();
+    }
 }
