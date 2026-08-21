@@ -78,6 +78,18 @@ public class SOMAnalysis {
      * representar bien los datos y aun así tenerlos mal ordenados.
      */
     public static double topographicError(SOM som, List<Sample> datos) {
+        return topographicError(som, datos, false);
+    }
+
+    /**
+     * @param incluirDiagonales si una neurona en diagonal cuenta como vecina.
+     *
+     * La rejilla conecta 4 vecinas (arriba, abajo, izquierda, derecha), así que
+     * con el criterio estricto una segunda mejor neurona en diagonal cuenta como
+     * fallo aunque esté pegada. Contar diagonales mide la vecindad geométrica en
+     * vez de la de las aristas.
+     */
+    public static double topographicError(SOM som, List<Sample> datos, boolean incluirDiagonales) {
         exigirRejilla(som);
         int fallos = 0;
 
@@ -96,7 +108,10 @@ public class SOMAnalysis {
                 }
             }
 
-            if (segunda == null || !sonVecinas(mejor, segunda)) fallos++;
+            boolean vecinas = incluirDiagonales
+                    ? sonContiguas(som, mejor, segunda)
+                    : sonVecinas(mejor, segunda);
+            if (segunda == null || !vecinas) fallos++;
         }
         return (double) fallos / datos.size();
     }
@@ -116,6 +131,55 @@ public class SOMAnalysis {
         return etiquetas;
     }
 
+    /**
+     * Matriz de confusión: filas la especie real, columnas la predicha, en el
+     * orden de {@code etiquetas}.
+     *
+     * Un porcentaje de acierto suelto esconde *dónde* falla el modelo; esto lo
+     * enseña. En Iris se espera ver setosa perfecta y la confusión concentrada
+     * entre versicolor y virginica, que es donde se solapan de verdad.
+     */
+    public static int[][] confusionMatrix(SOM som, List<Sample> datos, List<String> etiquetas) {
+        int n = etiquetas.size();
+        int[][] m = new int[n][n];
+
+        for (Sample s : datos) {
+            if (s.getLabel() == null) continue;
+            int real = indiceDe(etiquetas, s.getLabel());
+            int predicho = indiceDe(etiquetas, som.classify(som.findBMU(s)));
+            if (real >= 0 && predicho >= 0) m[real][predicho]++;
+        }
+        return m;
+    }
+
+    /** Acierto global de una matriz de confusión. */
+    public static double accuracy(int[][] confusion) {
+        int aciertos = 0, total = 0;
+        for (int i = 0; i < confusion.length; i++) {
+            for (int j = 0; j < confusion[i].length; j++) {
+                total += confusion[i][j];
+                if (i == j) aciertos += confusion[i][j];
+            }
+        }
+        return total == 0 ? 0 : aciertos * 100.0 / total;
+    }
+
+    /** Compara etiquetas ignorando el prefijo "Iris-" y las mayúsculas. */
+    private static int indiceDe(List<String> etiquetas, String valor) {
+        if (valor == null) return -1;
+        String v = normalizar(valor);
+        for (int i = 0; i < etiquetas.size(); i++) {
+            if (normalizar(etiquetas.get(i)).equals(v)) return i;
+        }
+        return -1;
+    }
+
+    private static String normalizar(String s) {
+        String t = s.trim().toLowerCase();
+        int guion = t.lastIndexOf('-');
+        return guion >= 0 ? t.substring(guion + 1) : t;
+    }
+
     /** Mínimo y máximo de una matriz, para escalar el color al dibujarla. */
     public static double[] rango(double[][] m) {
         double min = Double.MAX_VALUE, max = -Double.MAX_VALUE;
@@ -123,6 +187,13 @@ public class SOMAnalysis {
             for (double v : fila) { min = Math.min(min, v); max = Math.max(max, v); }
         }
         return new double[]{min, max};
+    }
+
+    /** Contiguas en la rejilla incluyendo diagonales (distancia de Chebyshev 1). */
+    private static boolean sonContiguas(SOM som, SOMNeuron a, SOMNeuron b) {
+        int[] pa = som.positionOf(a), pb = som.positionOf(b);
+        if (pa == null || pb == null) return false;
+        return Math.abs(pa[0] - pb[0]) <= 1 && Math.abs(pa[1] - pb[1]) <= 1;
     }
 
     private static boolean sonVecinas(SOMNeuron a, SOMNeuron b) {

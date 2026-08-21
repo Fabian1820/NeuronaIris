@@ -41,6 +41,7 @@ public class SOM extends LinkedGraph {
     public enum Topology { RING, GRID }
 
     private Topology topology = Topology.RING;
+    private boolean shrinkRadius = false;
     private int rows = 0;
     private int cols = 0;
 
@@ -64,6 +65,23 @@ public class SOM extends LinkedGraph {
       this.topology = Topology.GRID;
       this.rows = rows;
       this.cols = cols;
+    }
+
+    /**
+     * Si el radio de vecindad se encoge con las épocas.
+     *
+     * El SOM canónico empieza con una vecindad ancha —para que el mapa se
+     * despliegue— y la va estrechando hasta 1, para afinar. Aquí era constante.
+     */
+    public void setShrinkRadius(boolean v) { this.shrinkRadius = v; }
+    public boolean isShrinkRadius() { return shrinkRadius; }
+
+    /** Radio efectivo en una época: decae linealmente hasta 1 si está activado. */
+    public int radiusAt(int epoch)
+    {
+        if (!shrinkRadius || epochs <= 1) return radious;
+        double t = (epoch - 1) / (double) (epochs - 1);       // 0 en la primera, 1 en la última
+        return Math.max(1, (int) Math.round(radious - t * (radious - 1)));
     }
 
     public Topology getTopology() { return topology; }
@@ -362,7 +380,7 @@ public class SOM extends LinkedGraph {
      */
     public void updateBmuAndAdjacents(SOMNeuron bmu, Sample flower, int currentEpoch)
     {
-        for (Map.Entry<SOMNeuron, Integer> e : neighborhood(bmu, radious).entrySet())
+        for (Map.Entry<SOMNeuron, Integer> e : neighborhood(bmu, radiusAt(currentEpoch)).entrySet())
         {
             double influencia = influenceRate(e.getValue(), currentEpoch);
             e.getKey().updateWeight(influencia, this.currentLearningRate, flower);

@@ -5,7 +5,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.List;
 import java.util.Set;
 
@@ -141,6 +143,45 @@ public class Dataset {
             if (s.getLabel() != null) out.add(s.getLabel());
         }
         return out;
+    }
+
+    /**
+     * Parte el dataset en entrenamiento y prueba respetando la proporción de
+     * cada etiqueta (muestreo estratificado).
+     *
+     * Medir el acierto sobre los mismos datos con los que se entrenó siempre da
+     * un número optimista; esto permite medirlo sobre muestras no vistas.
+     *
+     * @return dos datasets: [entrenamiento, prueba]
+     */
+    public Dataset[] split(double proporcionEntrenamiento, long semilla) {
+        if (proporcionEntrenamiento <= 0 || proporcionEntrenamiento >= 1) {
+            throw new IllegalArgumentException(
+                    "La proporción de entrenamiento debe estar entre 0 y 1, y llegó "
+                            + proporcionEntrenamiento);
+        }
+
+        Map<String, List<Sample>> porEtiqueta = new LinkedHashMap<>();
+        for (Sample s : samples) {
+            porEtiqueta.computeIfAbsent(String.valueOf(s.getLabel()), k -> new ArrayList<>()).add(s);
+        }
+
+        java.util.Random rand = new java.util.Random(semilla);
+        List<Sample> entrena = new ArrayList<>(), prueba = new ArrayList<>();
+
+        for (List<Sample> grupo : porEtiqueta.values()) {
+            List<Sample> copia = new ArrayList<>(grupo);
+            java.util.Collections.shuffle(copia, rand);
+            int corte = (int) Math.round(copia.size() * proporcionEntrenamiento);
+            corte = Math.max(1, Math.min(copia.size() - 1, corte));
+            entrena.addAll(copia.subList(0, corte));
+            prueba.addAll(copia.subList(corte, copia.size()));
+        }
+
+        return new Dataset[]{
+                new Dataset(entrena, featureNames),
+                new Dataset(prueba, featureNames)
+        };
     }
 
     /**
