@@ -49,13 +49,20 @@ Los tests:
 
 ## Cómo empaquetarlo
 
-Para generar una aplicación nativa hace falta un **JDK completo**: con carpeta `jmods` y con `jpackage`. Los runtime que traen algunos IDE (por ejemplo el de Android Studio) son imágenes tipo JRE sin `jmods`, y `jlink` falla con *"Module java.desktop not found"*.
-
 ```bash
 JAVA_HOME=/ruta/al/jdk ./scripts/empaquetar.sh
 ```
 
-El script comprueba el JDK, construye la imagen de runtime con `jlink` y la aplicación con `jpackage`. El resultado queda en `target/instalador/`.
+Genera `target/instalador/NeuronaIris.app` (~88 MB): una aplicación autocontenida con su propio runtime, que no necesita Java instalado ni el proyecto al lado.
+
+Hace falta un **JDK completo**, con carpeta `jmods` y con `jpackage`. Los runtime que traen algunos IDE (por ejemplo el de Android Studio) son imágenes tipo JRE sin `jmods`, y `jlink` falla con *"Module java.desktop not found"*; el script lo detecta y lo dice. En macOS con Homebrew:
+
+```bash
+brew install openjdk@21
+JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home ./scripts/empaquetar.sh
+```
+
+Para un instalador en vez de una carpeta de aplicación, cambia `--type app-image` por `dmg`, `msi` o `deb` en el script.
 
 ## Cómo se usa la aplicación
 
