@@ -43,17 +43,17 @@ public class MapaView {
 
     public void mostrar() {
         if (som == null || som.getTopology() != SOM.Topology.GRID) {
-            throw new IllegalStateException("Se necesita un mapa con topología de rejilla");
+            throw new IllegalStateException("A grid topology map is required");
         }
 
         selector.getItems().add("U-matrix");
-        selector.getItems().add("Etiquetas");
+        selector.getItems().add("Labels");
         String[] nombres = som.getDataset().getFeatureNames();
         for (String n : nombres) selector.getItems().add("Variable · " + n);
         selector.getSelectionModel().selectFirst();
         selector.setOnAction(e -> dibujar());
 
-        Label titulo = new Label("Mapa autoorganizado  ·  rejilla "
+        Label titulo = new Label("Self-organizing map  ·  grid "
                 + som.getRows() + "×" + som.getCols());
         titulo.setFont(Font.font("System", 16));
         titulo.setTextFill(Color.web("#dddddd"));
@@ -84,7 +84,7 @@ public class MapaView {
         raiz.setStyle("-fx-background-color: #1e1e1e;");
 
         Stage ventana = new Stage();
-        ventana.setTitle("Mapa autoorganizado");
+        ventana.setTitle("Self-organizing map");
         ventana.setScene(new Scene(raiz, 900, 700));
         ventana.setMinWidth(480);
         ventana.setMinHeight(400);
@@ -107,7 +107,7 @@ public class MapaView {
         double y0 = (alto - celda * filas) / 2;
 
         String opcion = selector.getSelectionModel().getSelectedItem();
-        if ("Etiquetas".equals(opcion)) {
+        if ("Labels".equals(opcion)) {
             dibujarEtiquetas(g, x0, y0, celda, filas, columnas);
         } else {
             dibujarMatriz(g, x0, y0, celda, filas, columnas, opcion);
@@ -123,13 +123,13 @@ public class MapaView {
             String nombre = opcion.substring("Variable · ".length());
             int k = indiceDe(nombre);
             m = SOMAnalysis.componentPlane(som, k);
-            explicacion = "Plano de componentes de «" + nombre + "»: el valor que aprendió cada "
-                    + "neurona para esa variable. Comparando planos se ve qué variable manda en "
-                    + "cada zona del mapa.";
+            explicacion = "Component plane for \u00ab" + nombre + "\u00bb: the value each neuron "
+                    + "learned for that variable. Comparing planes shows which variable dominates "
+                    + "each area of the map.";
         } else {
             m = SOMAnalysis.uMatrix(som);
-            explicacion = "U-matrix: distancia media de cada neurona a sus vecinas. Las zonas "
-                    + "claras son fronteras entre grupos; las oscuras, el interior de un grupo.";
+            explicacion = "U-matrix: average distance from each neuron to its neighbours. Light "
+                    + "areas are boundaries between clusters; dark areas, the inside of a cluster.";
         }
 
         double[] r = SOMAnalysis.rango(m);
@@ -143,7 +143,7 @@ public class MapaView {
             }
         }
 
-        leyenda.setText(String.format("%s%nMínimo %.3f (oscuro)  ·  máximo %.3f (claro)",
+        leyenda.setText(String.format("%s%nMinimum %.3f (dark)  \u00b7  maximum %.3f (light)",
                 explicacion, min, max));
     }
 
@@ -167,9 +167,9 @@ public class MapaView {
             }
         }
 
-        StringBuilder sb = new StringBuilder("Especie que domina cada neurona. ");
+        StringBuilder sb = new StringBuilder("Dominant species per neuron. ");
         for (var e : colores.entrySet()) sb.append("· ").append(e.getKey()).append(" ");
-        sb.append("· gris: neurona que no ganó ninguna muestra.");
+        sb.append("\u00b7 grey: neuron that won no samples.");
         leyenda.setText(sb.toString());
     }
 

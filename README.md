@@ -84,8 +84,7 @@ El grafo sobre el que se apoya el mapa es la librería `cu.edu.cujae.ceis.graph`
 
 - El radio de vecindad puede encogerse con las épocas (`setShrinkRadius`), pero viene **desactivado**: medido sobre 20 semillas mejora siempre el error de cuantización y da resultados mixtos en el topográfico.
 - La normalización min-max existe pero no se aplica por defecto. En Iris no mejora el acierto porque el largo del pétalo —que domina la distancia con un 70 %— es justo la variable discriminante. En otro dataset conviene activarla.
-- La interfaz sigue atada al Iris aunque el núcleo no lo esté: los campos de entrada manual y los ejes de las gráficas hablan de sépalos y pétalos. Cargar otro dataset funciona a nivel de biblioteca, pero la pantalla no se adapta a él.
-- Los textos de la interfaz están en inglés y los de la vista del mapa en español.
+- La interfaz sigue atada al Iris aunque el núcleo no lo esté: los campos de entrada manual y los ejes de las gráficas hablan de sépalos y pétalos. Cargar otro dataset funciona a nivel de biblioteca, pero la pantalla no se adapta a él — sería el siguiente paso natural.
 
 ## Autoría
 

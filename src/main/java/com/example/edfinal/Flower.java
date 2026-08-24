@@ -18,7 +18,7 @@ public class Flower extends Sample {
 
     /** Nombres de las variables, en el orden en que vienen en iris.data. */
     public static final String[] FEATURE_NAMES = {
-            "largo sépalo", "ancho sépalo", "largo pétalo", "ancho pétalo"
+            "sepal length", "sepal width", "petal length", "petal width"
     };
 
     public Flower(double sepalLength, double sepalWidth, double petalLength, double petalWidth) {

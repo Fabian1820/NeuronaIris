@@ -67,7 +67,7 @@ public class GestorTxt {
         }
         catch (IOException e)
         {
-            throw new IllegalStateException("No se pudo leer el dataset", e);
+            throw new IllegalStateException("Could not read the dataset", e);
         }
     }
 

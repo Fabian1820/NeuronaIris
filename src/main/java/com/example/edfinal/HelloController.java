@@ -31,8 +31,8 @@ import java.util.ResourceBundle;
 
 public class HelloController implements Initializable {
 
-    private static final String TOPOLOGIA_ANILLO = "Anillo 1-D";
-    private static final String TOPOLOGIA_REJILLA = "Rejilla 2-D";
+    private static final String TOPOLOGIA_ANILLO = "1-D ring";
+    private static final String TOPOLOGIA_REJILLA = "2-D grid";
 
     public SOM map;
     public boolean startPressed;
@@ -95,7 +95,7 @@ private void changeImage() {
         if(startPressed) {
             if (map.isTrained()) {
                 FileChooser fileChooser = new FileChooser();
-                fileChooser.setTitle("Seleccionar Archivo");
+                fileChooser.setTitle("Select file");
                 fileChooser.getExtensionFilters().addAll(
                         new FileChooser.ExtensionFilter("DAT", "*.data")
                 );
@@ -211,7 +211,7 @@ private void changeImage() {
         try {
             new com.example.edfinal.ui.MapaView(map).mostrar();
         } catch (Exception e) {
-            showAlert("No se pudo abrir el mapa: " + e.getMessage(), Alert.AlertType.ERROR);
+            showAlert("Could not open the map: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
