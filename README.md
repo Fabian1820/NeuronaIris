@@ -59,11 +59,11 @@ El script comprueba el JDK, construye la imagen de runtime con `jlink` y la apli
 
 ## Cómo se usa la aplicación
 
-1. **START** crea el mapa con los parámetros del formulario (épocas, neuronas, tasa de aprendizaje, radio).
+1. **START** crea el mapa con los parámetros del formulario: épocas, neuronas, tasa de aprendizaje, radio y **topología** (anillo 1-D o rejilla 2-D).
 2. **TRAIN** lo entrena. Se puede reentrenar para seguir afinando.
-3. **2-D MAP** entrena una rejilla con esos mismos parámetros y abre la U-matrix, los planos de componentes y las etiquetas.
+3. **2-D MAP** abre la U-matrix, los planos de componentes y las etiquetas del mapa actual. Necesita que la topología sea rejilla.
 4. **Classify** clasifica una flor introducida a mano; **Load File** clasifica un fichero entero.
-5. **Save Map** / **Load Map** guardan y recuperan el mapa entrenado.
+5. **Save Map** / **Load Map** guardan y recuperan el mapa entrenado en `~/.neuronairis/mapa.som`, un fichero de texto con la topología, los parámetros y los pesos de cada neurona.
 
 ## Cómo está hecho
 
@@ -84,8 +84,8 @@ El grafo sobre el que se apoya el mapa es la librería `cu.edu.cujae.ceis.graph`
 
 - El radio de vecindad puede encogerse con las épocas (`setShrinkRadius`), pero viene **desactivado**: medido sobre 20 semillas mejora siempre el error de cuantización y da resultados mixtos en el topográfico.
 - La normalización min-max existe pero no se aplica por defecto. En Iris no mejora el acierto porque el largo del pétalo —que domina la distancia con un 70 %— es justo la variable discriminante. En otro dataset conviene activarla.
-- El mapa se guarda en un formato binario propio (`RandomAccessFile`) que solo entiende esta aplicación y solo sirve para el caso Iris de cuatro medidas. Un formato de texto lo haría portable e inspeccionable.
-- La ventana del mapa 2-D entrena su propia rejilla, aparte del anillo del formulario principal. Unificar ambas en una sola configuración sería lo natural.
+- La interfaz sigue atada al Iris aunque el núcleo no lo esté: los campos de entrada manual y los ejes de las gráficas hablan de sépalos y pétalos. Cargar otro dataset funciona a nivel de biblioteca, pero la pantalla no se adapta a él.
+- Los textos de la interfaz están en inglés y los de la vista del mapa en español.
 
 ## Autoría
 
