@@ -130,6 +130,24 @@ class DatasetGenericoTest {
     }
 
     @Test
+    @DisplayName("El dataset viaja en el classpath, no en una ruta del disco")
+    void elDatasetEstaEnElClasspath() {
+        assertNotNull(GestorTxt.class.getResourceAsStream("/com/example/edfinal/iris.data"),
+                "el Iris debe ir dentro del jar para que la app sea distribuible");
+        assertEquals(150, GestorTxt.getIrisDataset().size());
+    }
+
+    @Test
+    @DisplayName("El estado de la app se guarda en la carpeta del usuario")
+    void elEstadoViveEnLaCarpetaDelUsuario() {
+        String ruta = GestorTxt.archivoDeEstado("Map.dat");
+        assertTrue(ruta.startsWith(System.getProperty("user.home")),
+                "no debe escribirse en el directorio de trabajo: " + ruta);
+        assertTrue(ruta.endsWith("Map.dat"));
+        assertTrue(GestorTxt.carpetaDeEstado().isDirectory());
+    }
+
+    @Test
     @DisplayName("Normalizar deja cada variable en [0,1]")
     void normalizarEscalaTodasLasVariables() {
         Dataset norm = datasetSintetico(7).normalized();

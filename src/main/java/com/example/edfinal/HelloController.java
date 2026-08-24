@@ -122,7 +122,7 @@ private void changeImage() {
 
     public void loadMap(ActionEvent actionEvent) throws IOException {
         // Map.dat lo genera "Guardar": en una copia recién clonada no existe todavía.
-        java.io.File saved = new java.io.File("Map.dat");
+        java.io.File saved = new java.io.File(GestorTxt.archivoDeEstado("Map.dat"));
         if (!saved.isFile() || saved.length() == 0) {
             showAlert("There is no saved map yet. Train a map and press Save first.", Alert.AlertType.WARNING);
             return;

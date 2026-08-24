@@ -8,12 +8,33 @@ import com.example.edfinal.SOMNeuron;
 import cu.edu.cujae.ceis.graph.vertex.Vertex;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 
 public class GestorTxt {
-    private static final String path = "src/main/java/com/example/edfinal/Ficheros/iris.data";
+    /** El dataset viaja dentro del jar, no en una ruta relativa al directorio de trabajo. */
+    private static final String RECURSO_IRIS = "/com/example/edfinal/iris.data";
+
+    /**
+     * Carpeta donde la app guarda su estado (mapas y configuraciones).
+     *
+     * Antes se escribía en el directorio de trabajo, que en una aplicación
+     * empaquetada puede ser de solo lectura o cualquier sitio.
+     */
+    public static File carpetaDeEstado()
+    {
+        File dir = new File(System.getProperty("user.home"), ".neuronairis");
+        if (!dir.isDirectory()) dir.mkdirs();
+        return dir;
+    }
+
+    /** Ruta de un fichero de estado dentro de la carpeta de la app. */
+    public static String archivoDeEstado(String nombre)
+    {
+        return new File(carpetaDeEstado(), nombre).getAbsolutePath();
+    }
 
     private static ArrayList<Flower> flowersDataBase;
     private static ArrayList<Flower> lista;
@@ -24,9 +45,27 @@ public class GestorTxt {
     {
         if(flowersDataBase==null)
         {
-            flowersDataBase = load(path);
+            flowersDataBase = loadIris();
         }
         return flowersDataBase;
+    }
+
+    /** Lee el Iris del classpath, así funciona igual desde el IDE que dentro del jar. */
+    private static ArrayList<Flower> loadIris()
+    {
+        InputStream in = GestorTxt.class.getResourceAsStream(RECURSO_IRIS);
+        if (in == null)
+        {
+            throw new IllegalStateException("No se encuentra el dataset en " + RECURSO_IRIS);
+        }
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)))
+        {
+            return parse(br);
+        }
+        catch (IOException e)
+        {
+            throw new IllegalStateException("No se pudo leer el dataset", e);
+        }
     }
 
     /** El Iris como Dataset genérico (lo que consume el mapa). */
@@ -52,51 +91,41 @@ public class GestorTxt {
         return lista;
     }
 
-    private static String getPath()
-    {
-        return path;
+
+
+    /** Lee flores de un fichero suelto elegido por el usuario. */
+    private static ArrayList<Flower> load(String path){
+        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+            return parse(br);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
 
-    private static ArrayList<Flower> load(String path){
+    /** Una flor por línea: cuatro medidas y la especie, separadas por comas. */
+    private static ArrayList<Flower> parse(BufferedReader bufer) throws IOException {
         ArrayList<Flower> flowers = new ArrayList<>();
-        BufferedReader bufer;
-        try {
-            bufer = new BufferedReader(new FileReader(path));
+        String linea;
+        while((linea=bufer.readLine())!=null)
+        {
+            if (linea.isBlank()) continue;
+            String[] partes = linea.split(",");
+            if (partes.length < 5) continue;
 
-            String linea;
-            try {
-                while((linea=bufer.readLine())!=null)
-                {
-                    String[] partes = linea.split(",");
+            double sepalLength = Double.parseDouble(partes[0]);
+            double sepalWidth = Double.parseDouble(partes[1]);
+            double petalLength = Double.parseDouble(partes[2]);
+            double petalWidth = Double.parseDouble(partes[3]);
+            String type = partes[4];
 
-                    double sepalLength = Double.parseDouble(partes[0]);
-                    double sepalWidth = Double.parseDouble(partes[1]);
-                    double petalLength = Double.parseDouble(partes[2]);
-                    double petalWidth = Double.parseDouble(partes[3]);
-                    String type = partes[4];
-
-                    Flower f = new Flower(sepalLength, sepalWidth, petalLength, petalWidth, type);
-                    flowers.add(f);
-                }
-
-            } catch (NumberFormatException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            flowers.add(new Flower(sepalLength, sepalWidth, petalLength, petalWidth, type));
         }
-
         return flowers;
     }
 
     public static void writeMap(SOM map) throws IOException {
-        RandomAccessFile raf = new RandomAccessFile("Map.dat", "rw");
+        RandomAccessFile raf = new RandomAccessFile(archivoDeEstado("Map.dat"), "rw");
 
         raf.writeInt(map.getEpochs());
         raf.writeInt(map.getTotalNeurons());
@@ -119,7 +148,7 @@ public class GestorTxt {
     }
 
     public static SOM loadMap() throws IOException {
-        RandomAccessFile raf = new RandomAccessFile("Map.dat", "rw");
+        RandomAccessFile raf = new RandomAccessFile(archivoDeEstado("Map.dat"), "rw");
         int epochs= raf.readInt();
         int neurons = raf.readInt();
         double learningRate = raf.readDouble();
@@ -144,7 +173,7 @@ public class GestorTxt {
 
     public static void writeItemB() {
         try {
-            PrintWriter pw = new PrintWriter("incisoB.txt");
+            PrintWriter pw = new PrintWriter(archivoDeEstado("incisoB.txt"));
             for(BMUandFlowers baf : BMUandFManager.getLista())
             {
                 pw.write("BMU: " + baf.bmu.getId()+" ");
@@ -174,7 +203,7 @@ public class GestorTxt {
     }
 
     public static void writeInConfig(SOMNeuron n) throws IOException {
-        RandomAccessFile raf = new RandomAccessFile("Configuration.dat","rw");
+        RandomAccessFile raf = new RandomAccessFile(archivoDeEstado("Configuration.dat"),"rw");
         raf.skipBytes(20);
         long pos = raf.getFilePointer();
         int cantIdent = raf.readInt();
@@ -191,7 +220,7 @@ public class GestorTxt {
     }
 
     public static void writeHeaderConfig(SOM map) throws IOException {
-        RandomAccessFile raf = new RandomAccessFile("Configuration.dat","rw");
+        RandomAccessFile raf = new RandomAccessFile(archivoDeEstado("Configuration.dat"),"rw");
         raf.setLength(0);
         raf.writeInt(map.getEpochs());
         raf.writeInt(map.getTotalNeurons());
@@ -203,7 +232,7 @@ public class GestorTxt {
     }
 
     public static ArrayList<SOMNeuron> readConfig() throws IOException {
-        RandomAccessFile raf = new RandomAccessFile("Configuration.dat","rw");
+        RandomAccessFile raf = new RandomAccessFile(archivoDeEstado("Configuration.dat"),"rw");
         ArrayList<SOMNeuron> list = new ArrayList<>();
         raf.skipBytes(20);
         int cant = raf.readInt();
