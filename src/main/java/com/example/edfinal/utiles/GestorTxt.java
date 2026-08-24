@@ -2,6 +2,9 @@ package com.example.edfinal.utiles;
 
 import com.example.edfinal.Flower;
 import com.example.edfinal.data.Dataset;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import com.example.edfinal.data.Sample;
 import com.example.edfinal.SOM;
 import com.example.edfinal.SOMNeuron;
@@ -124,51 +127,111 @@ public class GestorTxt {
         return flowers;
     }
 
+    /** Nombre del fichero donde se guarda el mapa entrenado. */
+    private static final String MAPA = "mapa.som";
+
+    /**
+     * Guarda el mapa en texto plano.
+     *
+     * El formato anterior era binario y escribía exactamente cuatro doubles por
+     * neurona, así que solo servía para el Iris y no había forma de mirarlo. Este
+     * es inspeccionable con cualquier editor, admite cualquier número de
+     * variables y conserva la topología.
+     */
     public static void writeMap(SOM map) throws IOException {
-        RandomAccessFile raf = new RandomAccessFile(archivoDeEstado("Map.dat"), "rw");
-
-        raf.writeInt(map.getEpochs());
-        raf.writeInt(map.getTotalNeurons());
-        raf.writeDouble(map.getInitialLearningRate());
-        raf.writeInt(map.getRadious());
-
-        Iterator<Vertex> iter = map.getVerticesList().iterator();
-
-        while (iter.hasNext())
+        try (PrintWriter pw = new PrintWriter(archivoDeEstado(MAPA), StandardCharsets.UTF_8))
         {
-            SOMNeuron n = (SOMNeuron) iter.next();
-            raf.writeInt(n.getId());
-            raf.writeDouble(((Flower)n.getInfo()).getSepalLength());
-            raf.writeDouble(((Flower)n.getInfo()).getSepalWidth());
-            raf.writeDouble(((Flower)n.getInfo()).getPetalLength());
-            raf.writeDouble(((Flower)n.getInfo()).getPetalWidth());
-        }
+            pw.println("# NeuronaIris · mapa autoorganizado");
+            pw.println("version=1");
+            pw.println("topology=" + map.getTopology());
+            pw.println("rows=" + map.getRows());
+            pw.println("cols=" + map.getCols());
+            pw.println("epochs=" + map.getEpochs());
+            pw.println("neurons=" + map.getTotalNeurons());
+            pw.println("learningRate=" + map.getInitialLearningRate());
+            pw.println("radius=" + map.getRadious());
+            pw.println("features=" + String.join(",", map.getDataset().getFeatureNames()));
+            pw.println("# id,peso1,peso2,...");
 
-        raf.close();
+            for (Vertex v : map.getVerticesList())
+            {
+                SOMNeuron n = (SOMNeuron) v;
+                StringBuilder sb = new StringBuilder().append(n.getId());
+                Sample w = n.getWeights();
+                for (int i = 0; i < w.size(); i++) sb.append(',').append(w.get(i));
+                pw.println(sb);
+            }
+        }
+    }
+
+    /** ¿Hay un mapa guardado? */
+    public static boolean haySavedMap() {
+        File f = new File(archivoDeEstado(MAPA));
+        return f.isFile() && f.length() > 0;
     }
 
     public static SOM loadMap() throws IOException {
-        RandomAccessFile raf = new RandomAccessFile(archivoDeEstado("Map.dat"), "rw");
-        int epochs= raf.readInt();
-        int neurons = raf.readInt();
-        double learningRate = raf.readDouble();
-        int radius = raf.readInt();
-        SOM m = new SOM(epochs, neurons, learningRate, radius);
-        m.setTrained(true);
-        m.setInit(true);
-        while(neurons>0)
+        Map<String, String> cab = new HashMap<>();
+        List<Sample> pesos = new ArrayList<>();
+        List<Integer> ids = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(
+                new InputStreamReader(new FileInputStream(archivoDeEstado(MAPA)), StandardCharsets.UTF_8)))
         {
-            int id = raf.readInt();
-            double sepalLength = raf.readDouble();
-            double sepalWidth = raf.readDouble();
-            double petalLength = raf.readDouble();
-            double petalWidth = raf.readDouble();
-            m.getVerticesList().add(new SOMNeuron(id, new Flower(sepalLength, sepalWidth, petalLength, petalWidth)));
-            neurons--;
+            String linea;
+            while ((linea = br.readLine()) != null)
+            {
+                linea = linea.trim();
+                if (linea.isEmpty() || linea.startsWith("#")) continue;
+
+                int igual = linea.indexOf('=');
+                if (igual > 0 && !linea.contains(","))
+                {
+                    cab.put(linea.substring(0, igual), linea.substring(igual + 1));
+                    continue;
+                }
+                if (igual > 0 && linea.startsWith("features="))
+                {
+                    cab.put("features", linea.substring(igual + 1));
+                    continue;
+                }
+
+                String[] partes = linea.split(",");
+                ids.add(Integer.parseInt(partes[0].trim()));
+                double[] w = new double[partes.length - 1];
+                for (int i = 0; i < w.length; i++) w[i] = Double.parseDouble(partes[i + 1].trim());
+                pesos.add(new Sample(w));
+            }
+        }
+
+        if (pesos.isEmpty()) throw new IOException("El fichero de mapa no tiene neuronas");
+
+        int epochs = Integer.parseInt(cab.getOrDefault("epochs", "1"));
+        double lr = Double.parseDouble(cab.getOrDefault("learningRate", "0.5"));
+        int radius = Integer.parseInt(cab.getOrDefault("radius", "1"));
+        boolean rejilla = "GRID".equals(cab.get("topology"));
+        int rows = Integer.parseInt(cab.getOrDefault("rows", "0"));
+        int cols = Integer.parseInt(cab.getOrDefault("cols", "0"));
+
+        SOM m = rejilla
+                ? new SOM(epochs, rows, cols, lr, radius, getIrisDataset())
+                : new SOM(epochs, pesos.size(), lr, radius, getIrisDataset());
+
+        boolean esIris = pesos.get(0).size() == 4;
+        for (int i = 0; i < pesos.size(); i++)
+        {
+            Sample w = pesos.get(i);
+            m.getVerticesList().add(new SOMNeuron(ids.get(i), esIris ? Flower.from(w) : w));
         }
         m.makeConnections();
-        raf.close();
-        return  m;
+        m.setInit(true);
+        m.setTrained(true);
+
+        // Sin esto el mapa cargado no sabe a qué especie corresponde cada neurona
+        // y clasificar devolvía vacío.
+        m.groupBmus(m.getDataset().getSamples());
+        m.labelNeurons(m.getDataset().getSamples());
+        return m;
     }
 
     public static void writeItemB() {

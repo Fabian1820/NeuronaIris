@@ -30,6 +30,10 @@ import java.util.Iterator;
 import java.util.ResourceBundle;
 
 public class HelloController implements Initializable {
+
+    private static final String TOPOLOGIA_ANILLO = "Anillo 1-D";
+    private static final String TOPOLOGIA_REJILLA = "Rejilla 2-D";
+
     public SOM map;
     public boolean startPressed;
     public ScatterChart<Number, Number> SepalChart;
@@ -44,6 +48,7 @@ public class HelloController implements Initializable {
     public TextField EpochsTF;
     public TextField LearningRateTF;
     public TextField RadiusTF;
+    public ComboBox<String> TopologyCB;
     public Button CloseButton;
     public TextArea TextA;
     public ImageView ImgView;
@@ -64,6 +69,8 @@ public class HelloController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         startPressed=false;
+        TopologyCB.getItems().setAll(TOPOLOGIA_ANILLO, TOPOLOGIA_REJILLA);
+        TopologyCB.getSelectionModel().select(TOPOLOGIA_REJILLA);
         SepalChart.setLegendVisible(false);
         PetalChart.setLegendVisible(false);
         WidthChart.setLegendVisible(false);
@@ -121,9 +128,8 @@ private void changeImage() {
     }
 
     public void loadMap(ActionEvent actionEvent) throws IOException {
-        // Map.dat lo genera "Guardar": en una copia recién clonada no existe todavía.
-        java.io.File saved = new java.io.File(GestorTxt.archivoDeEstado("Map.dat"));
-        if (!saved.isFile() || saved.length() == 0) {
+        // El fichero lo genera "Save Map": en una copia recién instalada no existe.
+        if (!GestorTxt.haySavedMap()) {
             showAlert("There is no saved map yet. Train a map and press Save first.", Alert.AlertType.WARNING);
             return;
         }
@@ -158,7 +164,17 @@ private void changeImage() {
             int neurons = Integer.parseInt(NeuronsTF.getText());
             double learningRate = Double.parseDouble(LearningRateTF.getText());
             int radius = Integer.parseInt(RadiusTF.getText());
-            map = new SOM(epochs, neurons, learningRate, radius);
+            if (esRejillaSeleccionada()) {
+                if (neurons < 4) {
+                    showAlert("A 2-D map needs at least 4 neurons.", Alert.AlertType.WARNING);
+                    return;
+                }
+                int[] rejilla = repartirEnRejilla(neurons);
+                map = new SOM(epochs, rejilla[0], rejilla[1], learningRate, radius,
+                        GestorTxt.getIrisDataset());
+            } else {
+                map = new SOM(epochs, neurons, learningRate, radius);
+            }
             GestorTxt.writeHeaderConfig(map);
             map.initialize();
             mostrar();
@@ -171,42 +187,36 @@ private void changeImage() {
     }
 
     /**
-     * Entrena una rejilla 2-D con los mismos parámetros del formulario y abre la
-     * vista del mapa (U-matrix, planos de componentes y etiquetas).
+     * Abre la vista del mapa actual: U-matrix, planos de componentes y etiquetas.
      *
-     * El mapa del formulario principal es un anillo, y esas lecturas necesitan
-     * una rejilla; se entrena una aparte con el mismo número de neuronas,
-     * repartidas en la rejilla más cuadrada posible.
+     * Antes esto entrenaba una rejilla aparte, así que lo que se veía no era el
+     * mapa con el que trabajaba el resto de la pantalla. Ahora se dibuja el
+     * mismo, y la topología se elige en el formulario.
      */
     public void verMapa2D(ActionEvent actionEvent) {
-        int epochs, neurons, radius;
-        double learningRate;
-        try {
-            epochs = Integer.parseInt(EpochsTF.getText());
-            neurons = Integer.parseInt(NeuronsTF.getText());
-            learningRate = Double.parseDouble(LearningRateTF.getText());
-            radius = Integer.parseInt(RadiusTF.getText());
-        } catch (Exception e) {
-            showAlert("Fill all the map configuration parameters.", Alert.AlertType.WARNING);
+        if (!startPressed || map == null) {
+            showAlert("The map has not been created. To do so press Start", Alert.AlertType.WARNING);
+            return;
+        }
+        if (map.getTopology() != SOM.Topology.GRID) {
+            showAlert("These readings need a 2-D map. Choose \"" + TOPOLOGIA_REJILLA
+                    + "\" and press Start again.", Alert.AlertType.WARNING);
+            return;
+        }
+        if (!map.isTrained()) {
+            showAlert("The map has not been trained. To do so press Train.", Alert.AlertType.WARNING);
             return;
         }
 
-        if (neurons < 4) {
-            showAlert("A 2-D map needs at least 4 neurons.", Alert.AlertType.WARNING);
-            return;
-        }
-
-        int[] rejilla = repartirEnRejilla(neurons);
-        SOM mapa2D = new SOM(epochs, rejilla[0], rejilla[1], learningRate, radius,
-                GestorTxt.getIrisDataset());
-        mapa2D.initialize();
-        mapa2D.train();
-
         try {
-            new com.example.edfinal.ui.MapaView(mapa2D).mostrar();
+            new com.example.edfinal.ui.MapaView(map).mostrar();
         } catch (Exception e) {
             showAlert("No se pudo abrir el mapa: " + e.getMessage(), Alert.AlertType.ERROR);
         }
+    }
+
+    private boolean esRejillaSeleccionada() {
+        return TOPOLOGIA_REJILLA.equals(TopologyCB.getSelectionModel().getSelectedItem());
     }
 
     /** Reparte n neuronas en la rejilla más cuadrada posible. */
