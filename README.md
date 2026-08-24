@@ -47,6 +47,16 @@ Los tests:
 ./mvnw test
 ```
 
+## Cómo empaquetarlo
+
+Para generar una aplicación nativa hace falta un **JDK completo**: con carpeta `jmods` y con `jpackage`. Los runtime que traen algunos IDE (por ejemplo el de Android Studio) son imágenes tipo JRE sin `jmods`, y `jlink` falla con *"Module java.desktop not found"*.
+
+```bash
+JAVA_HOME=/ruta/al/jdk ./scripts/empaquetar.sh
+```
+
+El script comprueba el JDK, construye la imagen de runtime con `jlink` y la aplicación con `jpackage`. El resultado queda en `target/instalador/`.
+
 ## Cómo se usa la aplicación
 
 1. **START** crea el mapa con los parámetros del formulario (épocas, neuronas, tasa de aprendizaje, radio).
@@ -64,22 +74,24 @@ Los tests:
 - **`data.SOMAnalysis`** — U-matrix, planos de componentes, error topográfico, matriz de confusión.
 - **`ui.MapaView`** — la ventana del mapa, construida con contenedores y un `Canvas` que se redibuja al redimensionar.
 
+La pantalla principal usa `BorderPane` + `GridPane` + `FlowPane`: las gráficas se reparten el espacio, el panel lateral mantiene su ancho y los controles bajan de línea si la ventana se estrecha. El dataset viaja dentro del jar y el estado de la aplicación (mapas guardados) se escribe en `~/.neuronairis/`.
+
 El grafo sobre el que se apoya el mapa es la librería `cu.edu.cujae.ceis.graph` de la CUJAE, incluida en el árbol de fuentes.
 
 `Flower` sobrevive como vista con nombres (`getPetalLength()`…) sobre `Sample`, porque la interfaz lee las medidas del Iris por nombre.
 
 ## Estado y limitaciones
 
-- La pantalla principal está dibujada en FXML con **coordenadas absolutas** sobre un lienzo de 1545×881. Para que quepa en monitores más pequeños se escala el contenido manteniendo la proporción. Rehacerla con contenedores reales sigue pendiente; la ventana del mapa 2-D ya está hecha así.
 - El radio de vecindad puede encogerse con las épocas (`setShrinkRadius`), pero viene **desactivado**: medido sobre 20 semillas mejora siempre el error de cuantización y da resultados mixtos en el topográfico.
 - La normalización min-max existe pero no se aplica por defecto. En Iris no mejora el acierto porque el largo del pétalo —que domina la distancia con un 70 %— es justo la variable discriminante. En otro dataset conviene activarla.
-- El dataset se lee de una ruta relativa al directorio de trabajo, así que hoy funciona con `./mvnw` desde la raíz pero no empaquetado en un jar.
+- El mapa se guarda en un formato binario propio (`RandomAccessFile`) que solo entiende esta aplicación y solo sirve para el caso Iris de cuatro medidas. Un formato de texto lo haría portable e inspeccionable.
+- La ventana del mapa 2-D entrena su propia rejilla, aparte del anillo del formulario principal. Unificar ambas en una sola configuración sería lo natural.
 
 ## Autoría
 
 Trabajo de la asignatura de Estructuras de Datos de la **CUJAE** (2024), hecho en equipo por **Ruben Frias**, **Fabián Fernández**, **Clari21** y **MrKettleburn**. La mayor parte del código original —incluido el núcleo del SOM y la interfaz— es de Ruben Frias.
 
-En 2026 Fabián retomó el proyecto para terminarlo, porque la última versión del equipo nunca llegó a subirse. De ese trabajo posterior salen: el desacoplamiento del dataset, la topología en rejilla, las lecturas del mapa, la evaluación con datos no vistos y la batería de 47 tests, además de arreglar varios fallos del código original (las imágenes se cargaban desde rutas absolutas de una máquina concreta, reentrenar corrompía el agrupamiento y la clasificación podía entrar en un ciclo infinito).
+En 2026 Fabián retomó el proyecto para terminarlo, porque la última versión del equipo nunca llegó a subirse. De ese trabajo posterior salen: el desacoplamiento del dataset, la topología en rejilla, las lecturas del mapa, la evaluación con datos no vistos y la batería de 49 tests, además de arreglar varios fallos del código original (las imágenes se cargaban desde rutas absolutas de una máquina concreta, reentrenar corrompía el agrupamiento y la clasificación podía entrar en un ciclo infinito).
 
 ## Dataset
 
