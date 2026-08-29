@@ -20,7 +20,6 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 
 <!--
@@ -105,24 +104,13 @@
       <VBox fx:id="result" maxWidth="380.0" minWidth="320.0" prefWidth="360.0" spacing="10.0">
          <padding><Insets bottom="8.0" left="6.0" right="14.0" top="4.0" /></padding>
 
-         <Label opacity="0.55" text="Data Entry" />
-         <GridPane hgap="10.0" vgap="4.0">
+         <Label fx:id="datasetLabel" opacity="0.55" text="Data Entry" />
+         <!-- Una fila por variable del dataset; lo rellena HelloController -->
+         <GridPane fx:id="entradaGrid" hgap="10.0" vgap="4.0">
             <columnConstraints>
                <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
                <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
             </columnConstraints>
-            <rowConstraints>
-               <RowConstraints /><RowConstraints /><RowConstraints /><RowConstraints />
-            </rowConstraints>
-
-            <Label text="Sepal Length" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-            <Label text="Petal Length" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-            <TextField fx:id="SepalLengthText" alignment="CENTER" prefHeight="38.0" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-            <TextField fx:id="PetalLengthText" alignment="CENTER" prefHeight="38.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <Label text="Sepal Width" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-            <Label text="Petal Width" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <TextField fx:id="SepalWidthText" alignment="CENTER" prefHeight="38.0" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-            <TextField fx:id="PetalWidthText" alignment="CENTER" prefHeight="38.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
          </GridPane>
 
          <HBox alignment="CENTER">
@@ -130,6 +118,7 @@
          </HBox>
 
          <FlowPane hgap="8.0" vgap="6.0">
+            <Button fx:id="LoadDatasetButton" mnemonicParsing="false" onAction="#loadDataset" text="Load Dataset" />
             <Button fx:id="LoadFileButton" mnemonicParsing="false" onAction="#loadFile" text="Load File" />
             <Button fx:id="LoadMapButton" mnemonicParsing="false" onAction="#loadMap" text="Load Map" />
             <Button fx:id="SaveMapButton" mnemonicParsing="false" onAction="#save" text="Save Map" />
@@ -148,29 +137,9 @@
 
    <bottom>
       <!-- Leyenda: FlowPane para que se reordene en ventanas estrechas -->
-      <FlowPane alignment="CENTER" hgap="18.0" vgap="6.0">
+      <!-- Una entrada por etiqueta del dataset; lo rellena HelloController -->
+      <FlowPane fx:id="leyendaPane" alignment="CENTER" hgap="18.0" vgap="6.0">
          <padding><Insets bottom="10.0" left="14.0" right="14.0" top="6.0" /></padding>
-
-         <HBox alignment="CENTER_LEFT" spacing="6.0">
-            <Circle id="OrangeC" fill="ORANGE" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
-            <Label text="Data Base Random Weights" />
-         </HBox>
-         <HBox alignment="CENTER_LEFT" spacing="6.0">
-            <Circle fill="RED" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
-            <Label text="Iris Setosa" />
-         </HBox>
-         <HBox alignment="CENTER_LEFT" spacing="6.0">
-            <Circle id="GreenC" fill="GREEN" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
-            <Label text="Iris Versicolor" />
-         </HBox>
-         <HBox alignment="CENTER_LEFT" spacing="6.0">
-            <Circle id="BlueC" fill="BLUE" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
-            <Label text="Iris Virginica" />
-         </HBox>
-         <HBox alignment="CENTER_LEFT" spacing="6.0">
-            <Circle id="YellowC" fill="YELLOW" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
-            <Label text="BMU of Data Entry" />
-         </HBox>
       </FlowPane>
    </bottom>
 </BorderPane>

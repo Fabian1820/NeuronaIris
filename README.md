@@ -1,8 +1,8 @@
 # NeuronaIris
 
-Clasificador del dataset **Iris** con un **mapa autoorganizado (SOM)** implementado desde cero en Java, con interfaz JavaFX.
+Herramienta de **mapas autoorganizados (SOM)** implementada desde cero en Java, con interfaz JavaFX. Viene con el dataset **Iris** cargado, y acepta cualquier CSV numérico.
 
-Un SOM es una red neuronal no supervisada que proyecta datos de muchas variables sobre una rejilla de neuronas, colocando cerca lo que se parece. Aquí se entrena sobre las medidas de 150 flores y el mapa acaba separando solo las tres especies, sin que nadie le diga cuáles son.
+Un SOM es una red neuronal no supervisada que proyecta datos de muchas variables sobre una rejilla de neuronas, colocando cerca lo que se parece. Con el Iris se entrena sobre las medidas de 150 flores y el mapa acaba separando solo las tres especies, sin que nadie le diga cuáles son.
 
 ![U-matrix, especie dominante y planos de componentes](docs/mapa-som.png)
 
@@ -69,8 +69,9 @@ Para un instalador en vez de una carpeta de aplicación, cambia `--type app-imag
 1. **START** crea el mapa con los parámetros del formulario: épocas, neuronas, tasa de aprendizaje, radio y **topología** (anillo 1-D o rejilla 2-D).
 2. **TRAIN** lo entrena. Se puede reentrenar para seguir afinando.
 3. **2-D MAP** abre la U-matrix, los planos de componentes y las etiquetas del mapa actual. Necesita que la topología sea rejilla.
-4. **Classify** clasifica una flor introducida a mano; **Load File** clasifica un fichero entero.
-5. **Save Map** / **Load Map** guardan y recuperan el mapa entrenado en `~/.neuronairis/mapa.som`, un fichero de texto con la topología, los parámetros y los pesos de cada neurona.
+4. **Load Dataset** carga cualquier CSV numérico: la pantalla rehace los campos de entrada, los ejes de las gráficas y la leyenda según sus variables y etiquetas. En `docs/ejemplo-3variables.csv` hay uno de prueba con tres variables.
+5. **Classify** clasifica una muestra introducida a mano; **Load File** clasifica un fichero entero.
+6. **Save Map** / **Load Map** guardan y recuperan el mapa entrenado en `~/.neuronairis/mapa.som`, un fichero de texto con la topología, los parámetros y los pesos de cada neurona.
 
 ## Cómo está hecho
 
@@ -81,7 +82,7 @@ Para un instalador en vez de una carpeta de aplicación, cambia `--type app-imag
 - **`data.SOMAnalysis`** — U-matrix, planos de componentes, error topográfico, matriz de confusión.
 - **`ui.MapaView`** — la ventana del mapa, construida con contenedores y un `Canvas` que se redibuja al redimensionar.
 
-La pantalla principal usa `BorderPane` + `GridPane` + `FlowPane`: las gráficas se reparten el espacio, el panel lateral mantiene su ancho y los controles bajan de línea si la ventana se estrecha. El dataset viaja dentro del jar y el estado de la aplicación (mapas guardados) se escribe en `~/.neuronairis/`.
+La pantalla principal usa `BorderPane` + `GridPane` + `FlowPane`: las gráficas se reparten el espacio, el panel lateral mantiene su ancho y los controles bajan de línea si la ventana se estrecha. Los campos de entrada, los ejes y la leyenda se construyen en tiempo de ejecución a partir del dataset cargado. El Iris viaja dentro del jar y el estado de la aplicación (mapas guardados) se escribe en `~/.neuronairis/`.
 
 El grafo sobre el que se apoya el mapa es la librería `cu.edu.cujae.ceis.graph` de la CUJAE, incluida en el árbol de fuentes.
 
@@ -91,13 +92,14 @@ El grafo sobre el que se apoya el mapa es la librería `cu.edu.cujae.ceis.graph`
 
 - El radio de vecindad puede encogerse con las épocas (`setShrinkRadius`), pero viene **desactivado**: medido sobre 20 semillas mejora siempre el error de cuantización y da resultados mixtos en el topográfico.
 - La normalización min-max existe pero no se aplica por defecto. En Iris no mejora el acierto porque el largo del pétalo —que domina la distancia con un 70 %— es justo la variable discriminante. En otro dataset conviene activarla.
-- La interfaz sigue atada al Iris aunque el núcleo no lo esté: los campos de entrada manual y los ejes de las gráficas hablan de sépalos y pétalos. Cargar otro dataset funciona a nivel de biblioteca, pero la pantalla no se adapta a él — sería el siguiente paso natural.
+- Las gráficas muestran cuatro pares de variables elegidos automáticamente. Con datasets de muchas variables se ven solo los primeros pares; poder elegir los ejes a mano sería lo siguiente.
+- El carrusel de imágenes del panel lateral son fotos de flores de iris, herencia del proyecto original: no cambia al cargar otro dataset.
 
 ## Autoría
 
 Trabajo de la asignatura de Estructuras de Datos de la **CUJAE** (2024), hecho en equipo por **Ruben Frias**, **Fabián Fernández**, **Clari21** y **MrKettleburn**. La mayor parte del código original —incluido el núcleo del SOM y la interfaz— es de Ruben Frias.
 
-En 2026 Fabián retomó el proyecto para terminarlo, porque la última versión del equipo nunca llegó a subirse. De ese trabajo posterior salen: el desacoplamiento del dataset, la topología en rejilla, las lecturas del mapa, la evaluación con datos no vistos y la batería de 49 tests, además de arreglar varios fallos del código original (las imágenes se cargaban desde rutas absolutas de una máquina concreta, reentrenar corrompía el agrupamiento y la clasificación podía entrar en un ciclo infinito).
+En 2026 Fabián retomó el proyecto para terminarlo, porque la última versión del equipo nunca llegó a subirse. De ese trabajo posterior salen: el desacoplamiento del dataset, la topología en rejilla, las lecturas del mapa, la evaluación con datos no vistos y la batería de 62 tests, además de arreglar varios fallos del código original (las imágenes se cargaban desde rutas absolutas de una máquina concreta, reentrenar corrompía el agrupamiento y la clasificación podía entrar en un ciclo infinito).
 
 ## Dataset
 
