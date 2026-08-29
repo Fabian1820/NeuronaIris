@@ -38,7 +38,20 @@ public class SOM extends LinkedGraph {
     private Dataset dataset;
 
     /** Cómo se conectan las neuronas entre sí. */
-    public enum Topology { RING, GRID }
+    public enum Topology {
+        /** Anillo 1-D: cada neurona con sus dos anteriores y dos siguientes. */
+        RING,
+        /** Rejilla rectangular: 4 vecinas (arriba, abajo, izquierda, derecha). */
+        GRID,
+        /**
+         * Rejilla hexagonal: hasta 6 vecinas, con las filas impares desplazadas
+         * media celda. Es la que usan las implementaciones de referencia de SOM,
+         * porque reparte la vecindad de forma más uniforme: en una rejilla
+         * rectangular las cuatro vecinas están a distancia 1 pero las cuatro
+         * diagonales a √2, mientras que en la hexagonal las seis equidistan.
+         */
+        HEX
+    }
 
     private Topology topology = Topology.RING;
     private boolean shrinkRadius = false;
@@ -58,13 +71,29 @@ public class SOM extends LinkedGraph {
      */
     public SOM(int epochs, int rows, int cols, double learningRate, int radius, Dataset dataset)
     {
+      this(epochs, rows, cols, learningRate, radius, dataset, Topology.GRID);
+    }
+
+    /** Mapa 2-D con la topología indicada: rejilla rectangular o hexagonal. */
+    public SOM(int epochs, int rows, int cols, double learningRate, int radius, Dataset dataset,
+               Topology topology)
+    {
       this(epochs, rows * cols, learningRate, radius, dataset);
       if (rows < 2 || cols < 2) {
           throw new IllegalArgumentException("Una rejilla necesita al menos 2x2 y se pidió " + rows + "x" + cols);
       }
-      this.topology = Topology.GRID;
+      if (topology != Topology.GRID && topology != Topology.HEX) {
+          throw new IllegalArgumentException("Una rejilla 2-D es GRID o HEX, y se pidió " + topology);
+      }
+      this.topology = topology;
       this.rows = rows;
       this.cols = cols;
+    }
+
+    /** ¿El mapa está dispuesto en dos dimensiones? */
+    public boolean esRejilla()
+    {
+        return topology == Topology.GRID || topology == Topology.HEX;
     }
 
     /**
@@ -91,7 +120,7 @@ public class SOM extends LinkedGraph {
     /** Fila y columna de una neurona en la rejilla (null si el mapa es un anillo). */
     public int[] positionOf(SOMNeuron n)
     {
-        if (topology != Topology.GRID) return null;
+        if (!esRejilla()) return null;
         int idx = this.verticesList.indexOf(n);
         return idx < 0 ? null : new int[]{ idx / cols, idx % cols };
     }
@@ -156,6 +185,7 @@ public class SOM extends LinkedGraph {
 
     public void makeConnections()
     {
+        if (topology == Topology.HEX) { makeHexConnections(); return; }
         if (topology == Topology.GRID) { makeGridConnections(); return; }
         makeRingConnections();
     }
@@ -170,6 +200,38 @@ public class SOM extends LinkedGraph {
                 int actual = r * cols + c;
                 if (c + 1 < cols) this.insertEdgeNDG(actual, r * cols + (c + 1));
                 if (r + 1 < rows) this.insertEdgeNDG(actual, (r + 1) * cols + c);
+            }
+        }
+    }
+
+    /**
+     * Rejilla hexagonal en coordenadas desplazadas "odd-r": las filas impares se
+     * corren media celda a la derecha, así que cada neurona toca hasta seis.
+     *
+     * Solo se insertan las aristas hacia la derecha y hacia abajo; como son no
+     * dirigidas, eso ya conecta el par entero y evita duplicarlas.
+     */
+    private void makeHexConnections()
+    {
+        for (int r = 0; r < rows; r++)
+        {
+            boolean filaImpar = (r % 2) == 1;
+            for (int c = 0; c < cols; c++)
+            {
+                int actual = r * cols + c;
+
+                // Vecina de la derecha, en la misma fila
+                if (c + 1 < cols) this.insertEdgeNDG(actual, r * cols + (c + 1));
+
+                if (r + 1 < rows)
+                {
+                    // Las dos de la fila de abajo. En las filas pares quedan en
+                    // c-1 y c; en las impares, en c y c+1.
+                    int izquierda = filaImpar ? c : c - 1;
+                    int derecha = filaImpar ? c + 1 : c;
+                    if (izquierda >= 0 && izquierda < cols) this.insertEdgeNDG(actual, (r + 1) * cols + izquierda);
+                    if (derecha >= 0 && derecha < cols) this.insertEdgeNDG(actual, (r + 1) * cols + derecha);
+                }
             }
         }
     }

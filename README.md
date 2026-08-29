@@ -64,9 +64,29 @@ JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home ./scrip
 
 Para un instalador en vez de una carpeta de aplicación, cambia `--type app-image` por `dmg`, `msi` o `deb` en el script.
 
+## Rectangular o hexagonal
+
+La rejilla hexagonal es la que usan las implementaciones de referencia, porque su vecindad es uniforme: las seis vecinas equidistan, mientras que en la rectangular las cuatro de los lados están a distancia 1 y las cuatro diagonales a √2.
+
+Medido sobre 20 semillas, rejilla 8×6, 40 épocas y radio 2:
+
+| | rectangular | hexagonal |
+|---|---|---|
+| Error topográfico *(vecindad del grafo)* | 16.5 % | **5.6 %** |
+| Error topográfico *(celdas que se tocan)* | **3.3 %** | 5.6 % |
+| Acierto | 97.3 % | 97.2 % |
+| Error de cuantización | **0.281** | 0.300 |
+| Neuronas muertas | **5.9 / 48** | 7.5 / 48 |
+
+La lectura importante está en las dos primeras filas. La rectangular solo sale bien parada cuando se le conceden las cuatro diagonales, que su función de vecindad **nunca usa al entrenar**: medida contra su propia topología se va al 16.5 %. En la hexagonal ambas medidas coinciden, porque sus seis vecinas son a la vez las de las aristas y las que se tocan.
+
+A cambio, la hexagonal representa los datos algo peor y desperdicia más neuronas. Viene seleccionada por defecto por coherencia, pero las dos están disponibles.
+
+![Mapa con rejilla hexagonal](docs/mapa-som-hex.png)
+
 ## Cómo se usa la aplicación
 
-1. **START** crea el mapa con los parámetros del formulario: épocas, neuronas, tasa de aprendizaje, radio y **topología** (anillo 1-D o rejilla 2-D).
+1. **START** crea el mapa con los parámetros del formulario: épocas, neuronas, tasa de aprendizaje, radio y **topología** (anillo 1-D, rejilla rectangular o rejilla hexagonal).
 2. **TRAIN** lo entrena. Se puede reentrenar para seguir afinando.
 3. **2-D MAP** abre la U-matrix, los planos de componentes y las etiquetas del mapa actual. Necesita que la topología sea rejilla.
 4. **Load Dataset** carga cualquier CSV numérico: la pantalla rehace los campos de entrada, los ejes de las gráficas y la leyenda según sus variables y etiquetas. En `docs/ejemplo-3variables.csv` hay uno de prueba con tres variables. Cada gráfica tiene sus propios desplegables **X** e **Y** para elegir qué par de variables muestra.
@@ -77,7 +97,7 @@ Para un instalador en vez de una carpeta de aplicación, cambia `--type app-imag
 
 - **`data.Sample`** — una muestra de N variables con etiqueta. Es la unidad del mapa: tanto los datos como los pesos de cada neurona.
 - **`data.Dataset`** — carga cualquier CSV numérico (toma como variables las columnas que parsean a número y como etiqueta la que no), calcula rangos, normaliza y parte en entrenamiento/prueba de forma estratificada.
-- **`SOM`** — el mapa. Dos topologías: anillo 1-D y **rejilla 2-D**. La vecindad se calcula con un recorrido en anchura sobre el grafo, así que la distancia es el número de saltos y funciona igual en ambas.
+- **`SOM`** — el mapa. Tres topologías: anillo 1-D, **rejilla rectangular** (4 vecinas) y **rejilla hexagonal** (6 vecinas, filas impares desplazadas media celda). La vecindad se calcula con un recorrido en anchura sobre el grafo, así que la distancia es el número de saltos y funciona igual en las tres.
 - **`SOMNeuron`** — una neurona; sus pesos viven en el mismo espacio que los datos.
 - **`data.SOMAnalysis`** — U-matrix, planos de componentes, error topográfico, matriz de confusión.
 - **`ui.MapaView`** — la ventana del mapa, construida con contenedores y un `Canvas` que se redibuja al redimensionar.
@@ -92,14 +112,13 @@ El grafo sobre el que se apoya el mapa es la librería `cu.edu.cujae.ceis.graph`
 
 - El radio de vecindad puede encogerse con las épocas (`setShrinkRadius`), pero viene **desactivado**: medido sobre 20 semillas mejora siempre el error de cuantización y da resultados mixtos en el topográfico.
 - La normalización min-max existe pero no se aplica por defecto. En Iris no mejora el acierto porque el largo del pétalo —que domina la distancia con un 70 %— es justo la variable discriminante. En otro dataset conviene activarla.
-- El SOM es de rejilla rectangular con vecindad de 4. Las implementaciones de referencia suelen usar rejilla hexagonal, que reparte la vecindad de forma más uniforme.
 - No hay validación cruzada: la evaluación usa particiones 70/30 repetidas, que para este tamaño de dataset es suficiente pero no es lo mismo.
 
 ## Autoría
 
 Trabajo de la asignatura de Estructuras de Datos de la **CUJAE** (2024), hecho en equipo por **Ruben Frias**, **Fabián Fernández**, **Clari21** y **MrKettleburn**. La mayor parte del código original —incluido el núcleo del SOM y la interfaz— es de Ruben Frias.
 
-En 2026 Fabián retomó el proyecto para terminarlo, porque la última versión del equipo nunca llegó a subirse. De ese trabajo posterior salen: el desacoplamiento del dataset, la topología en rejilla, las lecturas del mapa, la evaluación con datos no vistos y la batería de 65 tests, además de arreglar varios fallos del código original (las imágenes se cargaban desde rutas absolutas de una máquina concreta, reentrenar corrompía el agrupamiento y la clasificación podía entrar en un ciclo infinito).
+En 2026 Fabián retomó el proyecto para terminarlo, porque la última versión del equipo nunca llegó a subirse. De ese trabajo posterior salen: el desacoplamiento del dataset, la topología en rejilla, las lecturas del mapa, la evaluación con datos no vistos y la batería de 74 tests, además de arreglar varios fallos del código original (las imágenes se cargaban desde rutas absolutas de una máquina concreta, reentrenar corrompía el agrupamiento y la clasificación podía entrar en un ciclo infinito).
 
 ## Dataset
 

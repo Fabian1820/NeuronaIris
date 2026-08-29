@@ -48,6 +48,7 @@ public class HelloController implements Initializable {
 
     private static final String TOPOLOGIA_ANILLO = "1-D ring";
     private static final String TOPOLOGIA_REJILLA = "2-D grid";
+    private static final String TOPOLOGIA_HEX = "2-D hex grid";
 
     /** Colores con los que se pinta cada etiqueta del dataset, en orden de aparición. */
     private static final Color[] PALETA = {
@@ -120,8 +121,8 @@ public class HelloController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         startPressed = false;
 
-        TopologyCB.getItems().setAll(TOPOLOGIA_ANILLO, TOPOLOGIA_REJILLA);
-        TopologyCB.getSelectionModel().select(TOPOLOGIA_REJILLA);
+        TopologyCB.getItems().setAll(TOPOLOGIA_ANILLO, TOPOLOGIA_REJILLA, TOPOLOGIA_HEX);
+        TopologyCB.getSelectionModel().select(TOPOLOGIA_HEX);
 
         for (ScatterChart<Number, Number> c : graficas()) c.setLegendVisible(false);
 
@@ -515,7 +516,8 @@ public class HelloController implements Initializable {
                     return;
                 }
                 int[] rejilla = repartirEnRejilla(neurons);
-                map = new SOM(epochs, rejilla[0], rejilla[1], learningRate, radius, dataset);
+                map = new SOM(epochs, rejilla[0], rejilla[1], learningRate, radius, dataset,
+                        topologiaSeleccionada());
             } else {
                 map = new SOM(epochs, neurons, learningRate, radius, dataset);
             }
@@ -548,9 +550,9 @@ public class HelloController implements Initializable {
             showAlert("The map has not been created. To do so press Start", Alert.AlertType.WARNING);
             return;
         }
-        if (map.getTopology() != SOM.Topology.GRID) {
+        if (!map.esRejilla()) {
             showAlert("These readings need a 2-D map. Choose \"" + TOPOLOGIA_REJILLA
-                    + "\" and press Start again.", Alert.AlertType.WARNING);
+                    + "\" or \"" + TOPOLOGIA_HEX + "\" and press Start again.", Alert.AlertType.WARNING);
             return;
         }
         if (!map.isTrained()) {
@@ -566,7 +568,13 @@ public class HelloController implements Initializable {
     }
 
     private boolean esRejillaSeleccionada() {
-        return TOPOLOGIA_REJILLA.equals(TopologyCB.getSelectionModel().getSelectedItem());
+        String sel = TopologyCB.getSelectionModel().getSelectedItem();
+        return TOPOLOGIA_REJILLA.equals(sel) || TOPOLOGIA_HEX.equals(sel);
+    }
+
+    private SOM.Topology topologiaSeleccionada() {
+        return TOPOLOGIA_HEX.equals(TopologyCB.getSelectionModel().getSelectedItem())
+                ? SOM.Topology.HEX : SOM.Topology.GRID;
     }
 
     /** Reparte n neuronas en la rejilla más cuadrada posible. */

@@ -42,7 +42,7 @@ public class MapaView {
     }
 
     public void mostrar() {
-        if (som == null || som.getTopology() != SOM.Topology.GRID) {
+        if (som == null || !som.esRejilla()) {
             throw new IllegalStateException("A grid topology map is required");
         }
 
@@ -53,7 +53,8 @@ public class MapaView {
         selector.getSelectionModel().selectFirst();
         selector.setOnAction(e -> dibujar());
 
-        Label titulo = new Label("Self-organizing map  ·  grid "
+        Label titulo = new Label("Self-organizing map  ·  "
+                + (som.getTopology() == SOM.Topology.HEX ? "hex" : "rect") + " grid "
                 + som.getRows() + "×" + som.getCols());
         titulo.setFont(Font.font("System", 16));
         titulo.setTextFill(Color.web("#dddddd"));
@@ -102,9 +103,23 @@ public class MapaView {
         g.fillRect(0, 0, ancho, alto);
 
         int filas = som.getRows(), columnas = som.getCols();
-        double celda = Math.min((ancho - 2 * MARGEN) / columnas, (alto - 2 * MARGEN) / filas);
-        double x0 = (ancho - celda * columnas) / 2;
-        double y0 = (alto - celda * filas) / 2;
+        boolean hex = som.getTopology() == SOM.Topology.HEX;
+
+        double celda;
+        double x0, y0;
+        if (hex) {
+            // Hexágonos con vértice arriba: ancho √3·s, separación vertical 1.5·s,
+            // y las filas impares corridas medio hexágono.
+            double porAncho = (ancho - 2 * MARGEN) / (Math.sqrt(3) * (columnas + 0.5));
+            double porAlto = (alto - 2 * MARGEN) / (1.5 * (filas - 1) + 2);
+            celda = Math.min(porAncho, porAlto);
+            x0 = (ancho - Math.sqrt(3) * celda * (columnas + 0.5)) / 2;
+            y0 = (alto - (1.5 * (filas - 1) + 2) * celda) / 2;
+        } else {
+            celda = Math.min((ancho - 2 * MARGEN) / columnas, (alto - 2 * MARGEN) / filas);
+            x0 = (ancho - celda * columnas) / 2;
+            y0 = (alto - celda * filas) / 2;
+        }
 
         String opcion = selector.getSelectionModel().getSelectedItem();
         if ("Labels".equals(opcion)) {
@@ -112,6 +127,27 @@ public class MapaView {
         } else {
             dibujarMatriz(g, x0, y0, celda, filas, columnas, opcion);
         }
+    }
+
+    /** Pinta la celda (fila, columna) con la forma que toque según la topología. */
+    private void pintarCelda(GraphicsContext g, double x0, double y0, double celda,
+                             int fila, int columna) {
+        if (som.getTopology() != SOM.Topology.HEX) {
+            g.fillRect(x0 + columna * celda, y0 + fila * celda, celda - 1, celda - 1);
+            return;
+        }
+
+        double w = Math.sqrt(3) * celda;
+        double cx = x0 + w * (columna + ((fila % 2 == 1) ? 1.0 : 0.5));
+        double cy = y0 + celda * (1 + 1.5 * fila);
+
+        double[] xs = new double[6], ys = new double[6];
+        for (int i = 0; i < 6; i++) {
+            double a = Math.toRadians(60 * i - 90);   // vértice arriba
+            xs[i] = cx + (celda - 0.6) * Math.cos(a);
+            ys[i] = cy + (celda - 0.6) * Math.sin(a);
+        }
+        g.fillPolygon(xs, ys, 6);
     }
 
     private void dibujarMatriz(GraphicsContext g, double x0, double y0, double celda,
@@ -139,7 +175,7 @@ public class MapaView {
             for (int j = 0; j < columnas; j++) {
                 double t = (m[i][j] - min) / rango;
                 g.setFill(colorDeCalor(t));
-                g.fillRect(x0 + j * celda, y0 + i * celda, celda - 1, celda - 1);
+                pintarCelda(g, x0, y0, celda, i, j);
             }
         }
 
@@ -163,7 +199,7 @@ public class MapaView {
                     color = colores.get(e);
                 }
                 g.setFill(color);
-                g.fillRect(x0 + j * celda, y0 + i * celda, celda - 1, celda - 1);
+                pintarCelda(g, x0, y0, celda, i, j);
             }
         }
 

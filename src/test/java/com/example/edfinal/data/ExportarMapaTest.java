@@ -24,6 +24,9 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class ExportarMapaTest {
 
+    private static final SOM.Topology TOPOLOGIA =
+            SOM.Topology.valueOf(System.getProperty("mapa.topologia", "GRID"));
+
     private static final int CELDA = 46;
     private static final int MARGEN = 30;
 
@@ -33,7 +36,7 @@ class ExportarMapaTest {
         RandomFeaturesPicker.setSeed(21);
         BMUStock.clear();
 
-        SOM som = new SOM(40, 8, 6, 0.5, 2, GestorTxt.getIrisDataset());
+        SOM som = new SOM(40, 8, 6, 0.5, 2, GestorTxt.getIrisDataset(), TOPOLOGIA);
         som.initialize();
         som.train();
 
@@ -54,8 +57,8 @@ class ExportarMapaTest {
 
         g.setColor(new Color(0xdddddd));
         g.setFont(new Font("SansSerif", Font.BOLD, 18));
-        g.drawString("SOM sobre Iris · rejilla " + som.getRows() + "x" + som.getCols()
-                + " · 40 épocas · radio 2", MARGEN, 26);
+        g.drawString("SOM sobre Iris · rejilla " + (TOPOLOGIA == SOM.Topology.HEX ? "hexagonal " : "")
+                + som.getRows() + "x" + som.getCols() + " · 40 épocas · radio 2", MARGEN, 26);
 
         int panel = 0;
         panel = dibujarMatriz(g, SOMAnalysis.uMatrix(som), "U-matrix", panel,
@@ -68,7 +71,7 @@ class ExportarMapaTest {
         g.dispose();
 
         File salida = new File(System.getProperty("mapa.salida",
-                "target/mapa-som.png"));
+                TOPOLOGIA == SOM.Topology.HEX ? "target/mapa-som-hex.png" : "target/mapa-som.png"));
         salida.getParentFile().mkdirs();
         ImageIO.write(img, "png", salida);
 
@@ -95,10 +98,30 @@ class ExportarMapaTest {
                         (float) Math.pow(t, 0.75),
                         (float) (Math.pow(t, 1.35) * 0.85),
                         (float) (Math.pow(1 - t, 1.8) * 0.45 + t * 0.25)));
-                g.fillRect(px + MARGEN + j * CELDA, py + 24 + i * CELDA, CELDA - 2, CELDA - 2);
+                celda(g, px + MARGEN, py + 24, i, j);
             }
         }
         return panel + 1;
+    }
+
+    /** Cuadrado o hexágono según la topología del mapa. */
+    private void celda(Graphics2D g, int x0, int y0, int fila, int columna) {
+        if (TOPOLOGIA != SOM.Topology.HEX) {
+            g.fillRect(x0 + columna * CELDA, y0 + fila * CELDA, CELDA - 2, CELDA - 2);
+            return;
+        }
+        double s = CELDA / 1.8;
+        double w = Math.sqrt(3) * s;
+        double cx = x0 + w * (columna + ((fila % 2 == 1) ? 1.0 : 0.5));
+        double cy = y0 + s * (1 + 1.5 * fila);
+
+        int[] xs = new int[6], ys = new int[6];
+        for (int i = 0; i < 6; i++) {
+            double a = Math.toRadians(60 * i - 90);
+            xs[i] = (int) Math.round(cx + (s - 0.8) * Math.cos(a));
+            ys[i] = (int) Math.round(cy + (s - 0.8) * Math.sin(a));
+        }
+        g.fillPolygon(xs, ys, 6);
     }
 
     private int dibujarEtiquetas(Graphics2D g, SOM som, int panel, int columnasPanel,
@@ -123,7 +146,7 @@ class ExportarMapaTest {
                     c = colores.get(e);
                 }
                 g.setColor(c);
-                g.fillRect(px + MARGEN + j * CELDA, py + 24 + i * CELDA, CELDA - 2, CELDA - 2);
+                celda(g, px + MARGEN, py + 24, i, j);
             }
         }
 

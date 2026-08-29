@@ -209,12 +209,18 @@ public class GestorTxt {
         int epochs = Integer.parseInt(cab.getOrDefault("epochs", "1"));
         double lr = Double.parseDouble(cab.getOrDefault("learningRate", "0.5"));
         int radius = Integer.parseInt(cab.getOrDefault("radius", "1"));
-        boolean rejilla = "GRID".equals(cab.get("topology"));
+        SOM.Topology topologia;
+        try {
+            topologia = SOM.Topology.valueOf(cab.getOrDefault("topology", "RING"));
+        } catch (IllegalArgumentException e) {
+            topologia = SOM.Topology.RING;
+        }
+        boolean rejilla = topologia != SOM.Topology.RING;
         int rows = Integer.parseInt(cab.getOrDefault("rows", "0"));
         int cols = Integer.parseInt(cab.getOrDefault("cols", "0"));
 
         SOM m = rejilla
-                ? new SOM(epochs, rows, cols, lr, radius, getIrisDataset())
+                ? new SOM(epochs, rows, cols, lr, radius, getIrisDataset(), topologia)
                 : new SOM(epochs, pesos.size(), lr, radius, getIrisDataset());
 
         boolean esIris = pesos.get(0).size() == 4;

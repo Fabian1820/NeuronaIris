@@ -189,8 +189,16 @@ public class SOMAnalysis {
         return new double[]{min, max};
     }
 
-    /** Contiguas en la rejilla incluyendo diagonales (distancia de Chebyshev 1). */
+    /**
+     * Contiguas geométricamente en la rejilla.
+     *
+     * En la rectangular cuenta también la diagonal (distancia de Chebyshev 1),
+     * porque con vecindad de 4 una segunda mejor neurona pegada en diagonal
+     * contaría como fallo. En la hexagonal las seis vecinas ya son las de las
+     * aristas, así que no hay diagonales que rescatar.
+     */
     private static boolean sonContiguas(SOM som, SOMNeuron a, SOMNeuron b) {
+        if (som.getTopology() == SOM.Topology.HEX) return sonVecinas(a, b);
         int[] pa = som.positionOf(a), pb = som.positionOf(b);
         if (pa == null || pb == null) return false;
         return Math.abs(pa[0] - pb[0]) <= 1 && Math.abs(pa[1] - pb[1]) <= 1;
@@ -208,7 +216,7 @@ public class SOMAnalysis {
     }
 
     private static void exigirRejilla(SOM som) {
-        if (som.getTopology() != SOM.Topology.GRID) {
+        if (!som.esRejilla()) {
             throw new IllegalStateException(
                     "Estas lecturas necesitan una rejilla 2-D; el mapa es un anillo");
         }
