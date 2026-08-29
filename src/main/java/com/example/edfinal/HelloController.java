@@ -13,6 +13,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
@@ -23,7 +25,10 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -52,21 +57,26 @@ public class HelloController implements Initializable {
     public SOM map;
     public boolean startPressed;
 
-    public ScatterChart<Number, Number> SepalChart;
-    public ScatterChart<Number, Number> PetalChart;
-    public ScatterChart<Number, Number> WidthChart;
-    public ScatterChart<Number, Number> LengthChart;
+    public ScatterChart<Number, Number> chart3;
+    public ScatterChart<Number, Number> chart1;
+    public ScatterChart<Number, Number> chart0;
+    public ScatterChart<Number, Number> chart2;
 
     public TextField NeuronsTF;
     public TextField EpochsTF;
     public TextField LearningRateTF;
     public TextField RadiusTF;
     public ComboBox<String> TopologyCB;
+
+    public ComboBox<String> xVar0, xVar1, xVar2, xVar3;
+    public ComboBox<String> yVar0, yVar1, yVar2, yVar3;
     public Button CloseButton;
     public TextArea TextA;
     public ImageView ImgView;
 
     @FXML private AnchorPane ImgAnchor;
+    @FXML private StackPane panelInferior;
+    @FXML private Canvas distribucionCanvas;
     @FXML private GridPane entradaGrid;
     @FXML private FlowPane leyendaPane;
     @FXML private Label datasetLabel;
@@ -81,6 +91,20 @@ public class HelloController implements Initializable {
     private int[][] paresDeEjes;
 
     private final Map<String, Color> coloresPorEtiqueta = new LinkedHashMap<>();
+
+    /**
+     * Lo que hay dibujado ahora mismo, para poder repintarlo si cambian los ejes.
+     * Sin esto, elegir otra variable dejaría las gráficas en blanco hasta el
+     * siguiente entrenamiento.
+     */
+    private record Capa(List<Sample> muestras, Color color) {}
+    private final List<Capa> capas = new ArrayList<>();
+
+    /** Evita que rellenar los selectores dispare sus propios listeners. */
+    private boolean actualizandoSelectores = false;
+
+    /** El carrusel de fotos solo tiene sentido con el Iris. */
+    private boolean datasetEsIris = true;
 
     private int currentImageIndex = 0;
     // Rutas dentro del classpath: funcionan en cualquier máquina y dentro del jar.
@@ -106,11 +130,31 @@ public class HelloController implements Initializable {
         imageChangeTimeline.setCycleCount(Timeline.INDEFINITE);
         imageChangeTimeline.play();
 
-        usarDataset(GestorTxt.getIrisDataset(), "Iris");
+        // El Canvas no se redimensiona solo dentro de un StackPane.
+        distribucionCanvas.widthProperty().bind(panelInferior.widthProperty());
+        distribucionCanvas.heightProperty().bind(panelInferior.heightProperty());
+        distribucionCanvas.widthProperty().addListener((o, a, b) -> dibujarDistribucion());
+        distribucionCanvas.heightProperty().addListener((o, a, b) -> dibujarDistribucion());
+
+        for (int k = 0; k < 4; k++) {
+            final int indice = k;
+            selectoresX().get(k).setOnAction(e -> cambiarEje(indice));
+            selectoresY().get(k).setOnAction(e -> cambiarEje(indice));
+        }
+
+        usarDataset(GestorTxt.getIrisDataset(), "Iris", true);
+    }
+
+    private List<ComboBox<String>> selectoresX() {
+        return List.of(xVar0, xVar1, xVar2, xVar3);
+    }
+
+    private List<ComboBox<String>> selectoresY() {
+        return List.of(yVar0, yVar1, yVar2, yVar3);
     }
 
     private List<ScatterChart<Number, Number>> graficas() {
-        return List.of(WidthChart, PetalChart, LengthChart, SepalChart);
+        return List.of(chart0, chart1, chart2, chart3);
     }
 
     // ---------- dataset ----------
@@ -122,16 +166,19 @@ public class HelloController implements Initializable {
      * Antes todo esto estaba cableado a las cuatro medidas del Iris, así que el
      * núcleo aceptaba cualquier CSV pero la interfaz no.
      */
-    private void usarDataset(Dataset d, String nombre) {
+    private void usarDataset(Dataset d, String nombre, boolean esIris) {
         this.dataset = d;
+        this.datasetEsIris = esIris;
         this.map = null;
         this.startPressed = false;
         TextA.setText("");
 
         construirCamposDeEntrada();
         elegirParesDeEjes();
+        configurarSelectores();
         asignarColores();
         construirLeyenda();
+        actualizarPanelInferior();
 
         datasetLabel.setText("Data Entry  ·  " + nombre + "  ("
                 + d.size() + " samples, " + d.dimension() + " variables)");
@@ -189,6 +236,47 @@ public class HelloController implements Initializable {
         }
     }
 
+    /** Rellena los ocho desplegables con las variables del dataset. */
+    private void configurarSelectores() {
+        actualizandoSelectores = true;
+        try {
+            String[] nombres = dataset.getFeatureNames();
+            for (int k = 0; k < 4; k++) {
+                ComboBox<String> cx = selectoresX().get(k), cy = selectoresY().get(k);
+                cx.getItems().setAll(nombres);
+                cy.getItems().setAll(nombres);
+                cx.getSelectionModel().select(paresDeEjes[k][0]);
+                cy.getSelectionModel().select(paresDeEjes[k][1]);
+            }
+        } finally {
+            actualizandoSelectores = false;
+        }
+    }
+
+    /** Cambia el par de variables de una gráfica y la vuelve a dibujar. */
+    private void cambiarEje(int k) {
+        if (actualizandoSelectores) return;
+
+        int x = selectoresX().get(k).getSelectionModel().getSelectedIndex();
+        int y = selectoresY().get(k).getSelectionModel().getSelectedIndex();
+        if (x < 0 || y < 0) return;
+
+        paresDeEjes[k] = new int[]{x, y};
+        String[] nombres = dataset.getFeatureNames();
+        ScatterChart<Number, Number> chart = graficas().get(k);
+        ((NumberAxis) chart.getXAxis()).setLabel(nombres[x]);
+        ((NumberAxis) chart.getYAxis()).setLabel(nombres[y]);
+
+        redibujar(k);
+    }
+
+    /** Redibuja una gráfica a partir de las capas que hay guardadas. */
+    private void redibujar(int k) {
+        ScatterChart<Number, Number> chart = graficas().get(k);
+        chart.getData().clear();
+        for (Capa capa : capas) dibujarCapa(chart, k, capa);
+    }
+
     private void asignarColores() {
         coloresPorEtiqueta.clear();
         int i = 0;
@@ -235,13 +323,69 @@ public class HelloController implements Initializable {
         try {
             Dataset d = Dataset.fromCsv(elegido.getAbsolutePath());
             BMUStock.clear();
-            usarDataset(d, elegido.getName());
+            usarDataset(d, elegido.getName(), false);
         } catch (Exception e) {
             showAlert("Could not read the dataset: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
+    /**
+     * Enseña el carrusel de fotos con el Iris, y con cualquier otro dataset la
+     * distribución de muestras por etiqueta, que sí dice algo de los datos.
+     */
+    private void actualizarPanelInferior() {
+        ImgAnchor.setVisible(datasetEsIris);
+        ImgAnchor.setManaged(datasetEsIris);
+        distribucionCanvas.setVisible(!datasetEsIris);
+        dibujarDistribucion();
+    }
+
+    private void dibujarDistribucion() {
+        if (datasetEsIris || dataset == null) return;
+        double ancho = distribucionCanvas.getWidth(), alto = distribucionCanvas.getHeight();
+        if (ancho <= 0 || alto <= 0) return;
+
+        Map<String, Integer> cuenta = contarPorEtiqueta(dataset);
+
+        GraphicsContext g = distribucionCanvas.getGraphicsContext2D();
+        g.clearRect(0, 0, ancho, alto);
+        g.setFill(Color.web("#bbbbbb"));
+        g.setFont(Font.font("System", 12));
+        g.setTextAlign(TextAlignment.LEFT);
+        g.fillText("Samples per label", 6, 14);
+
+        if (cuenta.isEmpty()) {
+            g.fillText("(the dataset has no labels)", 6, 34);
+            return;
+        }
+
+        int maximo = cuenta.values().stream().mapToInt(Integer::intValue).max().orElse(1);
+        double y = 26, altoBarra = Math.min(24, (alto - 34) / cuenta.size() - 6);
+        double anchoMax = ancho - 110;
+
+        for (Map.Entry<String, Integer> e : cuenta.entrySet()) {
+            g.setFill(coloresPorEtiqueta.getOrDefault(e.getKey(), Color.GRAY));
+            g.fillRect(6, y, Math.max(2, anchoMax * e.getValue() / maximo), altoBarra);
+            g.setFill(Color.web("#dddddd"));
+            g.fillText(e.getKey() + "  (" + e.getValue() + ")", 10, y + altoBarra - 4);
+            y += altoBarra + 6;
+        }
+    }
+
+    /** Cuántas muestras aporta cada etiqueta, en orden de aparición. */
+    static Map<String, Integer> contarPorEtiqueta(Dataset d) {
+        Map<String, Integer> cuenta = new LinkedHashMap<>();
+        for (Sample s : d.getSamples()) {
+            if (s.getLabel() == null) continue;
+            String t = s.getLabel().trim().toLowerCase();
+            int guion = t.lastIndexOf('-');
+            cuenta.merge(guion >= 0 ? t.substring(guion + 1) : t, 1, Integer::sum);
+        }
+        return cuenta;
+    }
+
     private void changeImage() {
+        if (!datasetEsIris) return;
         var stream = getClass().getResourceAsStream(imagePaths[currentImageIndex]);
         if (stream != null) {
             ImgView.setImage(new Image(stream));
@@ -329,13 +473,12 @@ public class HelloController implements Initializable {
             // El registro en Configuration.dat es accesorio: no debe romper la clasificación.
         }
 
-        List<ScatterChart<Number, Number>> cs = graficas();
-        for (int k = 0; k < cs.size(); k++) {
-            if (cs.get(k).getData().size() > coloresPorEtiqueta.size()) {
-                cs.get(k).getData().remove(cs.get(k).getData().size() - 1);
-            }
-            updateChartData(cs.get(k), entrada.get(paresDeEjes[k][0]), entrada.get(paresDeEjes[k][1]), Color.YELLOW);
+        // La muestra introducida a mano sustituye a la anterior, no se acumula.
+        if (!capas.isEmpty() && capas.get(capas.size() - 1).color() == Color.YELLOW) {
+            capas.remove(capas.size() - 1);
+            for (int k = 0; k < graficas().size(); k++) redibujar(k);
         }
+        pintar(List.of(entrada), Color.YELLOW);
     }
 
     // ---------- mapa ----------
@@ -441,6 +584,7 @@ public class HelloController implements Initializable {
     // ---------- gráficas ----------
 
     private void limpiarGraficas() {
+        capas.clear();
         for (ScatterChart<Number, Number> c : graficas()) c.getData().clear();
     }
 
@@ -467,16 +611,21 @@ public class HelloController implements Initializable {
 
     private void pintar(List<Sample> muestras, Color color) {
         if (muestras.isEmpty()) return;
+        Capa capa = new Capa(List.copyOf(muestras), color);
+        capas.add(capa);
         List<ScatterChart<Number, Number>> cs = graficas();
-        for (int k = 0; k < cs.size(); k++) {
-            double[] x = new double[muestras.size()];
-            double[] y = new double[muestras.size()];
-            for (int i = 0; i < muestras.size(); i++) {
-                x[i] = muestras.get(i).get(paresDeEjes[k][0]);
-                y[i] = muestras.get(i).get(paresDeEjes[k][1]);
-            }
-            updateChartDataGroup(cs.get(k), x, y, color);
+        for (int k = 0; k < cs.size(); k++) dibujarCapa(cs.get(k), k, capa);
+    }
+
+    private void dibujarCapa(ScatterChart<Number, Number> chart, int k, Capa capa) {
+        List<Sample> muestras = capa.muestras();
+        double[] x = new double[muestras.size()];
+        double[] y = new double[muestras.size()];
+        for (int i = 0; i < muestras.size(); i++) {
+            x[i] = muestras.get(i).get(paresDeEjes[k][0]);
+            y[i] = muestras.get(i).get(paresDeEjes[k][1]);
         }
+        updateChartDataGroup(chart, x, y, capa.color());
     }
 
     private void updateChartData(ScatterChart<Number, Number> chart, double x, double y, Color color) {

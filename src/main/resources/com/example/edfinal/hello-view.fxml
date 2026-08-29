@@ -2,6 +2,7 @@
 
 <?import java.net.URL?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.chart.ScatterChart?>
 <?import javafx.scene.control.Button?>
@@ -80,22 +81,58 @@
             <RowConstraints minHeight="160.0" percentHeight="50.0" vgrow="ALWAYS" />
          </rowConstraints>
 
-         <ScatterChart fx:id="WidthChart" GridPane.columnIndex="0" GridPane.rowIndex="0">
-            <xAxis><NumberAxis label="Petal Width" side="BOTTOM" /></xAxis>
-            <yAxis><NumberAxis label="Sepal Width" side="LEFT" /></yAxis>
-         </ScatterChart>
-         <ScatterChart fx:id="PetalChart" GridPane.columnIndex="1" GridPane.rowIndex="0">
-            <xAxis><NumberAxis label="Petal Width" side="BOTTOM" /></xAxis>
-            <yAxis><NumberAxis label="Petal Length" side="LEFT" /></yAxis>
-         </ScatterChart>
-         <ScatterChart fx:id="LengthChart" GridPane.columnIndex="0" GridPane.rowIndex="1">
-            <xAxis><NumberAxis label="Petal Length" side="BOTTOM" /></xAxis>
-            <yAxis><NumberAxis label="Sepal Length" side="LEFT" /></yAxis>
-         </ScatterChart>
-         <ScatterChart fx:id="SepalChart" GridPane.columnIndex="1" GridPane.rowIndex="1">
-            <xAxis><NumberAxis label="Sepal Width" side="BOTTOM" /></xAxis>
-            <yAxis><NumberAxis label="Sepal Length" side="LEFT" /></yAxis>
-         </ScatterChart>
+         <VBox spacing="2.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+            <!-- Ejes elegibles: se rellenan con las variables del dataset -->
+            <HBox alignment="CENTER_LEFT" spacing="4.0">
+               <Label text="X" />
+               <ComboBox fx:id="xVar0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+               <Label text="Y" />
+               <ComboBox fx:id="yVar0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+            </HBox>
+            <ScatterChart fx:id="chart0" VBox.vgrow="ALWAYS">
+               <xAxis><NumberAxis side="BOTTOM" /></xAxis>
+               <yAxis><NumberAxis side="LEFT" /></yAxis>
+            </ScatterChart>
+         </VBox>
+         <VBox spacing="2.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+            <!-- Ejes elegibles: se rellenan con las variables del dataset -->
+            <HBox alignment="CENTER_LEFT" spacing="4.0">
+               <Label text="X" />
+               <ComboBox fx:id="xVar1" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+               <Label text="Y" />
+               <ComboBox fx:id="yVar1" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+            </HBox>
+            <ScatterChart fx:id="chart1" VBox.vgrow="ALWAYS">
+               <xAxis><NumberAxis side="BOTTOM" /></xAxis>
+               <yAxis><NumberAxis side="LEFT" /></yAxis>
+            </ScatterChart>
+         </VBox>
+         <VBox spacing="2.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+            <!-- Ejes elegibles: se rellenan con las variables del dataset -->
+            <HBox alignment="CENTER_LEFT" spacing="4.0">
+               <Label text="X" />
+               <ComboBox fx:id="xVar2" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+               <Label text="Y" />
+               <ComboBox fx:id="yVar2" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+            </HBox>
+            <ScatterChart fx:id="chart2" VBox.vgrow="ALWAYS">
+               <xAxis><NumberAxis side="BOTTOM" /></xAxis>
+               <yAxis><NumberAxis side="LEFT" /></yAxis>
+            </ScatterChart>
+         </VBox>
+         <VBox spacing="2.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+            <!-- Ejes elegibles: se rellenan con las variables del dataset -->
+            <HBox alignment="CENTER_LEFT" spacing="4.0">
+               <Label text="X" />
+               <ComboBox fx:id="xVar3" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+               <Label text="Y" />
+               <ComboBox fx:id="yVar3" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+            </HBox>
+            <ScatterChart fx:id="chart3" VBox.vgrow="ALWAYS">
+               <xAxis><NumberAxis side="BOTTOM" /></xAxis>
+               <yAxis><NumberAxis side="LEFT" /></yAxis>
+            </ScatterChart>
+         </VBox>
       </GridPane>
    </center>
 
@@ -127,10 +164,13 @@
          <Label opacity="0.55" text="BMUs" />
          <TextArea fx:id="TextA" disable="true" editable="false" minHeight="120.0" promptText="Here you'll see the BMUs properties that the classification finds" style="-fx-control-inner-background: #1C1C1E; -fx-text-alignment: center; -fx-font-family: System;" wrapText="true" VBox.vgrow="ALWAYS" />
 
-         <StackPane maxHeight="270.0" minHeight="150.0" VBox.vgrow="SOMETIMES">
+         <!-- Para el Iris se enseña el carrusel de fotos; para cualquier otro
+              dataset, la distribución de muestras por etiqueta. -->
+         <StackPane fx:id="panelInferior" maxHeight="270.0" minHeight="150.0" VBox.vgrow="SOMETIMES">
             <AnchorPane fx:id="ImgAnchor" maxHeight="270.0" maxWidth="270.0" style="-fx-border-color: gray;-fx-border-width: 2;-fx-background-radius: 100;">
                <ImageView fx:id="ImgView" fitHeight="260.0" fitWidth="260.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
             </AnchorPane>
+            <Canvas fx:id="distribucionCanvas" />
          </StackPane>
       </VBox>
    </right>
