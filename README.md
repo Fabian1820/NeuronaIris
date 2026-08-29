@@ -90,7 +90,18 @@ A cambio, la hexagonal representa los datos algo peor y desperdicia más neurona
 
 ## Barrido de hiperparámetros
 
-El botón **AUTO-TUNE** prueba 162 combinaciones de épocas, neuronas, radio, tasa de aprendizaje y topología, puntúa cada una por validación cruzada de 5 pliegues y deja la mejor en el formulario. Corre en un hilo aparte para no congelar la interfaz.
+El botón **AUTO-TUNE** sortea 40 configuraciones de épocas, neuronas, radio, tasa de aprendizaje y topología, puntúa cada una por validación cruzada de 5 pliegues y deja la mejor en el formulario. Corre en un hilo aparte para no congelar la interfaz.
+
+Hay dos estrategias implementadas, **parrilla completa** (`buscar`) y **búsqueda aleatoria** (`buscarAleatorio`). La interfaz usa la aleatoria, y la razón está medida:
+
+| presupuesto | mejor acierto *(media de 5 semillas)* | veces que iguala a la parrilla |
+|---|---|---|
+| parrilla completa — 162 evaluaciones | 98.0 % | — |
+| aleatoria — 10 | 97.3 % | 1 de 5 |
+| aleatoria — 20 | 97.6 % | 2 de 5 |
+| **aleatoria — 40** | **97.9 %** | **4 de 5** |
+
+Con una cuarta parte de las evaluaciones llega prácticamente al mismo sitio. Además la aleatoria explora valores que la parrilla no contempla: la tasa de aprendizaje puede salir 0.37 y no solo 0.3 o 0.5.
 
 Los parámetros importan bastante: sobre el Iris, entre la mejor y la peor combinación hay **casi 7 puntos** de acierto.
 
@@ -126,7 +137,7 @@ Por eso la cifra de la sección de resultados sale de validación cruzada con pa
 - **`SOM`** — el mapa. Tres topologías: anillo 1-D, **rejilla rectangular** (4 vecinas) y **rejilla hexagonal** (6 vecinas, filas impares desplazadas media celda). La vecindad se calcula con un recorrido en anchura sobre el grafo, así que la distancia es el número de saltos y funciona igual en las tres.
 - **`SOMNeuron`** — una neurona; sus pesos viven en el mismo espacio que los datos.
 - **`data.SOMAnalysis`** — U-matrix, planos de componentes, error topográfico, matriz de confusión.
-- **`data.BusquedaHiperparametros`** — parrilla de combinaciones y barrido puntuado por validación cruzada.
+- **`data.BusquedaHiperparametros`** — parrilla de combinaciones y muestreo aleatorio de un espacio de rangos, con el barrido puntuado por validación cruzada.
 - **`ui.MapaView`** — la ventana del mapa, construida con contenedores y un `Canvas` que se redibuja al redimensionar.
 
 La pantalla principal usa `BorderPane` + `GridPane` + `FlowPane`: las gráficas se reparten el espacio, el panel lateral mantiene su ancho y los controles bajan de línea si la ventana se estrecha. Los campos de entrada, los desplegables de ejes y la leyenda se construyen en tiempo de ejecución a partir del dataset cargado. Lo dibujado se guarda en capas, de modo que cambiar un eje repinta la gráfica sin tener que reentrenar. El panel inferior derecho muestra el carrusel de fotos con el Iris y la distribución de muestras por etiqueta con cualquier otro dataset. El Iris viaja dentro del jar y el estado de la aplicación (mapas guardados) se escribe en `~/.neuronairis/`.
@@ -139,14 +150,14 @@ El grafo sobre el que se apoya el mapa es la librería `cu.edu.cujae.ceis.graph`
 
 - El radio de vecindad puede encogerse con las épocas (`setShrinkRadius`), pero viene **desactivado**: medido sobre 20 semillas mejora siempre el error de cuantización y da resultados mixtos en el topográfico.
 - La normalización min-max existe pero no se aplica por defecto. En Iris no mejora el acierto porque el largo del pétalo —que domina la distancia con un 70 %— es justo la variable discriminante. En otro dataset conviene activarla.
-- El barrido recorre la parrilla entera. Con muchas variables o parrillas grandes, una búsqueda aleatoria o bayesiana llegaría antes al mismo sitio.
+- La búsqueda aleatoria sortea a ciegas: no aprende de lo ya probado. Una búsqueda bayesiana concentraría el presupuesto en las zonas prometedoras.
 - El barrido usa validación cruzada simple; la evaluación anidada, que es la que da la cifra honesta, está en los tests pero no en la interfaz.
 
 ## Autoría
 
 Trabajo de la asignatura de Estructuras de Datos de la **CUJAE** (2024), hecho en equipo por **Ruben Frias**, **Fabián Fernández**, **Clari21** y **MrKettleburn**. La mayor parte del código original —incluido el núcleo del SOM y la interfaz— es de Ruben Frias.
 
-En 2026 Fabián retomó el proyecto para terminarlo, porque la última versión del equipo nunca llegó a subirse. De ese trabajo posterior salen: el desacoplamiento del dataset, la topología en rejilla, las lecturas del mapa, la evaluación con validación cruzada y la batería de 86 tests, además de arreglar varios fallos del código original (las imágenes se cargaban desde rutas absolutas de una máquina concreta, reentrenar corrompía el agrupamiento y la clasificación podía entrar en un ciclo infinito).
+En 2026 Fabián retomó el proyecto para terminarlo, porque la última versión del equipo nunca llegó a subirse. De ese trabajo posterior salen: el desacoplamiento del dataset, la topología en rejilla, las lecturas del mapa, la evaluación con validación cruzada y la batería de 92 tests, además de arreglar varios fallos del código original (las imágenes se cargaban desde rutas absolutas de una máquina concreta, reentrenar corrompía el agrupamiento y la clasificación podía entrar en un ciclo infinito).
 
 ## Dataset
 
