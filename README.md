@@ -14,24 +14,28 @@ Un SOM es una red neuronal no supervisada que proyecta datos de muchas variables
 
 ## Resultados
 
-Media de **20 particiones estratificadas 70/30**, rejilla 8×6, 40 épocas:
+**Validación cruzada estratificada de 5 pliegues, repetida 5 veces** (750 evaluaciones), rejilla hexagonal 8×6, 40 épocas:
 
 | | |
 |---|---|
-| Acierto en entrenamiento | 97.6 % |
-| **Acierto sobre datos no vistos** | **95.9 %** |
-| Error de cuantización | 0.28 |
-| Error topográfico | 2.6 – 3.3 % |
+| **Acierto sobre datos no vistos** | **95.3 % ± 2.7** |
+| Peor pliegue / mejor pliegue | 90.0 % / 100.0 % |
+| Error de cuantización | 0.30 |
+| Error topográfico | 5.6 % |
 
-Matriz de confusión sobre 900 muestras de prueba:
+Cada muestra se evalúa exactamente una vez por repetición, y cada pliegue conserva la proporción de las tres especies.
+
+Matriz de confusión acumulada:
 
 | real \ predicha | setosa | versicolor | virginica |
 |---|---|---|---|
-| **setosa** | **300** | 0 | 0 |
-| **versicolor** | 0 | 277 | 23 |
-| **virginica** | 0 | 14 | 286 |
+| **setosa** | **250** | 0 | 0 |
+| **versicolor** | 1 | 231 | 18 |
+| **virginica** | 0 | 16 | 234 |
 
-*Setosa* se separa perfectamente. Los 37 fallos son todos entre *versicolor* y *virginica*, que es donde el dataset se solapa de verdad — lo mismo que ya insinuaba la U-matrix.
+*Setosa* se separa perfectamente. Casi todos los fallos son entre *versicolor* y *virginica*, que es donde el dataset se solapa de verdad — lo mismo que ya insinuaba la U-matrix.
+
+Para comparar, la estimación por particiones 70/30 repetidas daba 95.9 %: la validación cruzada confirma el número en vez de darlo por bueno.
 
 ## Cómo ejecutarlo
 
@@ -96,7 +100,7 @@ A cambio, la hexagonal representa los datos algo peor y desperdicia más neurona
 ## Cómo está hecho
 
 - **`data.Sample`** — una muestra de N variables con etiqueta. Es la unidad del mapa: tanto los datos como los pesos de cada neurona.
-- **`data.Dataset`** — carga cualquier CSV numérico (toma como variables las columnas que parsean a número y como etiqueta la que no), calcula rangos, normaliza y parte en entrenamiento/prueba de forma estratificada.
+- **`data.Dataset`** — carga cualquier CSV numérico (toma como variables las columnas que parsean a número y como etiqueta la que no), calcula rangos, normaliza, y parte los datos de forma estratificada: en entrenamiento/prueba (`split`) o en k pliegues de validación cruzada (`kFold`).
 - **`SOM`** — el mapa. Tres topologías: anillo 1-D, **rejilla rectangular** (4 vecinas) y **rejilla hexagonal** (6 vecinas, filas impares desplazadas media celda). La vecindad se calcula con un recorrido en anchura sobre el grafo, así que la distancia es el número de saltos y funciona igual en las tres.
 - **`SOMNeuron`** — una neurona; sus pesos viven en el mismo espacio que los datos.
 - **`data.SOMAnalysis`** — U-matrix, planos de componentes, error topográfico, matriz de confusión.
@@ -112,13 +116,13 @@ El grafo sobre el que se apoya el mapa es la librería `cu.edu.cujae.ceis.graph`
 
 - El radio de vecindad puede encogerse con las épocas (`setShrinkRadius`), pero viene **desactivado**: medido sobre 20 semillas mejora siempre el error de cuantización y da resultados mixtos en el topográfico.
 - La normalización min-max existe pero no se aplica por defecto. En Iris no mejora el acierto porque el largo del pétalo —que domina la distancia con un 70 %— es justo la variable discriminante. En otro dataset conviene activarla.
-- No hay validación cruzada: la evaluación usa particiones 70/30 repetidas, que para este tamaño de dataset es suficiente pero no es lo mismo.
+- La búsqueda de hiperparámetros (épocas, neuronas, radio, tasa) es manual: no hay barrido automático que los ajuste.
 
 ## Autoría
 
 Trabajo de la asignatura de Estructuras de Datos de la **CUJAE** (2024), hecho en equipo por **Ruben Frias**, **Fabián Fernández**, **Clari21** y **MrKettleburn**. La mayor parte del código original —incluido el núcleo del SOM y la interfaz— es de Ruben Frias.
 
-En 2026 Fabián retomó el proyecto para terminarlo, porque la última versión del equipo nunca llegó a subirse. De ese trabajo posterior salen: el desacoplamiento del dataset, la topología en rejilla, las lecturas del mapa, la evaluación con datos no vistos y la batería de 74 tests, además de arreglar varios fallos del código original (las imágenes se cargaban desde rutas absolutas de una máquina concreta, reentrenar corrompía el agrupamiento y la clasificación podía entrar en un ciclo infinito).
+En 2026 Fabián retomó el proyecto para terminarlo, porque la última versión del equipo nunca llegó a subirse. De ese trabajo posterior salen: el desacoplamiento del dataset, la topología en rejilla, las lecturas del mapa, la evaluación con validación cruzada y la batería de 79 tests, además de arreglar varios fallos del código original (las imágenes se cargaban desde rutas absolutas de una máquina concreta, reentrenar corrompía el agrupamiento y la clasificación podía entrar en un ciclo infinito).
 
 ## Dataset
 

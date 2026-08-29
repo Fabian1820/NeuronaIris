@@ -185,6 +185,53 @@ public class Dataset {
     }
 
     /**
+     * Validación cruzada estratificada de k pliegues.
+     *
+     * Reparte cada etiqueta por turnos entre los k pliegues, así que todos
+     * conservan la proporción de clases. Cada muestra se usa exactamente una vez
+     * como prueba, cosa que las particiones 70/30 repetidas no garantizan: ahí
+     * una muestra puede caer en prueba muchas veces y otra ninguna.
+     *
+     * @return k pares {entrenamiento, prueba}
+     */
+    public Dataset[][] kFold(int k, long semilla) {
+        if (k < 2) {
+            throw new IllegalArgumentException("La validación cruzada necesita al menos 2 pliegues, y se pidió " + k);
+        }
+
+        Map<String, List<Sample>> porEtiqueta = new LinkedHashMap<>();
+        for (Sample s : samples) {
+            porEtiqueta.computeIfAbsent(String.valueOf(s.getLabel()), x -> new ArrayList<>()).add(s);
+        }
+
+        int menor = porEtiqueta.values().stream().mapToInt(List::size).min().orElse(0);
+        if (k > menor) {
+            throw new IllegalArgumentException("No caben " + k + " pliegues: la etiqueta menos"
+                    + " frecuente solo tiene " + menor + " muestras");
+        }
+
+        // Reparto por turnos dentro de cada etiqueta: mantiene la proporción.
+        List<List<Sample>> pliegues = new ArrayList<>();
+        for (int i = 0; i < k; i++) pliegues.add(new ArrayList<>());
+
+        java.util.Random rand = new java.util.Random(semilla);
+        for (List<Sample> grupo : porEtiqueta.values()) {
+            List<Sample> copia = new ArrayList<>(grupo);
+            java.util.Collections.shuffle(copia, rand);
+            for (int i = 0; i < copia.size(); i++) pliegues.get(i % k).add(copia.get(i));
+        }
+
+        Dataset[][] out = new Dataset[k][2];
+        for (int i = 0; i < k; i++) {
+            List<Sample> entrena = new ArrayList<>();
+            for (int j = 0; j < k; j++) if (j != i) entrena.addAll(pliegues.get(j));
+            out[i][0] = new Dataset(entrena, featureNames);
+            out[i][1] = new Dataset(pliegues.get(i), featureNames);
+        }
+        return out;
+    }
+
+    /**
      * Copia con cada variable escalada a [0,1].
      *
      * Sin esto, la variable de mayor recorrido domina la distancia euclidiana:
