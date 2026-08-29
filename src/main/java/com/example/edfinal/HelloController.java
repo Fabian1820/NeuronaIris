@@ -1,5 +1,6 @@
 package com.example.edfinal;
 
+import com.example.edfinal.data.BusquedaHiperparametros;
 import com.example.edfinal.data.Dataset;
 import com.example.edfinal.data.Sample;
 import com.example.edfinal.utiles.BMUStock;
@@ -8,6 +9,8 @@ import com.example.edfinal.utiles.GestorTxt;
 import cu.edu.cujae.ceis.graph.vertex.Vertex;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -72,6 +75,7 @@ public class HelloController implements Initializable {
     public ComboBox<String> xVar0, xVar1, xVar2, xVar3;
     public ComboBox<String> yVar0, yVar1, yVar2, yVar3;
     public Button CloseButton;
+    public Button startButton, trainButton, mapButton, tuneButton;
     public TextArea TextA;
     public ImageView ImgView;
 
@@ -482,6 +486,86 @@ public class HelloController implements Initializable {
         pintar(List.of(entrada), Color.YELLOW);
     }
 
+    // ---------- barrido de hiperparámetros ----------
+
+    /**
+     * Prueba muchas combinaciones de parámetros y deja la mejor en el formulario.
+     *
+     * Corre en un hilo aparte: el barrido son cientos de entrenamientos y en el
+     * hilo de la interfaz la dejaría congelada. Mientras dura se desactivan los
+     * botones que tocan el mapa, porque la semilla y el BMUStock son globales.
+     */
+    public void buscarHiperparametros(ActionEvent actionEvent) {
+        List<BusquedaHiperparametros.Config> parrilla = BusquedaHiperparametros.parrillaPorDefecto();
+
+        TextA.setText("Searching " + parrilla.size() + " configurations by 5-fold "
+                + "cross-validation…\n");
+        botonesOcupados(true);
+
+        Dataset datos = this.dataset;
+        Task<List<BusquedaHiperparametros.Resultado>> tarea = new Task<>() {
+            @Override
+            protected List<BusquedaHiperparametros.Resultado> call() {
+                int[] hechas = {0};
+                return BusquedaHiperparametros.buscar(datos, parrilla, 5, 1, r -> {
+                    hechas[0]++;
+                    if (hechas[0] % 20 == 0) {
+                        int n = hechas[0];
+                        Platform.runLater(() -> TextA.appendText(
+                                "  " + n + " / " + parrilla.size() + "\n"));
+                    }
+                });
+            }
+        };
+
+        tarea.setOnSucceeded(e -> {
+            botonesOcupados(false);
+            List<BusquedaHiperparametros.Resultado> res = tarea.getValue();
+            aplicar(res.get(0).config());
+
+            TextA.appendText("\nBest of " + res.size() + ":\n");
+            for (int i = 0; i < Math.min(5, res.size()); i++) {
+                BusquedaHiperparametros.Resultado r = res.get(i);
+                TextA.appendText(String.format("  %.1f%% ± %.1f  %s%n",
+                        r.acierto(), r.desviacion(), r.config()));
+            }
+            TextA.appendText("\nForm filled with the best one. Press Start and Train.\n"
+                    + "Note: this score is optimistic — picking the winner out of "
+                    + res.size() + " already used these data.\n");
+        });
+
+        tarea.setOnFailed(e -> {
+            botonesOcupados(false);
+            Throwable t = tarea.getException();
+            showAlert("The search failed: " + (t == null ? "unknown" : t.getMessage()),
+                    Alert.AlertType.ERROR);
+        });
+
+        Thread hilo = new Thread(tarea, "busqueda-hiperparametros");
+        hilo.setDaemon(true);
+        hilo.start();
+    }
+
+    /** Vuelca una configuración en el formulario. */
+    private void aplicar(BusquedaHiperparametros.Config c) {
+        NeuronsTF.setText(String.valueOf(c.neuronas()));
+        EpochsTF.setText(String.valueOf(c.epocas()));
+        RadiusTF.setText(String.valueOf(c.radio()));
+        LearningRateTF.setText(String.valueOf(c.tasaAprendizaje()));
+        TopologyCB.getSelectionModel().select(switch (c.topologia()) {
+            case HEX -> TOPOLOGIA_HEX;
+            case GRID -> TOPOLOGIA_REJILLA;
+            case RING -> TOPOLOGIA_ANILLO;
+        });
+    }
+
+    private void botonesOcupados(boolean ocupado) {
+        tuneButton.setDisable(ocupado);
+        startButton.setDisable(ocupado);
+        trainButton.setDisable(ocupado);
+        mapButton.setDisable(ocupado);
+    }
+
     // ---------- mapa ----------
 
     public void loadMap(ActionEvent actionEvent) throws IOException {
@@ -579,14 +663,7 @@ public class HelloController implements Initializable {
 
     /** Reparte n neuronas en la rejilla más cuadrada posible. */
     static int[] repartirEnRejilla(int n) {
-        int filas = (int) Math.floor(Math.sqrt(n));
-        while (filas > 1 && n % filas != 0) filas--;
-        int columnas = n / filas;
-        if (filas < 2) {              // número primo: se redondea hacia arriba
-            filas = 2;
-            columnas = (int) Math.ceil(n / 2.0);
-        }
-        return new int[]{filas, columnas};
+        return SOM.rejillaPara(n);
     }
 
     // ---------- gráficas ----------

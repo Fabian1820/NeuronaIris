@@ -64,6 +64,9 @@
             <Button fx:id="mapButton" mnemonicParsing="false" onAction="#verMapa2D" prefHeight="34.0" text="2-D MAP">
                <font><Font name="System Bold" size="12.0" /></font>
             </Button>
+            <Button fx:id="tuneButton" mnemonicParsing="false" onAction="#buscarHiperparametros" prefHeight="34.0" text="AUTO-TUNE">
+               <font><Font name="System Bold" size="12.0" /></font>
+            </Button>
          </FlowPane>
       </VBox>
    </top>

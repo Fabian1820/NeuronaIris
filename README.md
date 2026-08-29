@@ -88,14 +88,36 @@ A cambio, la hexagonal representa los datos algo peor y desperdicia más neurona
 
 ![Mapa con rejilla hexagonal](docs/mapa-som-hex.png)
 
+## Barrido de hiperparámetros
+
+El botón **AUTO-TUNE** prueba 162 combinaciones de épocas, neuronas, radio, tasa de aprendizaje y topología, puntúa cada una por validación cruzada de 5 pliegues y deja la mejor en el formulario. Corre en un hilo aparte para no congelar la interfaz.
+
+Los parámetros importan bastante: sobre el Iris, entre la mejor y la peor combinación hay **casi 7 puntos** de acierto.
+
+| | acierto | configuración |
+|---|---|---|
+| Mejor | **98.0 % ± 1.6** | hexagonal, 24 neuronas, 40 épocas, radio 2, lr 0.30 |
+| Peor | 91.3 % | hexagonal, 48 neuronas, 20 épocas, radio 1, lr 0.50 |
+
+**Ese 98.0 % es optimista y conviene no citarlo como resultado del modelo.** Elegir la ganadora entre 162 candidatas ya usó esos datos, así que parte de la ventaja es haber acertado con el ruido. Medido con evaluación anidada —buscar en una parte y evaluar en otra que la búsqueda no vio:
+
+| | |
+|---|---|
+| Lo que promete el barrido | 97.7 % |
+| Lo que rinde en datos no usados | **96.0 %** |
+| Optimismo | **1.7 puntos** |
+
+Por eso la cifra de la sección de resultados sale de validación cruzada con parámetros fijos, no del barrido.
+
 ## Cómo se usa la aplicación
 
 1. **START** crea el mapa con los parámetros del formulario: épocas, neuronas, tasa de aprendizaje, radio y **topología** (anillo 1-D, rejilla rectangular o rejilla hexagonal).
 2. **TRAIN** lo entrena. Se puede reentrenar para seguir afinando.
 3. **2-D MAP** abre la U-matrix, los planos de componentes y las etiquetas del mapa actual. Necesita que la topología sea rejilla.
-4. **Load Dataset** carga cualquier CSV numérico: la pantalla rehace los campos de entrada, los ejes de las gráficas y la leyenda según sus variables y etiquetas. En `docs/ejemplo-3variables.csv` hay uno de prueba con tres variables. Cada gráfica tiene sus propios desplegables **X** e **Y** para elegir qué par de variables muestra.
-5. **Classify** clasifica una muestra introducida a mano; **Load File** clasifica un fichero entero.
-6. **Save Map** / **Load Map** guardan y recuperan el mapa entrenado en `~/.neuronairis/mapa.som`, un fichero de texto con la topología, los parámetros y los pesos de cada neurona.
+4. **AUTO-TUNE** busca los mejores parámetros por validación cruzada y rellena el formulario con ellos.
+5. **Load Dataset** carga cualquier CSV numérico: la pantalla rehace los campos de entrada, los ejes de las gráficas y la leyenda según sus variables y etiquetas. En `docs/ejemplo-3variables.csv` hay uno de prueba con tres variables. Cada gráfica tiene sus propios desplegables **X** e **Y** para elegir qué par de variables muestra.
+6. **Classify** clasifica una muestra introducida a mano; **Load File** clasifica un fichero entero.
+7. **Save Map** / **Load Map** guardan y recuperan el mapa entrenado en `~/.neuronairis/mapa.som`, un fichero de texto con la topología, los parámetros y los pesos de cada neurona.
 
 ## Cómo está hecho
 
@@ -104,6 +126,7 @@ A cambio, la hexagonal representa los datos algo peor y desperdicia más neurona
 - **`SOM`** — el mapa. Tres topologías: anillo 1-D, **rejilla rectangular** (4 vecinas) y **rejilla hexagonal** (6 vecinas, filas impares desplazadas media celda). La vecindad se calcula con un recorrido en anchura sobre el grafo, así que la distancia es el número de saltos y funciona igual en las tres.
 - **`SOMNeuron`** — una neurona; sus pesos viven en el mismo espacio que los datos.
 - **`data.SOMAnalysis`** — U-matrix, planos de componentes, error topográfico, matriz de confusión.
+- **`data.BusquedaHiperparametros`** — parrilla de combinaciones y barrido puntuado por validación cruzada.
 - **`ui.MapaView`** — la ventana del mapa, construida con contenedores y un `Canvas` que se redibuja al redimensionar.
 
 La pantalla principal usa `BorderPane` + `GridPane` + `FlowPane`: las gráficas se reparten el espacio, el panel lateral mantiene su ancho y los controles bajan de línea si la ventana se estrecha. Los campos de entrada, los desplegables de ejes y la leyenda se construyen en tiempo de ejecución a partir del dataset cargado. Lo dibujado se guarda en capas, de modo que cambiar un eje repinta la gráfica sin tener que reentrenar. El panel inferior derecho muestra el carrusel de fotos con el Iris y la distribución de muestras por etiqueta con cualquier otro dataset. El Iris viaja dentro del jar y el estado de la aplicación (mapas guardados) se escribe en `~/.neuronairis/`.
@@ -116,13 +139,14 @@ El grafo sobre el que se apoya el mapa es la librería `cu.edu.cujae.ceis.graph`
 
 - El radio de vecindad puede encogerse con las épocas (`setShrinkRadius`), pero viene **desactivado**: medido sobre 20 semillas mejora siempre el error de cuantización y da resultados mixtos en el topográfico.
 - La normalización min-max existe pero no se aplica por defecto. En Iris no mejora el acierto porque el largo del pétalo —que domina la distancia con un 70 %— es justo la variable discriminante. En otro dataset conviene activarla.
-- La búsqueda de hiperparámetros (épocas, neuronas, radio, tasa) es manual: no hay barrido automático que los ajuste.
+- El barrido recorre la parrilla entera. Con muchas variables o parrillas grandes, una búsqueda aleatoria o bayesiana llegaría antes al mismo sitio.
+- El barrido usa validación cruzada simple; la evaluación anidada, que es la que da la cifra honesta, está en los tests pero no en la interfaz.
 
 ## Autoría
 
 Trabajo de la asignatura de Estructuras de Datos de la **CUJAE** (2024), hecho en equipo por **Ruben Frias**, **Fabián Fernández**, **Clari21** y **MrKettleburn**. La mayor parte del código original —incluido el núcleo del SOM y la interfaz— es de Ruben Frias.
 
-En 2026 Fabián retomó el proyecto para terminarlo, porque la última versión del equipo nunca llegó a subirse. De ese trabajo posterior salen: el desacoplamiento del dataset, la topología en rejilla, las lecturas del mapa, la evaluación con validación cruzada y la batería de 79 tests, además de arreglar varios fallos del código original (las imágenes se cargaban desde rutas absolutas de una máquina concreta, reentrenar corrompía el agrupamiento y la clasificación podía entrar en un ciclo infinito).
+En 2026 Fabián retomó el proyecto para terminarlo, porque la última versión del equipo nunca llegó a subirse. De ese trabajo posterior salen: el desacoplamiento del dataset, la topología en rejilla, las lecturas del mapa, la evaluación con validación cruzada y la batería de 86 tests, además de arreglar varios fallos del código original (las imágenes se cargaban desde rutas absolutas de una máquina concreta, reentrenar corrompía el agrupamiento y la clasificación podía entrar en un ciclo infinito).
 
 ## Dataset
 

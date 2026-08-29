@@ -90,6 +90,24 @@ public class SOM extends LinkedGraph {
       this.cols = cols;
     }
 
+    /**
+     * Reparte n neuronas en la rejilla más cuadrada posible.
+     *
+     * Si n es primo se redondea hacia arriba, porque una rejilla de una sola
+     * fila no sería 2-D.
+     */
+    public static int[] rejillaPara(int n)
+    {
+        int filas = (int) Math.floor(Math.sqrt(n));
+        while (filas > 1 && n % filas != 0) filas--;
+        int columnas = n / filas;
+        if (filas < 2) {
+            filas = 2;
+            columnas = (int) Math.ceil(n / 2.0);
+        }
+        return new int[]{filas, columnas};
+    }
+
     /** ¿El mapa está dispuesto en dos dimensiones? */
     public boolean esRejilla()
     {
