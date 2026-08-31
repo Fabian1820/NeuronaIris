@@ -184,7 +184,15 @@ Por eso la cifra de la sección de resultados sale de validación cruzada con pa
 - **`SOMNeuron`** — una neurona; sus pesos viven en el mismo espacio que los datos.
 - **`data.SOMAnalysis`** — U-matrix, planos de componentes, error topográfico, matriz de confusión.
 - **`data.BusquedaHiperparametros`** — parrilla de combinaciones y muestreo aleatorio de un espacio de rangos, con el barrido puntuado por validación cruzada.
+- **`data.BusquedaBayesiana`** — TPE: modela lo ya probado y propone la siguiente configuración a partir de ello.
 - **`ui.MapaView`** — la ventana del mapa, construida con contenedores y un `Canvas` que se redibuja al redimensionar.
+- **`ui.PanelDispersion`** — las cuatro gráficas, sus selectores de ejes y la leyenda.
+- **`ui.PanelInferior`** — el carrusel del Iris y el reparto de muestras por etiqueta.
+- **`ui.FormularioEntrada`** — los campos para teclear una muestra a mano.
+
+`HelloController` se quedó solo con el cableado: reparte los nodos entre esas tres piezas y coordina el ciclo del mapa (crear, entrenar, clasificar, guardar). Antes lo hacía todo él y pasaba de las 780 líneas.
+
+Estas piezas reciben los nodos del controlador en vez de inyectarlos por FXML. Es a propósito: repartir la pantalla por `fx:include` obligaría a partir también el `.fxml` y a manejar controladores anidados, y no compensa para tres zonas de una sola ventana.
 
 La pantalla principal usa `BorderPane` + `GridPane` + `FlowPane`: las gráficas se reparten el espacio, el panel lateral mantiene su ancho y los controles bajan de línea si la ventana se estrecha. Los campos de entrada, los desplegables de ejes y la leyenda se construyen en tiempo de ejecución a partir del dataset cargado. Lo dibujado se guarda en capas, de modo que cambiar un eje repinta la gráfica sin tener que reentrenar. El panel inferior derecho muestra el carrusel de fotos con el Iris y la distribución de muestras por etiqueta con cualquier otro dataset. El Iris viaja dentro del jar y el estado de la aplicación (mapas guardados) se escribe en `~/.neuronairis/`.
 

@@ -6,44 +6,35 @@ import com.example.edfinal.data.Dataset;
 import com.example.edfinal.data.Sample;
 import com.example.edfinal.utiles.BMUStock;
 import com.example.edfinal.utiles.BMUandFManager;
+import com.example.edfinal.ui.FormularioEntrada;
+import com.example.edfinal.ui.PanelDispersion;
+import com.example.edfinal.ui.PanelInferior;
 import com.example.edfinal.utiles.GestorTxt;
 import cu.edu.cujae.ceis.graph.vertex.Vertex;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.ScatterChart;
-import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.TextAlignment;
 import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -53,11 +44,6 @@ public class HelloController implements Initializable {
     private static final String TOPOLOGIA_ANILLO = "1-D ring";
     private static final String TOPOLOGIA_REJILLA = "2-D grid";
     private static final String TOPOLOGIA_HEX = "2-D hex grid";
-
-    /** Colores con los que se pinta cada etiqueta del dataset, en orden de aparición. */
-    private static final Color[] PALETA = {
-            Color.RED, Color.GREEN, Color.DODGERBLUE, Color.GOLD, Color.MEDIUMORCHID, Color.CORAL
-    };
 
     public SOM map;
     public boolean startPressed;
@@ -90,37 +76,14 @@ public class HelloController implements Initializable {
     /** El dataset con el que trabaja la pantalla. Arranca con el Iris que va en el jar. */
     private Dataset dataset;
 
-    /** Un campo de texto por variable del dataset. */
-    private final List<TextField> camposEntrada = new ArrayList<>();
-
-    /** Qué par de variables dibuja cada gráfica: {x, y}. */
-    private int[][] paresDeEjes;
-
-    private final Map<String, Color> coloresPorEtiqueta = new LinkedHashMap<>();
-
-    /**
-     * Lo que hay dibujado ahora mismo, para poder repintarlo si cambian los ejes.
-     * Sin esto, elegir otra variable dejaría las gráficas en blanco hasta el
-     * siguiente entrenamiento.
-     */
-    private record Capa(List<Sample> muestras, Color color) {}
-    private final List<Capa> capas = new ArrayList<>();
-
-    /** Evita que rellenar los selectores dispare sus propios listeners. */
-    private boolean actualizandoSelectores = false;
-
     /** El carrusel de fotos solo tiene sentido con el Iris. */
     private boolean datasetEsIris = true;
 
-    private int currentImageIndex = 0;
-    // Rutas dentro del classpath: funcionan en cualquier máquina y dentro del jar.
-    private final String[] imagePaths = {
-            "/Imagen/FLORP.jpg",
-            "/Imagen/MORP.jpg",
-            "/Imagen/OIPP.jpg",
-            "/Imagen/RP.jpg",
-            "/Imagen/SPIP.jpg"
-    };
+    // Las tres piezas en las que se reparte la pantalla. El controlador solo las
+    // cablea y las coordina; el dibujo y el estado de cada zona vive en ellas.
+    private PanelDispersion dispersion;
+    private PanelInferior inferior;
+    private FormularioEntrada formulario;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -129,38 +92,15 @@ public class HelloController implements Initializable {
         TopologyCB.getItems().setAll(TOPOLOGIA_ANILLO, TOPOLOGIA_REJILLA, TOPOLOGIA_HEX);
         TopologyCB.getSelectionModel().select(TOPOLOGIA_HEX);
 
-        for (ScatterChart<Number, Number> c : graficas()) c.setLegendVisible(false);
-
-        Timeline imageChangeTimeline = new Timeline(
-                new KeyFrame(Duration.seconds(5), event -> changeImage()));
-        imageChangeTimeline.setCycleCount(Timeline.INDEFINITE);
-        imageChangeTimeline.play();
-
-        // El Canvas no se redimensiona solo dentro de un StackPane.
-        distribucionCanvas.widthProperty().bind(panelInferior.widthProperty());
-        distribucionCanvas.heightProperty().bind(panelInferior.heightProperty());
-        distribucionCanvas.widthProperty().addListener((o, a, b) -> dibujarDistribucion());
-        distribucionCanvas.heightProperty().addListener((o, a, b) -> dibujarDistribucion());
-
-        for (int k = 0; k < 4; k++) {
-            final int indice = k;
-            selectoresX().get(k).setOnAction(e -> cambiarEje(indice));
-            selectoresY().get(k).setOnAction(e -> cambiarEje(indice));
-        }
+        dispersion = new PanelDispersion(
+                List.of(chart0, chart1, chart2, chart3),
+                List.of(xVar0, xVar1, xVar2, xVar3),
+                List.of(yVar0, yVar1, yVar2, yVar3),
+                leyendaPane);
+        inferior = new PanelInferior(ImgAnchor, ImgView, panelInferior, distribucionCanvas);
+        formulario = new FormularioEntrada(entradaGrid);
 
         usarDataset(GestorTxt.getIrisDataset(), "Iris", true);
-    }
-
-    private List<ComboBox<String>> selectoresX() {
-        return List.of(xVar0, xVar1, xVar2, xVar3);
-    }
-
-    private List<ComboBox<String>> selectoresY() {
-        return List.of(yVar0, yVar1, yVar2, yVar3);
-    }
-
-    private List<ScatterChart<Number, Number>> graficas() {
-        return List.of(chart0, chart1, chart2, chart3);
     }
 
     // ---------- dataset ----------
@@ -173,147 +113,32 @@ public class HelloController implements Initializable {
      * núcleo aceptaba cualquier CSV pero la interfaz no.
      */
     private void usarDataset(Dataset d, String nombre, boolean esIris) {
-        this.dataset = d;
-        this.datasetEsIris = esIris;
         this.map = null;
         this.startPressed = false;
         TextA.setText("");
 
-        construirCamposDeEntrada();
-        elegirParesDeEjes();
-        configurarSelectores();
-        asignarColores();
-        construirLeyenda();
-        actualizarPanelInferior();
-
-        datasetLabel.setText("Data Entry  ·  " + nombre + "  ("
-                + d.size() + " samples, " + d.dimension() + " variables)");
-
-        limpiarGraficas();
-        mostrarBase();
-    }
-
-    private void construirCamposDeEntrada() {
-        entradaGrid.getChildren().clear();
-        camposEntrada.clear();
-
-        String[] nombres = dataset.getFeatureNames();
-        double[] min = dataset.getMin(), max = dataset.getMax();
-
-        for (int i = 0; i < nombres.length; i++) {
-            Label etiqueta = new Label(nombres[i]);
-            TextField campo = new TextField();
-            campo.setAlignment(Pos.CENTER);
-            campo.setPrefHeight(34);
-            campo.setPromptText(String.format("%.1f – %.1f", min[i], max[i]));
-            camposEntrada.add(campo);
-
-            // Dos variables por fila
-            int fila = (i / 2) * 2, columna = i % 2;
-            entradaGrid.add(etiqueta, columna, fila);
-            entradaGrid.add(campo, columna, fila + 1);
-        }
+        aplicarDataset(d, nombre, esIris);
+        dispersion.pintar(d.getSamples(), Color.ORANGE);
     }
 
     /**
-     * Cuatro pares de variables para las cuatro gráficas.
+     * Rehace la pantalla para un dataset sin tocar el mapa.
      *
-     * Con menos de cuatro combinaciones posibles se repite la última, para que
-     * siempre haya un par por gráfica sea cual sea la dimensión del dataset.
+     * Separado de {@link #usarDataset} porque "Load Map" trae su propio dataset
+     * dentro del mapa guardado: antes no pasaba por aquí y las gráficas se
+     * quedaban con los ejes del dataset anterior, lo que reventaba si el mapa
+     * cargado tenía menos variables que el que había en pantalla.
      */
-    static int[][] paresDeVariables(int dim) {
-        List<int[]> pares = new ArrayList<>();
-        for (int i = 0; i < dim && pares.size() < 4; i++) {
-            for (int j = i + 1; j < dim && pares.size() < 4; j++) pares.add(new int[]{i, j});
-        }
-        // Con una sola variable no hay pares: se dibuja contra sí misma.
-        while (pares.size() < 4) pares.add(new int[]{0, Math.min(1, dim - 1)});
-        return pares.toArray(new int[0][]);
-    }
+    private void aplicarDataset(Dataset d, String nombre, boolean esIris) {
+        this.dataset = d;
+        this.datasetEsIris = esIris;
 
-    private void elegirParesDeEjes() {
-        paresDeEjes = paresDeVariables(dataset.dimension());
+        formulario.reconstruir(d);
+        dispersion.usarDataset(d);
+        inferior.usarDataset(d, esIris, dispersion.colores());
 
-        String[] nombres = dataset.getFeatureNames();
-        List<ScatterChart<Number, Number>> cs = graficas();
-        for (int k = 0; k < cs.size(); k++) {
-            ((NumberAxis) cs.get(k).getXAxis()).setLabel(nombres[paresDeEjes[k][0]]);
-            ((NumberAxis) cs.get(k).getYAxis()).setLabel(nombres[paresDeEjes[k][1]]);
-        }
-    }
-
-    /** Rellena los ocho desplegables con las variables del dataset. */
-    private void configurarSelectores() {
-        actualizandoSelectores = true;
-        try {
-            String[] nombres = dataset.getFeatureNames();
-            for (int k = 0; k < 4; k++) {
-                ComboBox<String> cx = selectoresX().get(k), cy = selectoresY().get(k);
-                cx.getItems().setAll(nombres);
-                cy.getItems().setAll(nombres);
-                cx.getSelectionModel().select(paresDeEjes[k][0]);
-                cy.getSelectionModel().select(paresDeEjes[k][1]);
-            }
-        } finally {
-            actualizandoSelectores = false;
-        }
-    }
-
-    /** Cambia el par de variables de una gráfica y la vuelve a dibujar. */
-    private void cambiarEje(int k) {
-        if (actualizandoSelectores) return;
-
-        int x = selectoresX().get(k).getSelectionModel().getSelectedIndex();
-        int y = selectoresY().get(k).getSelectionModel().getSelectedIndex();
-        if (x < 0 || y < 0) return;
-
-        paresDeEjes[k] = new int[]{x, y};
-        String[] nombres = dataset.getFeatureNames();
-        ScatterChart<Number, Number> chart = graficas().get(k);
-        ((NumberAxis) chart.getXAxis()).setLabel(nombres[x]);
-        ((NumberAxis) chart.getYAxis()).setLabel(nombres[y]);
-
-        redibujar(k);
-    }
-
-    /** Redibuja una gráfica a partir de las capas que hay guardadas. */
-    private void redibujar(int k) {
-        ScatterChart<Number, Number> chart = graficas().get(k);
-        chart.getData().clear();
-        for (Capa capa : capas) dibujarCapa(chart, k, capa);
-    }
-
-    private void asignarColores() {
-        coloresPorEtiqueta.clear();
-        int i = 0;
-        for (String etiqueta : dataset.labels()) {
-            coloresPorEtiqueta.put(especie(etiqueta), PALETA[i++ % PALETA.length]);
-        }
-    }
-
-    private void construirLeyenda() {
-        leyendaPane.getChildren().clear();
-        leyendaPane.getChildren().add(entradaLeyenda(Color.ORANGE, "Data / random weights"));
-        for (Map.Entry<String, Color> e : coloresPorEtiqueta.entrySet()) {
-            leyendaPane.getChildren().add(entradaLeyenda(e.getValue(), e.getKey()));
-        }
-        leyendaPane.getChildren().add(entradaLeyenda(Color.YELLOW, "BMU of data entry"));
-    }
-
-    private HBox entradaLeyenda(Color color, String texto) {
-        Circle punto = new Circle(8, color);
-        punto.setStroke(Color.BLACK);
-        HBox caja = new HBox(6, punto, new Label(texto));
-        caja.setAlignment(Pos.CENTER_LEFT);
-        return caja;
-    }
-
-    /** "Iris-setosa" -> "setosa" */
-    private String especie(String tipo) {
-        if (tipo == null) return "";
-        String t = tipo.trim().toLowerCase();
-        int guion = t.lastIndexOf('-');
-        return guion >= 0 ? t.substring(guion + 1) : t;
+        datasetLabel.setText("Data Entry  ·  " + nombre + "  ("
+                + d.size() + " samples, " + d.dimension() + " variables)");
     }
 
     /** Carga un CSV cualquiera como dataset de trabajo. */
@@ -335,69 +160,7 @@ public class HelloController implements Initializable {
         }
     }
 
-    /**
-     * Enseña el carrusel de fotos con el Iris, y con cualquier otro dataset la
-     * distribución de muestras por etiqueta, que sí dice algo de los datos.
-     */
-    private void actualizarPanelInferior() {
-        ImgAnchor.setVisible(datasetEsIris);
-        ImgAnchor.setManaged(datasetEsIris);
-        distribucionCanvas.setVisible(!datasetEsIris);
-        dibujarDistribucion();
-    }
 
-    private void dibujarDistribucion() {
-        if (datasetEsIris || dataset == null) return;
-        double ancho = distribucionCanvas.getWidth(), alto = distribucionCanvas.getHeight();
-        if (ancho <= 0 || alto <= 0) return;
-
-        Map<String, Integer> cuenta = contarPorEtiqueta(dataset);
-
-        GraphicsContext g = distribucionCanvas.getGraphicsContext2D();
-        g.clearRect(0, 0, ancho, alto);
-        g.setFill(Color.web("#bbbbbb"));
-        g.setFont(Font.font("System", 12));
-        g.setTextAlign(TextAlignment.LEFT);
-        g.fillText("Samples per label", 6, 14);
-
-        if (cuenta.isEmpty()) {
-            g.fillText("(the dataset has no labels)", 6, 34);
-            return;
-        }
-
-        int maximo = cuenta.values().stream().mapToInt(Integer::intValue).max().orElse(1);
-        double y = 26, altoBarra = Math.min(24, (alto - 34) / cuenta.size() - 6);
-        double anchoMax = ancho - 110;
-
-        for (Map.Entry<String, Integer> e : cuenta.entrySet()) {
-            g.setFill(coloresPorEtiqueta.getOrDefault(e.getKey(), Color.GRAY));
-            g.fillRect(6, y, Math.max(2, anchoMax * e.getValue() / maximo), altoBarra);
-            g.setFill(Color.web("#dddddd"));
-            g.fillText(e.getKey() + "  (" + e.getValue() + ")", 10, y + altoBarra - 4);
-            y += altoBarra + 6;
-        }
-    }
-
-    /** Cuántas muestras aporta cada etiqueta, en orden de aparición. */
-    static Map<String, Integer> contarPorEtiqueta(Dataset d) {
-        Map<String, Integer> cuenta = new LinkedHashMap<>();
-        for (Sample s : d.getSamples()) {
-            if (s.getLabel() == null) continue;
-            String t = s.getLabel().trim().toLowerCase();
-            int guion = t.lastIndexOf('-');
-            cuenta.merge(guion >= 0 ? t.substring(guion + 1) : t, 1, Integer::sum);
-        }
-        return cuenta;
-    }
-
-    private void changeImage() {
-        if (!datasetEsIris) return;
-        var stream = getClass().getResourceAsStream(imagePaths[currentImageIndex]);
-        if (stream != null) {
-            ImgView.setImage(new Image(stream));
-        }
-        currentImageIndex = (currentImageIndex + 1) % imagePaths.length;
-    }
 
     // ---------- clasificación ----------
 
@@ -450,12 +213,8 @@ public class HelloController implements Initializable {
             return;
         }
 
-        double[] valores = new double[camposEntrada.size()];
-        try {
-            for (int i = 0; i < camposEntrada.size(); i++) {
-                valores[i] = Double.parseDouble(camposEntrada.get(i).getText().trim());
-            }
-        } catch (Exception e) {
+        double[] valores = formulario.valores();
+        if (valores == null) {
             showAlert("Fill every variable with a number.", Alert.AlertType.ERROR);
             return;
         }
@@ -480,11 +239,8 @@ public class HelloController implements Initializable {
         }
 
         // La muestra introducida a mano sustituye a la anterior, no se acumula.
-        if (!capas.isEmpty() && capas.get(capas.size() - 1).color() == Color.YELLOW) {
-            capas.remove(capas.size() - 1);
-            for (int k = 0; k < graficas().size(); k++) redibujar(k);
-        }
-        pintar(List.of(entrada), Color.YELLOW);
+        dispersion.quitarUltimaCapaSiEs(Color.YELLOW);
+        dispersion.pintar(List.of(entrada), Color.YELLOW);
     }
 
     // ---------- barrido de hiperparámetros ----------
@@ -590,9 +346,8 @@ public class HelloController implements Initializable {
             showAlert("There is no saved map yet. Train a map and press Save first.", Alert.AlertType.WARNING);
             return;
         }
-        limpiarGraficas();
         this.map = GestorTxt.loadMap();
-        this.dataset = map.getDataset();
+        aplicarDataset(map.getDataset(), "saved map", false);
         GestorTxt.writeHeaderConfig(map);
         map.groupBmus(dataset.getSamples());
         pintarGrupos();
@@ -601,7 +356,7 @@ public class HelloController implements Initializable {
     }
 
     public void start(ActionEvent actionEvent) {
-        limpiarGraficas();
+        dispersion.limpiar();
         TextA.setText("");
         try {
             BMUStock.clear();
@@ -615,7 +370,7 @@ public class HelloController implements Initializable {
                     showAlert("A 2-D map needs at least 4 neurons.", Alert.AlertType.WARNING);
                     return;
                 }
-                int[] rejilla = repartirEnRejilla(neurons);
+                int[] rejilla = SOM.rejillaPara(neurons);
                 map = new SOM(epochs, rejilla[0], rejilla[1], learningRate, radius, dataset,
                         topologiaSeleccionada());
             } else {
@@ -623,7 +378,7 @@ public class HelloController implements Initializable {
             }
             GestorTxt.writeHeaderConfig(map);
             map.initialize();
-            mostrar();
+            mostrarPesos();
             this.startPressed = true;
         } catch (Exception e) {
             showAlert("Fill all the map configuration parameters.", Alert.AlertType.WARNING);
@@ -635,7 +390,7 @@ public class HelloController implements Initializable {
             showAlert("The map has not been created. To do so press Start", Alert.AlertType.WARNING);
             return;
         }
-        limpiarGraficas();
+        dispersion.limpiar();
         // Reentrenar es válido: sigue ajustando el mapa desde los pesos
         // actuales y rehace el agrupamiento desde cero.
         map.train();
@@ -677,80 +432,22 @@ public class HelloController implements Initializable {
                 ? SOM.Topology.HEX : SOM.Topology.GRID;
     }
 
-    /** Reparte n neuronas en la rejilla más cuadrada posible. */
-    static int[] repartirEnRejilla(int n) {
-        return SOM.rejillaPara(n);
-    }
-
     // ---------- gráficas ----------
 
-    private void limpiarGraficas() {
-        capas.clear();
-        for (ScatterChart<Number, Number> c : graficas()) c.getData().clear();
-    }
-
-    /** Dibuja las muestras del dataset. */
-    public void mostrarBase() {
-        pintar(dataset.getSamples(), Color.ORANGE);
-    }
-
     /** Dibuja los pesos actuales de las neuronas. */
-    public void mostrar() {
+    private void mostrarPesos() {
         List<Sample> pesos = new ArrayList<>();
         for (Vertex v : map.getVerticesList()) pesos.add(((SOMNeuron) v).getWeights());
-        pintar(pesos, Color.ORANGE);
+        dispersion.pintar(pesos, Color.ORANGE);
     }
 
     /** Dibuja las BMUs de cada etiqueta con su color. */
     private void pintarGrupos() {
-        for (Map.Entry<String, Color> e : coloresPorEtiqueta.entrySet()) {
+        for (Map.Entry<String, Color> e : dispersion.colores().entrySet()) {
             List<Sample> pesos = new ArrayList<>();
             for (SOMNeuron n : BMUStock.forLabel(e.getKey())) pesos.add(n.getWeights());
-            pintar(pesos, e.getValue());
+            dispersion.pintar(pesos, e.getValue());
         }
-    }
-
-    private void pintar(List<Sample> muestras, Color color) {
-        if (muestras.isEmpty()) return;
-        Capa capa = new Capa(List.copyOf(muestras), color);
-        capas.add(capa);
-        List<ScatterChart<Number, Number>> cs = graficas();
-        for (int k = 0; k < cs.size(); k++) dibujarCapa(cs.get(k), k, capa);
-    }
-
-    private void dibujarCapa(ScatterChart<Number, Number> chart, int k, Capa capa) {
-        List<Sample> muestras = capa.muestras();
-        double[] x = new double[muestras.size()];
-        double[] y = new double[muestras.size()];
-        for (int i = 0; i < muestras.size(); i++) {
-            x[i] = muestras.get(i).get(paresDeEjes[k][0]);
-            y[i] = muestras.get(i).get(paresDeEjes[k][1]);
-        }
-        updateChartDataGroup(chart, x, y, capa.color());
-    }
-
-    private void updateChartData(ScatterChart<Number, Number> chart, double x, double y, Color color) {
-        XYChart.Series<Number, Number> series = new XYChart.Series<>();
-        XYChart.Data<Number, Number> data = new XYChart.Data<>(x, y);
-
-        Circle circle = new Circle(7);
-        circle.setFill(color);
-        data.setNode(circle);
-
-        series.getData().add(data);
-        chart.getData().add(series);
-    }
-
-    private void updateChartDataGroup(ScatterChart<Number, Number> chart, double[] x, double[] y, Color color) {
-        XYChart.Series<Number, Number> series = new XYChart.Series<>();
-        for (int i = 0; i < x.length; i++) {
-            XYChart.Data<Number, Number> data = new XYChart.Data<>(x[i], y[i]);
-            Circle circle = new Circle(5);
-            circle.setFill(color);
-            data.setNode(circle);
-            series.getData().add(data);
-        }
-        chart.getData().add(series);
     }
 
     private void showAlert(String message, Alert.AlertType at) {

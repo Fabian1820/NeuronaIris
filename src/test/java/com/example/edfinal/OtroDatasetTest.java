@@ -1,5 +1,6 @@
 package com.example.edfinal;
 
+import com.example.edfinal.ui.PanelDispersion;
 import com.example.edfinal.data.Dataset;
 import com.example.edfinal.data.Sample;
 import com.example.edfinal.data.SOMAnalysis;
@@ -33,7 +34,7 @@ class OtroDatasetTest {
     @DisplayName("La interfaz sabe repartir las gráficas de un dataset de 3 variables")
     void paresDeEjesParaTresVariables() throws IOException {
         Dataset d = Dataset.fromCsv(RUTA);
-        int[][] pares = HelloController.paresDeVariables(d.dimension());
+        int[][] pares = PanelDispersion.paresDeVariables(d.dimension());
 
         assertEquals(4, pares.length);
         for (int[] p : pares) {
@@ -50,7 +51,7 @@ class OtroDatasetTest {
         RandomFeaturesPicker.setSeed(4);
         BMUStock.clear();
 
-        int[] rejilla = HelloController.repartirEnRejilla(30);
+        int[] rejilla = SOM.rejillaPara(30);
         SOM som = new SOM(40, rejilla[0], rejilla[1], 0.5, 2, d);
         som.initialize();
         som.train();
