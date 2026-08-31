@@ -759,6 +759,13 @@ public class HelloController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.initOwner(ImgAnchor.getScene().getWindow());
+
+        // Un Alert abre escena propia, así que no hereda la hoja de estilos de
+        // la ventana principal: sin esto salen diálogos claros sobre una app
+        // oscura. Se reutiliza el mismo tema en vez de una hoja aparte.
+        alert.getDialogPane().getStylesheets().addAll(
+                ImgAnchor.getScene().getStylesheets());
+
         alert.showAndWait();
     }
 

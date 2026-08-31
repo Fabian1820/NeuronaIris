@@ -1,5 +1,8 @@
 # NeuronaIris
 
+[![tests](https://github.com/Fabian1820/NeuronaIris/actions/workflows/tests.yml/badge.svg)](https://github.com/Fabian1820/NeuronaIris/actions/workflows/tests.yml)
+[![licencia MIT](https://img.shields.io/badge/licencia-MIT-blue.svg)](LICENSE)
+
 Herramienta de **mapas autoorganizados (SOM)** implementada desde cero en Java, con interfaz JavaFX. Viene con el dataset **Iris** cargado, y acepta cualquier CSV numérico.
 
 Un SOM es una red neuronal no supervisada que proyecta datos de muchas variables sobre una rejilla de neuronas, colocando cerca lo que se parece. Con el Iris se entrena sobre las medidas de 150 flores y el mapa acaba separando solo las tres especies, sin que nadie le diga cuáles son.
@@ -205,3 +208,9 @@ En 2026 Fabián retomó el proyecto para terminarlo, porque la última versión 
 ## Dataset
 
 [Iris](https://archive.ics.uci.edu/dataset/53/iris) — R. A. Fisher, 1936. 150 muestras, 4 medidas, 3 especies.
+
+## Licencia
+
+MIT — ver [LICENSE](LICENSE). El copyright es de los cuatro autores del proyecto original.
+
+Aparte queda la copia de `cu.edu.cujae.ceis.graph` incluida en el árbol de fuentes, que es de la CUJAE y cuyos derechos son de sus autores.
