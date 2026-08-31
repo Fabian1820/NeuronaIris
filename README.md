@@ -90,18 +90,61 @@ A cambio, la hexagonal representa los datos algo peor y desperdicia más neurona
 
 ## Barrido de hiperparámetros
 
-El botón **AUTO-TUNE** sortea 40 configuraciones de épocas, neuronas, radio, tasa de aprendizaje y topología, puntúa cada una por validación cruzada de 5 pliegues y deja la mejor en el formulario. Corre en un hilo aparte para no congelar la interfaz.
+El botón **AUTO-TUNE** busca la mejor combinación de épocas, neuronas, radio, tasa de aprendizaje y topología, y la deja en el formulario. Corre en un hilo aparte para no congelar la interfaz.
 
-Hay dos estrategias implementadas, **parrilla completa** (`buscar`) y **búsqueda aleatoria** (`buscarAleatorio`). La interfaz usa la aleatoria, y la razón está medida:
+Hay tres estrategias implementadas:
+
+| | qué hace | dónde |
+|---|---|---|
+| Parrilla completa | recorre las 162 combinaciones de una lista fija | `BusquedaHiperparametros.buscar` |
+| Búsqueda aleatoria | sortea configuraciones de rangos continuos | `BusquedaHiperparametros.buscarAleatorio` |
+| **Búsqueda bayesiana (TPE)** | **cada sorteo aprende de los anteriores** | `BusquedaBayesiana.buscar` |
+
+### Parrilla contra aleatoria
+
+Con una cuarta parte de las evaluaciones la aleatoria llega prácticamente al mismo sitio, y además explora valores que la parrilla no contempla: la tasa de aprendizaje puede salir 0.37 y no solo 0.3 o 0.5.
 
 | presupuesto | mejor acierto *(media de 5 semillas)* | veces que iguala a la parrilla |
 |---|---|---|
 | parrilla completa — 162 evaluaciones | 98.0 % | — |
 | aleatoria — 10 | 97.3 % | 1 de 5 |
 | aleatoria — 20 | 97.6 % | 2 de 5 |
-| **aleatoria — 40** | **97.9 %** | **4 de 5** |
+| aleatoria — 40 | 97.9 % | 4 de 5 |
 
-Con una cuarta parte de las evaluaciones llega prácticamente al mismo sitio. Además la aleatoria explora valores que la parrilla no contempla: la tasa de aprendizaje puede salir 0.37 y no solo 0.3 o 0.5.
+### La bayesiana y por qué al principio no servía de nada
+
+TPE (*Tree-structured Parzen Estimator*, el algoritmo de Hyperopt y Optuna) parte lo ya probado en un montón bueno y otro malo, estima con qué frecuencia aparece cada valor en cada uno —`l(x)` y `g(x)`— y prueba a continuación la configuración que maximiza `l(x)/g(x)`. Frente a un proceso gaussiano no hay que invertir matrices ni ajustar el núcleo, y admite sin violencia una variable categórica como la topología.
+
+Puesto tal cual sobre el Iris, **no le ganaba al azar**: 97.93 % contra 97.87 % con 40 evaluaciones, un empate. Antes de echarle la culpa al problema hay que descartar que el algoritmo esté mal, así que se le pasa una función de óptimo conocido con la misma forma de espacio de búsqueda:
+
+| sobre una función sintética, óptimo 100 | 40 evaluaciones |
+|---|---|
+| aleatoria | 91.0 |
+| **TPE** | **97.4** *(gana en 26 de 30 semillas)* |
+
+El motor converge. El problema era otro, y se ve midiendo el ruido de la métrica:
+
+- La **misma** configuración, evaluada con particiones distintas, se mueve entre **92.0 % y 97.3 %** — desviación de **1.57 puntos**.
+- Toda la parrilla de 162 cabe entre 91.3 % y 98.0 %, y de la mediana al máximo hay **2.67 puntos**.
+- El top-10 de una partición comparte **0 configuraciones** con el top-10 de otra.
+
+Es decir: reevaluar la misma configuración se mueve casi tanto como separa a una configuración mediana de la mejor de las 162. El ranking del que TPE aprende es en buena parte azar de partición, y un modelo ajustado a ruido no puede batir a no ajustar ninguno.
+
+Eso da una predicción comprobable: si se baja el ruido, TPE debería despegarse. Se comprueba **a igualdad de coste** —13 configuraciones con 3 particiones cada una, frente a 40 con una sola— y juzgando lo elegido con 10 particiones que ningún buscador vio:
+
+| buscador *(mismo coste: ~40 pasadas de validación cruzada)* | acierto real de lo elegido |
+|---|---|
+| aleatoria, 40 × 1 partición | 95.72 % |
+| TPE, 40 × 1 partición | 95.53 % |
+| aleatoria, 13 × 3 particiones | 95.77 % |
+| **TPE, 13 × 3 particiones** | **96.01 %** |
+
+Sobre 50 semillas, la diferencia pareada a favor de TPE es de **+0.23 puntos, IC 95 % de +0.07 a +0.39** — gana en 30, pierde en 9 y empata en 11. Por eso **AUTO-TUNE usa TPE con 3 repeticiones**: no porque la búsqueda bayesiana suene mejor, sino porque en este reparto del presupuesto es la única que se separa del azar de forma medible.
+
+Dos avisos que van con esto:
+
+- El número que anuncia la búsqueda es **optimista**. Elegir al ganador de entre varias configuraciones ya gastó los datos: medido sobre el Iris, la elegida rinde **0.93 puntos menos** sobre particiones que la búsqueda nunca vio. La interfaz lo dice.
+- TPE modela cada hiperparámetro por separado, así que no captura que un radio grande solo convenga con muchas neuronas. Las dependencias entre parámetros se le escapan.
 
 Los parámetros importan bastante: sobre el Iris, entre la mejor y la peor combinación hay **casi 7 puntos** de acierto.
 
@@ -150,14 +193,14 @@ El grafo sobre el que se apoya el mapa es la librería `cu.edu.cujae.ceis.graph`
 
 - El radio de vecindad puede encogerse con las épocas (`setShrinkRadius`), pero viene **desactivado**: medido sobre 20 semillas mejora siempre el error de cuantización y da resultados mixtos en el topográfico.
 - La normalización min-max existe pero no se aplica por defecto. En Iris no mejora el acierto porque el largo del pétalo —que domina la distancia con un 70 %— es justo la variable discriminante. En otro dataset conviene activarla.
-- La búsqueda aleatoria sortea a ciegas: no aprende de lo ya probado. Una búsqueda bayesiana concentraría el presupuesto en las zonas prometedoras.
-- El barrido usa validación cruzada simple; la evaluación anidada, que es la que da la cifra honesta, está en los tests pero no en la interfaz.
+- TPE trata los hiperparámetros como independientes. Un TPE multivariante o un proceso gaussiano capturarían las dependencias entre ellos, aunque sobre el Iris el margen que queda es de décimas.
+- El barrido usa validación cruzada repetida; la evaluación anidada, que es la que da la cifra honesta, está en los tests pero no en la interfaz.
 
 ## Autoría
 
 Trabajo de la asignatura de Estructuras de Datos de la **CUJAE** (2024), hecho en equipo por **Ruben Frias**, **Fabián Fernández**, **Clari21** y **MrKettleburn**. La mayor parte del código original —incluido el núcleo del SOM y la interfaz— es de Ruben Frias.
 
-En 2026 Fabián retomó el proyecto para terminarlo, porque la última versión del equipo nunca llegó a subirse. De ese trabajo posterior salen: el desacoplamiento del dataset, la topología en rejilla, las lecturas del mapa, la evaluación con validación cruzada y la batería de 92 tests, además de arreglar varios fallos del código original (las imágenes se cargaban desde rutas absolutas de una máquina concreta, reentrenar corrompía el agrupamiento y la clasificación podía entrar en un ciclo infinito).
+En 2026 Fabián retomó el proyecto para terminarlo, porque la última versión del equipo nunca llegó a subirse. De ese trabajo posterior salen: el desacoplamiento del dataset, la topología en rejilla, las lecturas del mapa, la evaluación con validación cruzada y la batería de 100 tests, además de arreglar varios fallos del código original (las imágenes se cargaban desde rutas absolutas de una máquina concreta, reentrenar corrompía el agrupamiento y la clasificación podía entrar en un ciclo infinito).
 
 ## Dataset
 

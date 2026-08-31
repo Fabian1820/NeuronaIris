@@ -1,5 +1,6 @@
 package com.example.edfinal;
 
+import com.example.edfinal.data.BusquedaBayesiana;
 import com.example.edfinal.data.BusquedaHiperparametros;
 import com.example.edfinal.data.Dataset;
 import com.example.edfinal.data.Sample;
@@ -496,15 +497,24 @@ public class HelloController implements Initializable {
      * botones que tocan el mapa, porque la semilla y el BMUStock son globales.
      */
     public void buscarHiperparametros(ActionEvent actionEvent) {
-        // Búsqueda aleatoria en vez de recorrer la parrilla entera: medido sobre
-        // el Iris, con 40 sorteos (una cuarta parte de las 162 combinaciones)
-        // llega al 97.9% frente al 98.0% de la parrilla, y en 4 de 5 semillas la
-        // iguala o la supera.
-        final int PRESUPUESTO = 40;
+        // Búsqueda bayesiana (TPE), no aleatoria: cada configuración que se prueba
+        // sale de lo aprendido en las anteriores.
+        //
+        // El presupuesto es el mismo de antes —unas 40 pasadas de validación
+        // cruzada— pero repartido distinto: 13 configuraciones evaluadas con 3
+        // particiones cada una, en vez de 40 con una sola. Medido sobre el Iris,
+        // repartirlo así es lo que hace que TPE sirva de algo: con una partición
+        // el ranking es medio ruido —la misma configuración se mueve ±1,6 puntos
+        // según qué partición le toque— y un modelo ajustado a ruido no mejora a
+        // sortear al azar. Con tres, la elegida rinde +0,23 puntos por encima de
+        // la del azar (IC 95% de +0,07 a +0,39, sobre 50 semillas).
+        final int PRESUPUESTO = 13;
+        final int REPETICIONES = 3;
+        final int ARRANQUE = 5;
         BusquedaHiperparametros.Espacio espacio = BusquedaHiperparametros.espacioPorDefecto();
 
-        TextA.setText("Sampling " + PRESUPUESTO + " configurations, scored by 5-fold "
-                + "cross-validation…\n");
+        TextA.setText("Bayesian search (TPE): " + PRESUPUESTO + " configurations, each scored "
+                + "by 5-fold cross-validation repeated " + REPETICIONES + "×…\n");
         botonesOcupados(true);
 
         Dataset datos = this.dataset;
@@ -512,13 +522,13 @@ public class HelloController implements Initializable {
             @Override
             protected List<BusquedaHiperparametros.Resultado> call() {
                 int[] hechas = {0};
-                return BusquedaHiperparametros.buscarAleatorio(datos, espacio, PRESUPUESTO, 5, 1, r -> {
+                return BusquedaBayesiana.buscar(datos, espacio, PRESUPUESTO, ARRANQUE, 5,
+                        REPETICIONES, 1, r -> {
                     hechas[0]++;
-                    if (hechas[0] % 10 == 0) {
-                        int n = hechas[0];
-                        Platform.runLater(() -> TextA.appendText(
-                                "  " + n + " / " + PRESUPUESTO + "\n"));
-                    }
+                    int n = hechas[0];
+                    Platform.runLater(() -> TextA.appendText(
+                            "  " + n + " / " + PRESUPUESTO
+                            + (n <= ARRANQUE ? "  (random start)" : "  (modelled)") + "\n"));
                 });
             }
         };
@@ -536,7 +546,8 @@ public class HelloController implements Initializable {
             }
             TextA.appendText("\nForm filled with the best one. Press Start and Train.\n"
                     + "Note: this score is optimistic — picking the winner out of "
-                    + res.size() + " already used these data.\n");
+                    + res.size() + " already used these data. Measured on Iris, the winner "
+                    + "scores about 0.9 points lower on splits the search never saw.\n");
         });
 
         tarea.setOnFailed(e -> {

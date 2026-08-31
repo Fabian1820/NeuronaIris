@@ -127,6 +127,42 @@ public class BusquedaHiperparametros {
                 mapasConTopografico == 0 ? Double.NaN : sumaTopo / mapasConTopografico);
     }
 
+    /**
+     * Puntúa una combinación repitiendo la validación cruzada con particiones
+     * distintas y promediando.
+     *
+     * Sale caro —cuesta {@code repeticiones} veces más— pero baja el ruido de la
+     * medición, y sobre el Iris ese ruido es del mismo tamaño que el margen que
+     * separa a una configuración mediana de la mejor. Con una sola partición, el
+     * ranking premia a la que le tocó la partición favorable.
+     *
+     * La desviación que se devuelve sigue siendo la de pliegue a pliegue, que es
+     * lo que muestra la interfaz; se promedia entre repeticiones.
+     */
+    public static Resultado evaluarRepetido(Dataset datos, Config c, int pliegues,
+                                            int repeticiones, long semilla,
+                                            List<String> etiquetas) {
+        if (repeticiones < 1) {
+            throw new IllegalArgumentException("Hay que evaluar al menos una vez");
+        }
+        double acierto = 0, desviacion = 0, cuantizacion = 0, topografico = 0;
+        int conTopografico = 0;
+
+        for (int i = 0; i < repeticiones; i++) {
+            Resultado r = evaluar(datos, c, pliegues, semilla + i, etiquetas);
+            acierto += r.acierto();
+            desviacion += r.desviacion();
+            cuantizacion += r.cuantizacion();
+            if (!Double.isNaN(r.topografico())) {
+                topografico += r.topografico();
+                conTopografico++;
+            }
+        }
+        return new Resultado(c, acierto / repeticiones, desviacion / repeticiones,
+                cuantizacion / repeticiones,
+                conTopografico == 0 ? Double.NaN : topografico / conTopografico);
+    }
+
     /** Crea el mapa que describe una configuración. */
     public static SOM construir(Config c, Dataset datos) {
         if (c.topologia() == SOM.Topology.RING) {
