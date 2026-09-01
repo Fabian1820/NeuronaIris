@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Construye una aplicación nativa de NeuronaIris.
+# Construye una aplicación nativa de Panal SOM.
 #
 # Necesita un JDK COMPLETO (con carpeta jmods y con jpackage). El runtime que
 # trae Android Studio no sirve: es una imagen tipo JRE sin jmods, y jlink falla
@@ -32,7 +32,7 @@ if [[ ! -x "$JAVA_HOME/bin/jpackage" ]]; then
 fi
 
 VERSION="1.0.0"
-NOMBRE="NeuronaIris"
+NOMBRE="Panal SOM"
 
 echo "==> Limpiando"
 rm -rf target/app target/app.zip target/instalador
@@ -47,8 +47,8 @@ mkdir -p target/instalador
 # El icono según la plataforma. Los genera scripts/generar-iconos.sh a partir
 # de docs/logo.svg y van versionados, así que empaquetar no necesita rsvg.
 case "$(uname -s)" in
-    Darwin) ICONO=docs/iconos/NeuronaIris.icns ;;
-    MINGW*|MSYS*|CYGWIN*) ICONO=docs/iconos/NeuronaIris.ico ;;
+    Darwin) ICONO=docs/iconos/panal.icns ;;
+    MINGW*|MSYS*|CYGWIN*) ICONO=docs/iconos/panal.ico ;;
     *) ICONO=docs/logo.png ;;
 esac
 OPCION_ICONO=()
@@ -63,7 +63,7 @@ fi
     --name "$NOMBRE" \
     --app-version "$VERSION" \
     --runtime-image target/app \
-    --module com.example.edfinal/com.example.edfinal.HelloApplication \
+    --module panal/panal.HelloApplication \
     --dest target/instalador \
     --vendor "CUJAE" \
     "${OPCION_ICONO[@]}" \

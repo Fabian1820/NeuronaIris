@@ -1,6 +1,6 @@
 package cu.edu.cujae.ceis.graph.interfaces;
 
-import com.example.edfinal.data.Sample;
+import panal.data.Sample;
 
 /**
  * <h1>Interface para grafos dirigidos con vértices ponderados</h1>

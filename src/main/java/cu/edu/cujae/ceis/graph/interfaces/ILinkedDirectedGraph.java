@@ -2,7 +2,7 @@ package cu.edu.cujae.ceis.graph.interfaces;
 
 import java.util.LinkedList;
 
-import com.example.edfinal.data.Sample;
+import panal.data.Sample;
 import cu.edu.cujae.ceis.graph.vertex.Vertex;
 
 /**

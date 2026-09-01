@@ -3,7 +3,7 @@ package cu.edu.cujae.ceis.graph;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import com.example.edfinal.data.Sample;
+import panal.data.Sample;
 import cu.edu.cujae.ceis.graph.edge.Edge;
 import cu.edu.cujae.ceis.graph.edge.WeightedEdge;
 import cu.edu.cujae.ceis.graph.interfaces.ILinkedDirectedGraph;

@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="-280 -280 559 559" width="512" height="512">
-  <title>NeuronaIris</title>
+  <title>Panal SOM</title>
   <!-- Siete neuronas vecinas de un mapa autoorganizado: el color de cada una
        es el peso que aprendió, como en los planos de componentes. -->
   <polygon points="93.00,0.00 46.50,80.54 -46.50,80.54 -93.00,0.00 -46.50,-80.54 46.50,-80.54" fill="#F30099"/>  <!-- centro -->

@@ -1,6 +1,6 @@
 package cu.edu.cujae.ceis.graph.vertex;
 
-import com.example.edfinal.data.Sample;
+import panal.data.Sample;
 
 /**
  * <h1>Vértice con peso</h1>

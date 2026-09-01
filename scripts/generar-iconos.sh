@@ -18,27 +18,27 @@ ICONOS=docs/iconos
 rm -rf "$ICONOS" && mkdir -p "$ICONOS"
 
 echo "==> PNG del icono de ventana"
-rsvg-convert -w 512 -h 512 "$SVG" -o src/main/resources/com/example/edfinal/logo.png
+rsvg-convert -w 512 -h 512 "$SVG" -o src/main/resources/panal/logo.png
 
 echo "==> PNG para el README"
 rsvg-convert -w 160 -h 160 "$SVG" -o docs/logo.png
 
 echo "==> .icns para macOS"
-SET="$ICONOS/NeuronaIris.iconset"
+SET="$ICONOS/panal.iconset"
 mkdir -p "$SET"
 for t in 16 32 128 256 512; do
     rsvg-convert -w $t          -h $t          "$SVG" -o "$SET/icon_${t}x${t}.png"
     rsvg-convert -w $((t*2))    -h $((t*2))    "$SVG" -o "$SET/icon_${t}x${t}@2x.png"
 done
 if command -v iconutil >/dev/null; then
-    iconutil -c icns "$SET" -o "$ICONOS/NeuronaIris.icns"
-    echo "    $ICONOS/NeuronaIris.icns"
+    iconutil -c icns "$SET" -o "$ICONOS/panal.icns"
+    echo "    $ICONOS/panal.icns"
 else
     echo "    (sin iconutil: el .icns solo se genera en macOS)"
 fi
 
 echo "==> .ico para Windows"
-python3 - "$SVG" "$ICONOS/NeuronaIris.ico" <<'PY'
+python3 - "$SVG" "$ICONOS/panal.ico" <<'PY'
 import subprocess, sys, io
 from PIL import Image
 svg, destino = sys.argv[1], sys.argv[2]
@@ -50,7 +50,7 @@ for t in (16, 24, 32, 48, 64, 128, 256):
 capas[0].save(destino, format="ICO", sizes=[(c.width, c.height) for c in capas],
               append_images=capas[1:])
 PY
-echo "    $ICONOS/NeuronaIris.ico"
+echo "    $ICONOS/panal.ico"
 
 rm -rf "$SET"
 echo

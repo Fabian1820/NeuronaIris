@@ -1,11 +1,13 @@
 <img src="docs/logo.png" alt="" width="120" align="right">
 
-# NeuronaIris
+# Panal SOM
 
-[![tests](https://github.com/Fabian1820/NeuronaIris/actions/workflows/tests.yml/badge.svg)](https://github.com/Fabian1820/NeuronaIris/actions/workflows/tests.yml)
+[![tests](https://github.com/Fabian1820/panal-som/actions/workflows/tests.yml/badge.svg)](https://github.com/Fabian1820/panal-som/actions/workflows/tests.yml)
 [![licencia MIT](https://img.shields.io/badge/licencia-MIT-blue.svg)](LICENSE)
 
 Herramienta de **mapas autoorganizados (SOM)** implementada desde cero en Java, con interfaz JavaFX. Viene con el dataset **Iris** cargado, y acepta cualquier CSV numérico.
+
+El nombre viene de la rejilla hexagonal sobre la que se organiza el mapa: un panal de neuronas donde las vecinas aprenden cosas parecidas. Antes se llamaba *NeuronaIris*, de cuando solo sabía del Iris.
 
 Un SOM es una red neuronal no supervisada que proyecta datos de muchas variables sobre una rejilla de neuronas, colocando cerca lo que se parece. Con el Iris se entrena sobre las medidas de 150 flores y el mapa acaba separando solo las tres especies, sin que nadie le diga cuáles son.
 
@@ -62,7 +64,7 @@ Los tests:
 JAVA_HOME=/ruta/al/jdk ./scripts/empaquetar.sh
 ```
 
-Genera `target/instalador/NeuronaIris.app` (~88 MB): una aplicación autocontenida con su propio runtime, que no necesita Java instalado ni el proyecto al lado.
+Genera `target/instalador/Panal SOM.app` (~88 MB): una aplicación autocontenida con su propio runtime, que no necesita Java instalado ni el proyecto al lado.
 
 Hace falta un **JDK completo**, con carpeta `jmods` y con `jpackage`. Los runtime que traen algunos IDE (por ejemplo el de Android Studio) son imágenes tipo JRE sin `jmods`, y `jlink` falla con *"Module java.desktop not found"*; el script lo detecta y lo dice. En macOS con Homebrew:
 
@@ -176,7 +178,7 @@ Por eso la cifra de la sección de resultados sale de validación cruzada con pa
 4. **AUTO-TUNE** busca los mejores parámetros por validación cruzada y rellena el formulario con ellos.
 5. **Load Dataset** carga cualquier CSV numérico: la pantalla rehace los campos de entrada, los ejes de las gráficas y la leyenda según sus variables y etiquetas. En `docs/ejemplo-3variables.csv` hay uno de prueba con tres variables. Cada gráfica tiene sus propios desplegables **X** e **Y** para elegir qué par de variables muestra.
 6. **Classify** clasifica una muestra introducida a mano; **Load File** clasifica un fichero entero.
-7. **Save Map** / **Load Map** guardan y recuperan el mapa entrenado en `~/.neuronairis/mapa.som`, un fichero de texto con la topología, los parámetros y los pesos de cada neurona.
+7. **Save Map** / **Load Map** guardan y recuperan el mapa entrenado en `~/.panal-som/mapa.som`, un fichero de texto con la topología, los parámetros y los pesos de cada neurona.
 
 ## Cómo está hecho
 
@@ -196,9 +198,9 @@ Por eso la cifra de la sección de resultados sale de validación cruzada con pa
 
 Estas piezas reciben los nodos del controlador en vez de inyectarlos por FXML. Es a propósito: repartir la pantalla por `fx:include` obligaría a partir también el `.fxml` y a manejar controladores anidados, y no compensa para tres zonas de una sola ventana.
 
-La pantalla principal usa `BorderPane` + `GridPane` + `FlowPane`: las gráficas se reparten el espacio, el panel lateral mantiene su ancho y los controles bajan de línea si la ventana se estrecha. Los campos de entrada, los desplegables de ejes y la leyenda se construyen en tiempo de ejecución a partir del dataset cargado. Lo dibujado se guarda en capas, de modo que cambiar un eje repinta la gráfica sin tener que reentrenar. El panel inferior derecho muestra el carrusel de fotos con el Iris y la distribución de muestras por etiqueta con cualquier otro dataset. El Iris viaja dentro del jar y el estado de la aplicación (mapas guardados) se escribe en `~/.neuronairis/`.
+La pantalla principal usa `BorderPane` + `GridPane` + `FlowPane`: las gráficas se reparten el espacio, el panel lateral mantiene su ancho y los controles bajan de línea si la ventana se estrecha. Los campos de entrada, los desplegables de ejes y la leyenda se construyen en tiempo de ejecución a partir del dataset cargado. Lo dibujado se guarda en capas, de modo que cambiar un eje repinta la gráfica sin tener que reentrenar. El panel inferior derecho muestra el carrusel de fotos con el Iris y la distribución de muestras por etiqueta con cualquier otro dataset. El Iris viaja dentro del jar y el estado de la aplicación (mapas guardados) se escribe en `~/.panal-som/`.
 
-El logo es siete neuronas vecinas de un mapa hexagonal, cada una del color del peso que aprendió: el mismo racimo y la misma escala que salen en los planos de componentes. La fuente es [`docs/logo.svg`](docs/logo.svg) y de ahí salen todos los tamaños —icono de ventana, `.icns` y `.ico`— con `scripts/generar-iconos.sh`.
+El logo es un trozo de ese panal: siete neuronas vecinas, cada una del color del peso que aprendió: el mismo racimo y la misma escala que salen en los planos de componentes. La fuente es [`docs/logo.svg`](docs/logo.svg) y de ahí salen todos los tamaños —icono de ventana, `.icns` y `.ico`— con `scripts/generar-iconos.sh`.
 
 El grafo sobre el que se apoya el mapa es la librería `cu.edu.cujae.ceis.graph` de la CUJAE, incluida en el árbol de fuentes.
 
