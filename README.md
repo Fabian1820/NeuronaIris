@@ -1,3 +1,5 @@
+<img src="docs/logo.png" alt="" width="120" align="right">
+
 # NeuronaIris
 
 [![tests](https://github.com/Fabian1820/NeuronaIris/actions/workflows/tests.yml/badge.svg)](https://github.com/Fabian1820/NeuronaIris/actions/workflows/tests.yml)
@@ -195,6 +197,8 @@ Por eso la cifra de la sección de resultados sale de validación cruzada con pa
 Estas piezas reciben los nodos del controlador en vez de inyectarlos por FXML. Es a propósito: repartir la pantalla por `fx:include` obligaría a partir también el `.fxml` y a manejar controladores anidados, y no compensa para tres zonas de una sola ventana.
 
 La pantalla principal usa `BorderPane` + `GridPane` + `FlowPane`: las gráficas se reparten el espacio, el panel lateral mantiene su ancho y los controles bajan de línea si la ventana se estrecha. Los campos de entrada, los desplegables de ejes y la leyenda se construyen en tiempo de ejecución a partir del dataset cargado. Lo dibujado se guarda en capas, de modo que cambiar un eje repinta la gráfica sin tener que reentrenar. El panel inferior derecho muestra el carrusel de fotos con el Iris y la distribución de muestras por etiqueta con cualquier otro dataset. El Iris viaja dentro del jar y el estado de la aplicación (mapas guardados) se escribe en `~/.neuronairis/`.
+
+El logo es siete neuronas vecinas de un mapa hexagonal, cada una del color del peso que aprendió: el mismo racimo y la misma escala que salen en los planos de componentes. La fuente es [`docs/logo.svg`](docs/logo.svg) y de ahí salen todos los tamaños —icono de ventana, `.icns` y `.ico`— con `scripts/generar-iconos.sh`.
 
 El grafo sobre el que se apoya el mapa es la librería `cu.edu.cujae.ceis.graph` de la CUJAE, incluida en el árbol de fuentes.
 

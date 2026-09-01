@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-280 -280 559 559" width="512" height="512">
+  <title>NeuronaIris</title>
+  <!-- Siete neuronas vecinas de un mapa autoorganizado: el color de cada una
+       es el peso que aprendió, como en los planos de componentes. -->
+  <polygon points="93.00,0.00 46.50,80.54 -46.50,80.54 -93.00,0.00 -46.50,-80.54 46.50,-80.54" fill="#F30099"/>  <!-- centro -->
+  <polygon points="93.00,-173.21 46.50,-92.66 -46.50,-92.66 -93.00,-173.21 -46.50,-253.75 46.50,-253.75" fill="#7F08FA"/>  <!-- arriba -->
+  <polygon points="243.00,-86.60 196.50,-6.06 103.50,-6.06 57.00,-86.60 103.50,-167.14 196.50,-167.14" fill="#D103CA"/>  <!-- arriba-derecha -->
+  <polygon points="243.00,86.60 196.50,167.14 103.50,167.14 57.00,86.60 103.50,6.06 196.50,6.06" fill="#FD7420"/>  <!-- abajo-derecha -->
+  <polygon points="93.00,173.21 46.50,253.75 -46.50,253.75 -93.00,173.21 -46.50,92.66 46.50,92.66" fill="#FDB101"/>  <!-- abajo -->
+  <polygon points="-57.00,86.60 -103.50,167.14 -196.50,167.14 -243.00,86.60 -196.50,6.06 -103.50,6.06" fill="#6A02E0"/>  <!-- abajo-izquierda -->
+  <polygon points="-57.00,-86.60 -103.50,-6.06 -196.50,-6.06 -243.00,-86.60 -196.50,-167.14 -103.50,-167.14" fill="#0025D1"/>  <!-- arriba-izquierda -->
+</svg>

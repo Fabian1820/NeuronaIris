@@ -30,6 +30,11 @@ class ExportarMapaTest {
     private static final int CELDA = 46;
     private static final int MARGEN = 30;
 
+    /** Hueco del título de la imagen, del de cada panel y del pie con la escala. */
+    private static final int CABECERA = 40;
+    private static final int ALTO_TITULO = 24;
+    private static final int ALTO_LEYENDA = 34;
+
     @Test
     @DisplayName("Exporta U-matrix, planos de componentes y etiquetas a PNG")
     void exportarPng() throws IOException {
@@ -45,11 +50,14 @@ class ExportarMapaTest {
         int columnasPanel = 3;
         int filasPanel = (int) Math.ceil(paneles / (double) columnasPanel);
 
-        int anchoPanel = som.getCols() * CELDA + MARGEN * 2;
-        int altoPanel = som.getRows() * CELDA + MARGEN * 2 + 24;
+        // El panel se mide por lo que ocupa el dibujo, no por filas x CELDA: una
+        // rejilla hexagonal avanza 1.5 s por fila y no una celda entera, así que
+        // reservar de más dejaba una franja vacía al pie de la imagen.
+        int anchoPanel = anchoContenido(som) + MARGEN * 2;
+        int altoPanel = ALTO_TITULO + altoContenido(som) + ALTO_LEYENDA + MARGEN;
 
         BufferedImage img = new BufferedImage(anchoPanel * columnasPanel,
-                altoPanel * filasPanel + 40, BufferedImage.TYPE_INT_RGB);
+                altoPanel * filasPanel + CABECERA, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = img.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setColor(new Color(0x1e1e1e));
@@ -82,7 +90,7 @@ class ExportarMapaTest {
     private int dibujarMatriz(Graphics2D g, double[][] m, String titulo, int panel,
                               int columnasPanel, int anchoPanel, int altoPanel, SOM som) {
         int px = (panel % columnasPanel) * anchoPanel;
-        int py = (panel / columnasPanel) * altoPanel + 40;
+        int py = (panel / columnasPanel) * altoPanel + CABECERA;
 
         g.setColor(new Color(0xbbbbbb));
         g.setFont(new Font("SansSerif", Font.PLAIN, 13));
@@ -93,15 +101,55 @@ class ExportarMapaTest {
 
         for (int i = 0; i < m.length; i++) {
             for (int j = 0; j < m[i].length; j++) {
-                float t = (float) ((m[i][j] - r[0]) / rango);
-                g.setColor(new Color(
-                        (float) Math.pow(t, 0.75),
-                        (float) (Math.pow(t, 1.35) * 0.85),
-                        (float) (Math.pow(1 - t, 1.8) * 0.45 + t * 0.25)));
-                celda(g, px + MARGEN, py + 24, i, j);
+                g.setColor(color((m[i][j] - r[0]) / rango));
+                celda(g, px + MARGEN, py + ALTO_TITULO, i, j);
             }
         }
+
+        barraDeColor(g, px + MARGEN, py + ALTO_TITULO + altoContenido(som) + 12,
+                anchoContenido(som), r[0], r[1]);
         return panel + 1;
+    }
+
+    /**
+     * La escala del panel, con sus extremos numerados.
+     *
+     * Sin esto la imagen enseña la forma del mapa pero no deja leer la magnitud:
+     * se ve dónde hay frontera, no cuánta.
+     */
+    private void barraDeColor(Graphics2D g, int x, int y, int ancho, double min, double max) {
+        int alto = 9;
+        for (int i = 0; i < ancho; i++) {
+            g.setColor(color(i / (double) (ancho - 1)));
+            g.fillRect(x + i, y, 1, alto);
+        }
+        g.setColor(new Color(0x888888));
+        g.setFont(new Font("SansSerif", Font.PLAIN, 10));
+        String izq = String.format("%.2f", min), der = String.format("%.2f", max);
+        g.drawString(izq, x, y + alto + 12);
+        g.drawString(der, x + ancho - g.getFontMetrics().stringWidth(der), y + alto + 12);
+    }
+
+    /** La misma escala para las celdas y para la barra: si difieren, la leyenda miente. */
+    private static Color color(double t) {
+        float u = (float) Math.max(0, Math.min(1, t));
+        return new Color((float) Math.pow(u, 0.75),
+                (float) (Math.pow(u, 1.35) * 0.85),
+                (float) (Math.pow(1 - u, 1.8) * 0.45 + u * 0.25));
+    }
+
+    /** Lo que ocupa de ancho la rejilla dibujada. */
+    private static int anchoContenido(SOM som) {
+        if (TOPOLOGIA != SOM.Topology.HEX) return som.getCols() * CELDA;
+        double s = CELDA / 1.8;
+        return (int) Math.ceil(Math.sqrt(3) * s * (som.getCols() + 0.5));
+    }
+
+    /** Y de alto: una rejilla hexagonal avanza 1.5 s por fila, no una celda. */
+    private static int altoContenido(SOM som) {
+        if (TOPOLOGIA != SOM.Topology.HEX) return som.getRows() * CELDA;
+        double s = CELDA / 1.8;
+        return (int) Math.ceil(s * (1.5 * (som.getRows() - 1) + 2));
     }
 
     /** Cuadrado o hexágono según la topología del mapa. */
@@ -127,7 +175,7 @@ class ExportarMapaTest {
     private int dibujarEtiquetas(Graphics2D g, SOM som, int panel, int columnasPanel,
                                  int anchoPanel, int altoPanel) {
         int px = (panel % columnasPanel) * anchoPanel;
-        int py = (panel / columnasPanel) * altoPanel + 40;
+        int py = (panel / columnasPanel) * altoPanel + CABECERA;
 
         g.setColor(new Color(0xbbbbbb));
         g.setFont(new Font("SansSerif", Font.PLAIN, 13));
@@ -146,12 +194,12 @@ class ExportarMapaTest {
                     c = colores.get(e);
                 }
                 g.setColor(c);
-                celda(g, px + MARGEN, py + 24, i, j);
+                celda(g, px + MARGEN, py + ALTO_TITULO, i, j);
             }
         }
 
         g.setFont(new Font("SansSerif", Font.PLAIN, 11));
-        int y = py + 24 + etiquetas.length * CELDA + 14;
+        int y = py + ALTO_TITULO + altoContenido(som) + 21;
         int x = px + MARGEN;
         for (var e : colores.entrySet()) {
             g.setColor(e.getValue());

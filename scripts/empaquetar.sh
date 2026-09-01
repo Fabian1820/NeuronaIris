@@ -43,6 +43,21 @@ echo "==> Imagen de runtime con jlink"
 
 echo "==> Aplicación nativa con jpackage"
 mkdir -p target/instalador
+
+# El icono según la plataforma. Los genera scripts/generar-iconos.sh a partir
+# de docs/logo.svg y van versionados, así que empaquetar no necesita rsvg.
+case "$(uname -s)" in
+    Darwin) ICONO=docs/iconos/NeuronaIris.icns ;;
+    MINGW*|MSYS*|CYGWIN*) ICONO=docs/iconos/NeuronaIris.ico ;;
+    *) ICONO=docs/logo.png ;;
+esac
+OPCION_ICONO=()
+if [[ -f "$ICONO" ]]; then
+    OPCION_ICONO=(--icon "$ICONO")
+else
+    echo "    aviso: no encuentro $ICONO, se empaqueta sin icono" >&2
+fi
+
 "$JAVA_HOME/bin/jpackage" \
     --type app-image \
     --name "$NOMBRE" \
@@ -51,7 +66,8 @@ mkdir -p target/instalador
     --module com.example.edfinal/com.example.edfinal.HelloApplication \
     --dest target/instalador \
     --vendor "CUJAE" \
-    --description "Clasificador del dataset Iris con un mapa autoorganizado"
+    "${OPCION_ICONO[@]}" \
+    --description "Mapas autoorganizados (SOM) sobre cualquier dataset numérico"
 
 echo
 echo "Listo: target/instalador/$NOMBRE"

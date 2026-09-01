@@ -9,6 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -36,7 +37,12 @@ public class HelloApplication extends Application {
         double ancho = Math.min(1545, pantalla.getWidth());
         double alto = Math.min(881, pantalla.getHeight());
 
-        stage.setTitle("Iris Classifier");
+        stage.setTitle("NeuronaIris");
+
+        // El icono va en los recursos del módulo, así que viaja dentro del jar.
+        var icono = HelloApplication.class.getResourceAsStream("logo.png");
+        if (icono != null) stage.getIcons().add(new Image(icono));
+
         stage.setScene(new Scene(raiz, ancho, alto));
         stage.setMinWidth(900);
         stage.setMinHeight(560);
